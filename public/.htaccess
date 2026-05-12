@@ -1,0 +1,17 @@
+# Disable directory listing (hides the "Index of /" page)
+Options -Indexes
+
+# Make sure index.html is loaded by default
+DirectoryIndex index.html
+
+# Enable rewrite engine for nice URLs
+RewriteEngine On
+
+# If the file hasn't been found, try adding .html (e.g. /about -> /about.html)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# Custom 404 page
+ErrorDocument 404 /404.html

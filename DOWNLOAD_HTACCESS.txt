@@ -1,0 +1,13 @@
+RewriteEngine On
+RewriteBase /
+
+# 1. Force Trailing Slash (Since NextJS exported folder/index.html)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !(.*)/$
+RewriteRule ^(.*)$ /$1/ [L,R=301]
+
+# 2. If the folder exists, serve the index.html inside it
+DirectoryIndex index.html
+
+# 3. Handle 404s (File/Folder not found) by showing the 404.html page
+ErrorDocument 404 /404.html
