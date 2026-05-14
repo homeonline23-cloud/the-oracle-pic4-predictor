@@ -57,17 +57,17 @@ export default function Navbar() {
   const navBtnShell =
     'rounded-none transition-all duration-200 font-bold tracking-wide border leading-tight shrink-0';
 
-  /** Same inactive “window” chrome as primary nav pills — keeps Log in / Join visually balanced. */
-  const authClusterInactiveShell =
-    'border-blue-600/55 bg-[linear-gradient(180deg,rgb(24,32,48)_0%,rgb(15,23,42)_45%,rgb(10,15,28)_100%)] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_3px_12px_rgba(0,0,0,0.5)] transition-all hover:border-blue-400/70 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_22px_rgba(59,130,246,0.28)] active:scale-[0.97]';
+  /** Matte inner tray: subtle neutral rim only — primary pills keep their own blue “window” chrome. */
+  const navInnerMatteShell =
+    'border border-white/16 bg-[linear-gradient(180deg,rgb(16,20,30)_0%,rgb(10,13,20)_48%,rgb(6,8,14)_100%)] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_6px_22px_rgba(0,0,0,0.55)] transition-all hover:border-white/26 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_8px_28px_rgba(0,0,0,0.5)] active:scale-[0.99]';
 
-  /** One shared “black window” behind primary pills + account (desktop). */
-  const navDesktopInnerPanelClass = `${navBtnShell} relative z-0 inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-2 px-2 py-1.5 sm:gap-x-2.5 sm:gap-y-2 sm:px-2.5 sm:py-2 ${authClusterInactiveShell}`;
+  /** One shared inner panel behind pills + account (desktop) — no second blue halo (outer band already glows). */
+  const navDesktopInnerPanelClass = `${navBtnShell} relative z-0 inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-2 px-2 py-1.5 sm:gap-x-2.5 sm:gap-y-2 sm:px-2.5 sm:py-2 ${navInnerMatteShell}`;
 
   const authDesktopLinkClass =
-    'inline-flex min-h-[36px] shrink-0 items-center justify-center whitespace-nowrap px-2.5 text-[10px] font-bold tracking-wide text-slate-100 transition-colors hover:bg-white/[0.07] hover:text-white sm:px-3 sm:text-xs';
+    'inline-flex min-h-[36px] shrink-0 items-center justify-center whitespace-nowrap px-2.5 text-[10px] font-medium tracking-wide text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white sm:px-3 sm:text-xs';
 
-  const authMobileClusterClass = `${navBtnShell} flex flex-col overflow-hidden ${authClusterInactiveShell}`;
+  const authMobileClusterClass = `${navBtnShell} flex flex-col overflow-hidden ${navInnerMatteShell}`;
 
   const authMobileSignInClass =
     'flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-bold tracking-wide text-slate-200 hover:text-white rounded-none border-0 border-b border-white/12 bg-transparent hover:bg-white/[0.05] transition-colors';
@@ -172,7 +172,7 @@ export default function Navbar() {
                       handleSignOut();
                       scrollToTop();
                     }}
-                    className="inline-flex min-h-[36px] shrink-0 items-center whitespace-nowrap px-1 text-[10px] font-bold tracking-wide text-slate-300 transition-colors hover:bg-white/[0.07] hover:text-white sm:text-xs"
+                    className="inline-flex min-h-[36px] shrink-0 items-center whitespace-nowrap px-1 text-[10px] font-medium tracking-wide text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white sm:text-xs"
                   >
                     Sign out
                   </button>
