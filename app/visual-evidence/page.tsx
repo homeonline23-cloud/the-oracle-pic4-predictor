@@ -10,6 +10,9 @@ import EditableImage from '@/components/EditableImage';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
 import PlayResponsiblyBanner from '@/components/PlayResponsiblyBanner';
+import SiteDisclaimer from '@/components/SiteDisclaimer';
+import { WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 /** Grid 24 sits in main grid immediately right of Grid 23; remaining files go below. */
 const GRID_AFTER_23 = { src: '/grid 24.png', alt: 'Grid 24', id: 'evidence_grid_24' } as const;
@@ -64,7 +67,7 @@ function EvidenceGridCard({
         >
           Verified Hit
         </div>
-        {userRole !== 'admin' && (
+        {userRole !== 'admin' && process.env.NODE_ENV !== 'development' && (
           <div className="absolute inset-0 bg-black/20 md:bg-black/60 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center z-10 pointer-events-none">
             <div
               className={`flex items-center gap-2 px-6 py-2.5 ${color.bg} text-white rounded-none hover:opacity-90 transition-all font-bold text-[11px] tracking-normal shadow-xl`}
@@ -113,7 +116,12 @@ export default function EvidencePage() {
           <div className="absolute -inset-4 md:-inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[60px] md:blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
           
           {/* Red Outer Border - Standard Size Window */}
-          <div className="relative min-h-0 border border-red-600/60 md:border-2 p-1 md:p-2 rounded-none bg-slate-900/20 shadow-2xl backdrop-blur-sm">
+          <div
+            className={cn(
+              'relative min-h-0 rounded-none bg-slate-900/20 p-1 backdrop-blur-sm md:p-2',
+              WINDOW_OUTER_SHELL_RESPONSIVE
+            )}
+          >
             
             {/* Content Box with Scroll */}
             <div className="relative min-h-0 overflow-y-auto rounded-none bg-slate-950/40 p-4 pb-6 backdrop-blur-xl custom-scrollbar md:p-8 md:pb-8">
@@ -204,6 +212,8 @@ export default function EvidencePage() {
               {/* Under grid archive — play responsibly (replaces prior “mainnet / encryption” strip). */}
               <PlayResponsiblyBanner />
 
+              <SiteDisclaimer className="mt-6 px-1" />
+
             </div>
           </div>
         </div>
@@ -223,7 +233,7 @@ export default function EvidencePage() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative w-full max-w-2xl aspect-square md:aspect-video bg-slate-900 rounded-none overflow-hidden border-[4px] border-red-600/80 shadow-2xl"
+              className="relative w-full max-w-2xl aspect-square md:aspect-video bg-slate-900 rounded-none overflow-hidden border-[4px] border-blue-600/[0.82] shadow-[0_0_40px_rgba(37,99,235,0.45),0_12px_40px_rgba(0,0,0,0.65)]"
               onClick={(e) => e.stopPropagation()}
             >
               <Image 

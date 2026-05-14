@@ -1,49 +1,27 @@
 /**
- * Date-based subtraction pairs for the grids. Internal base math is unchanged
- * (matches prior page-local implementations).
+ * Oracle anchor pairs — two circles above "Enter 4 Digits" + same digits get
+ * red/blue rings inside every grid cell.
  *
- * UI / grid anchors:
- * - Red circle: the former "blue" pair (top2 → bottom2, mirror preserved by formula).
- * - Blue circle: same pair + 1 mod 10 on both digits ("next step").
+ * COLOR RULE (do not swap):
+ *   • LEFT circle  = RED border/text   = digits **8** (top) and **3** (bottom).
+ *   • RIGHT circle = BLUE border/text  = digits **9** (top) and **4** (bottom).
+ *
+ * These digits are fixed; changing the page calendar does not move them.
  */
 
-const SUBTRACT_ANCHOR_DATE = new Date(2026, 3, 3); // April 3, 2026
-
-export function getDynamicNumbers(date: Date) {
-  const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const diffTime = targetDate.getTime() - SUBTRACT_ANCHOR_DATE.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-  let t1 = (6 + diffDays) % 10;
-  let t2 = (7 + diffDays) % 10;
-  if (t1 < 0) t1 += 10;
-  if (t2 < 0) t2 += 10;
-
-  const b1 = (t1 + 5) % 10;
-  const b2 = (t2 + 5) % 10;
-
-  if (t2 === 0 && b2 === 5) {
-    return { top1: 0, bottom1: 5, top2: 1, bottom2: 6 };
-  }
-
-  return { top1: t1, bottom1: b1, top2: t2, bottom2: b2 };
-}
-
-/** Values shown in red/blue circles and passed to grids + AI as anchor numbers. */
-export function getSubtractCircleAnchors(date: Date) {
-  const { top2, bottom2 } = getDynamicNumbers(date);
-  return {
-    anchorRedTop: top2,
-    anchorRedBottom: bottom2,
-    anchorBlueTop: (top2 + 1) % 10,
-    anchorBlueBottom: (bottom2 + 1) % 10,
-  };
-}
-
-/** Placeholder digits before mount (matches anchor date April 3, 2026). */
-export const SUBTRACT_CIRCLE_MOUNT_FALLBACK = {
-  anchorRedTop: 7,
-  anchorRedBottom: 2,
-  anchorBlueTop: 8,
-  anchorBlueBottom: 3,
+export const SUBTRACT_CIRCLE_ANCHORS = {
+  anchorRedTop: 8,
+  anchorRedBottom: 3,
+  anchorBlueTop: 9,
+  anchorBlueBottom: 4,
 } as const;
+
+export type SubtractCircleAnchors = typeof SUBTRACT_CIRCLE_ANCHORS;
+
+/** Date argument is ignored so anchors never shift grid positions. */
+export function getSubtractCircleAnchors(_date?: Date): SubtractCircleAnchors {
+  return { ...SUBTRACT_CIRCLE_ANCHORS };
+}
+
+/** Placeholder digits before mount (same as live anchors). */
+export const SUBTRACT_CIRCLE_MOUNT_FALLBACK = SUBTRACT_CIRCLE_ANCHORS;

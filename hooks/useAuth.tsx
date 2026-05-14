@@ -126,31 +126,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
         if (initialSession?.user) {
-          void fetchProfile(initialSession.user.id);
+          await fetchProfile(initialSession.user.id);
         }
-        setLoading(false);
+        if (!cancelled) setLoading(false);
 
         const {
           data: { subscription: sub },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
+        } = supabase.auth.onAuthStateChange(async (_event, session) => {
           if (cancelled) return;
 
           if (
             localStorage.getItem(MOCK_OWNER_SESSION_KEY) === 'true' &&
             !session?.user
           ) {
-            setLoading(false);
+            if (!cancelled) setLoading(false);
             return;
           }
 
           setSession(session);
           setUser(session?.user ?? null);
           if (session?.user) {
-            void fetchProfile(session.user.id);
+            await fetchProfile(session.user.id);
           } else {
             setProfile(null);
           }
-          setLoading(false);
+          if (!cancelled) setLoading(false);
         });
         subscription = sub;
       } catch (err) {

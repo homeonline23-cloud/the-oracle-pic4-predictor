@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Sparkles, Loader2, AlertCircle, Trash2, CheckCircle2, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { createClient } from '@/lib/supabase/client';
+import { WINDOW_OUTER_SHELL } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 interface AIPredictorProps {
   gridData: {
@@ -364,7 +366,12 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
             className="relative"
           >
             {/* Blackboard / Notebook Window */}
-            <div className="bg-black border-2 border-red-600/80 rounded-none shadow-2xl p-6 relative overflow-hidden min-h-[300px]">
+            <div
+              className={cn(
+                'relative min-h-[300px] overflow-hidden rounded-none bg-black p-6',
+                WINDOW_OUTER_SHELL
+              )}
+            >
               {/* Subtle Texture Overlay */}
               <div className="absolute inset-0 opacity-10 pointer-events-none bg-texture-blackboard"></div>
               

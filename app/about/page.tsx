@@ -4,8 +4,14 @@ import Image from 'next/image';
 import { Target, Cpu, Database, ShieldCheck, Globe } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import PageHeader from '@/components/PageHeader';
+import SiteDisclaimer from '@/components/SiteDisclaimer';
 import GridButtons from '@/components/GridButtons';
-import { PUBLIC_THE_SYSTEM_ROBOT_IMAGE, PUBLIC_THE_ORACLE_1_IMAGE } from '@/lib/constants';
+import {
+  PUBLIC_THE_SYSTEM_ROBOT_IMAGE,
+  PUBLIC_THE_ORACLE_1_IMAGE,
+  WINDOW_OUTER_SHELL,
+} from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 /** Full-width blue–white–red divider between major “windows” (balanced vertical padding). */
 function SectionStripe() {
@@ -31,8 +37,8 @@ export default function AboutPage() {
       icon: <Target className="h-6 w-6 text-red-500" />,
     },
     {
-      title: 'State-Scoped',
-      desc: 'Specific logic for New York, Florida, Texas, Georgia, and other major lotteries.',
+      title: 'State Scoped',
+      desc: 'Region-specific logic for major lottery formats and draw systems.',
       icon: <Globe className="h-6 w-6 text-emerald-500" />,
     },
     {
@@ -58,7 +64,12 @@ export default function AboutPage() {
             <div className="absolute -inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
             
             {/* Red Border Layer / Outer Window */}
-            <div className="relative border-2 border-red-600/80 p-2 rounded-none shadow-2xl overflow-hidden bg-slate-900/20 backdrop-blur-sm">
+            <div
+              className={cn(
+                'relative overflow-hidden rounded-none bg-slate-900/20 p-2 backdrop-blur-sm',
+                WINDOW_OUTER_SHELL
+              )}
+            >
               
               {/* Content Box — single symmetric gutter so every inner panel lines up */}
               <div className="relative bg-slate-950/40 px-5 py-8 backdrop-blur-xl md:px-8 rounded-none">
@@ -87,17 +98,16 @@ export default function AboutPage() {
                   {/* Core Analytics Engine — blue window (below robot image) */}
                   <div className="relative overflow-hidden rounded-none border border-blue-500/20 bg-[#00004d]/50 p-6 backdrop-blur-sm md:p-8">
                     <div className="absolute top-0 right-0 h-64 w-64 rounded-none bg-blue-600/10 blur-[100px]"></div>
-                    <div className="relative z-10">
-                      <h3 className="mb-4 inline-block text-lg font-bold tracking-normal text-white">
+                    <div className="relative z-10 text-center">
+                      <h3 className="mb-4 text-lg font-bold tracking-normal text-white">
                         Core Analytics Engine
                       </h3>
-                      <div className="space-y-4 text-xs font-medium leading-relaxed text-slate-300 md:text-sm">
-                        <p>
-                          The Oracle <span className="text-red-600 font-bold">Pic 4</span> Predictor takes the guesswork out of the <span className="text-red-600 font-bold">Pic 4</span> Grids system! 
-                          This AI-powered platform is your smart companion for analyzing number patterns and helping you spot high-probability combinations. Instead of relying purely on luck, the system combines <strong className="text-white font-bold">structured grids</strong> with <strong className="text-white font-bold">AI-powered analysis</strong> to help you visualize patterns and trends that may appear in upcoming draws.
+                      <div className="space-y-4 text-center text-xs font-medium leading-relaxed text-slate-300 md:text-sm">
+                        <p className="text-balance">
+                          The Oracle <span className="font-bold text-red-600">Pic 4</span> Predictor is designed to help users review <span className="font-bold text-red-600">Pic 4</span> grid data in a structured and visual way. The platform combines grid organization with pattern analysis to make historical number data easier to compare and understand. Instead of focusing on luck or assumptions, it presents information in a format that may help users notice recurring trends and relationships in past draw results.
                         </p>
-                        <p>
-                          Most people see <span className="text-red-600 font-bold">Pic 4</span> as chance—random, unpredictable. But here, in these Grids, something different happens. As soon as the winning numbers are placed, distinct patterns reveal themselves across all of the grids. All numbers inside those Grids are the playing winning numbers, just waiting to be recognized by you. It’s like the universe whispering its secrets: The winning numbers are hiding somewhere between these patterns and helping you spot high-probability combinations.
+                        <p className="text-balance">
+                          Many people view <span className="font-bold text-red-600">Pic 4</span> as highly random, but this system is built to support clearer review of the data behind each draw. Once historical results are entered, the grids can highlight repeated structures, visual connections, and number relationships across the dataset. The goal is not to promise outcomes, but to make analysis more organized, readable, and consistent.
                         </p>
                       </div>
                     </div>
@@ -159,17 +169,48 @@ export default function AboutPage() {
 
                   <SectionStripe />
 
+                  {/* How it Works — same 01 / 02 copy as Process page */}
+                  <div className="relative overflow-hidden rounded-none border border-blue-500/20 bg-[#00004d]/50 p-6 backdrop-blur-sm md:p-8">
+                    <div className="absolute top-0 right-0 h-64 w-64 rounded-none bg-blue-600/10 blur-[100px]" />
+                    <div className="relative z-10 mx-auto max-w-2xl space-y-8 text-center">
+                      <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">How it Works</h2>
+                      <div className="space-y-3">
+                        <h3 className="text-lg font-semibold tracking-normal text-white md:text-xl">
+                          <span className="font-bold text-blue-500 tabular-nums">01.</span>{' '}
+                          <span>
+                            The Oracle <span className="font-bold text-red-600">Pic 4</span> system organizes your numbers
+                          </span>
+                        </h3>
+                        <p className="text-xs font-medium leading-relaxed text-slate-300 md:text-sm text-balance">
+                          The Oracle <span className="font-bold text-red-600">Pic 4</span> system records the numbers you enter and uses them to build a clear historical view. This makes it easier to review past results and observe possible patterns.
+                        </p>
+                      </div>
+                      <div className="mx-auto h-px w-full max-w-md bg-white/10" aria-hidden />
+                      <div className="space-y-3">
+                        <h3 className="text-lg font-semibold tracking-normal text-white md:text-xl">
+                          <span className="font-bold text-blue-500 tabular-nums">02.</span> Choose your display settings
+                        </h3>
+                        <p className="text-xs font-medium leading-relaxed text-slate-300 md:text-sm text-balance">
+                          Select the options that match your preferred format, and the system will adjust the display to show the information in a way that is easier to compare and understand.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <SectionStripe />
+
                   {/* Geo Definition — aligned padding/stripe family with Core Analytics */}
                   <div className="relative overflow-hidden rounded-none border border-blue-500/20 bg-[#00004d]/50 p-6 backdrop-blur-sm md:p-8">
                     <div className="absolute inset-0 bg-blue-600/5"></div>
-                    <div className="relative z-10">
-                      <div className="mb-4 flex items-center gap-2 justify-center md:justify-start">
+                    <div className="relative z-10 text-center">
+                      <div className="mb-4 flex items-center justify-center gap-2">
                         <ShieldCheck className="h-5 w-5 text-blue-500" />
                         <h2 className="text-lg font-bold tracking-normal text-white">Geo Definition</h2>
                       </div>
-                      <p className="text-xs font-medium leading-relaxed text-slate-300 md:text-sm text-center md:text-left">
-                        &quot;The Oracle <span className="text-red-600 font-bold">Pic 4</span> is an AI-powered Pick 4 lottery prediction system that uses a 32-grid pattern engine and historical draw data to identify high-probability number combinations across all US Daily 4 games.&quot;
+                      <p className="text-xs font-medium leading-relaxed text-slate-300 md:text-sm text-balance max-w-2xl mx-auto">
+                        The Oracle <span className="font-bold text-red-600">Pic 4</span> is an AI-powered number analysis system that uses a 32-grid pattern engine and historical draw data to help identify recurring number combinations across supported draw formats.
                       </p>
+                      <SiteDisclaimer className="mt-8" />
                     </div>
                   </div>
                 </div>

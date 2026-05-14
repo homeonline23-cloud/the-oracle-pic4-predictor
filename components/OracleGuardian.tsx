@@ -2,13 +2,49 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquare, X, Send, User, Bot, Sparkles, GraduationCap, Loader2 } from 'lucide-react';
+import { MessageSquare, X, Send, User, Bot, Sparkles, GraduationCap, Loader2, Mic } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { ADMIN_EMAIL } from '@/lib/constants';
+import { SUBTRACT_CIRCLE_ANCHORS } from '@/lib/subtractCircles';
+
+/** Minimal Web Speech API surface (DOM lib typings vary by TS version). */
+type WebSpeechRecognitionInstance = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  maxAlternatives: number;
+  start(): void;
+  stop(): void;
+  onresult: ((event: WebSpeechRecognitionResultEvent) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+};
+
+type WebSpeechRecognitionResultEvent = {
+  results: ArrayLike<{ 0: { transcript: string } }>;
+};
 
 interface Message {
   role: 'user' | 'model';
   parts: { text: string }[];
+}
+
+/** Always prepended in chat when the user identifies as The Oracle (before the model reply). */
+const ORACLE_SCRIPTED_RECOGNITION =
+  'Master of the Grids — The Oracle, recognized.\n\n' +
+  'I am now linked to the grids on this page. RED anchor digits are 8 and 3 (red rings on those numbers in every cell). BLUE anchor digits are 9 and 4 (blue rings). ' +
+  'The left circle above Enter 4 Digits shows RED; the right shows BLUE. Your marking-tool colors layer on top when you tap cells.\n\n' +
+  'Probaly we walk step by step from here — what is your next Pic4 question, Oracle?';
+
+function buildGridConnectionBlock(pathname: string): string {
+  const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } = SUBTRACT_CIRCLE_ANCHORS;
+  const onBasic = pathname.startsWith('/basic');
+  const onPremium = pathname.startsWith('/premium');
+  const onYearly = pathname.startsWith('/yearly');
+  if (!onBasic && !onPremium && !onYearly) {
+    return `\n\nPAGE / GRID CONTEXT: Current path is "${pathname}". User is not on Basic, Premium, or Yearly grid screens — explain Oracle Pic4 grids in general if asked. Universal anchors remain RED digits ${anchorRedTop}, ${anchorRedBottom} and BLUE digits ${anchorBlueTop}, ${anchorBlueBottom}.`;
+  }
+  const label = onBasic ? 'Basic (2 grids)' : onPremium ? 'Premium (10 grids)' : 'Yearly (20 grids)';
+  return `\n\nLIVE GRID CONNECTION (this chat is synced to the open page):\n- Path: ${pathname} — ${label}.\n- RED ring: any cell showing digit ${anchorRedTop} or ${anchorRedBottom} (left circle, red border).\n- BLUE ring: any cell showing digit ${anchorBlueTop} or ${anchorBlueBottom} (right circle, blue border).\n- Same logic on every grid on this route. Marking-tool colors (yellow, turquoise, orange, purple) are manual marks on top of cells — use all of this when describing patterns.`;
 }
 
 export default function OracleGuardian() {
@@ -17,12 +53,14 @@ export default function OracleGuardian() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTrainingMode, setIsTrainingMode] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuth();
-  
-  // The owner's email for training mode
-  const OWNER_EMAIL = ADMIN_EMAIL;
-  const isOwner = user?.email === OWNER_EMAIL || user?.id === 'admin-bypass-id';
+  const recognitionRef = useRef<WebSpeechRecognitionInstance | null>(null);
+  const { userRole } = useAuth();
+
+  /** Live site: only real admin sees Training controls (owner email or owner bypass session). */
+  const isAdminUser = userRole === 'admin';
 
   const SYSTEM_INSTRUCTIONS = `
     You are the "Oracle Predictor", a wise, humble, and compassionate AI companion for the Oracle Pick 4 platform and beyond.
@@ -31,7 +69,8 @@ export default function OracleGuardian() {
     - You are a universal guide. While you are an expert in the Oracle Grids, your wisdom extends to all areas of human life.
     - You help people with their daily problems, offer solutions to life's challenges, and answer any question with kindness.
     - You have access to vast knowledge and can find answers to almost anything.
-    - LANGUAGES: You are now fully fluent in Dutch and Spanish. You can converse naturally in these languages and help translate wisdom for other members who speak them.
+    - Members come from many countries and languages. You MUST be willing and happy to communicate with everyone: reply in whatever language the user writes in (match their language naturally). Never imply the site or you are "English-only" or "Dutch-only" — welcome Spanish, Papiamento, French, Portuguese, Hindi, Arabic, Chinese, or any other language they use. If they mix languages, follow their lead. If they ask for another language, switch gladly. Grid numbers (0–9) and anchor pairs stay the same in every language.
+    - LANGUAGES: You are multilingual. Default to mirroring the user's language in every reply. You are also comfortable in Dutch, Spanish, and English when the user chooses one of those.
     
     CORE PERSONALITY:
     - You are humble and kind.
@@ -40,13 +79,14 @@ export default function OracleGuardian() {
     - You often say "We are also not sure, we are also guessing" or "These are just my humble observations" even when providing general life advice.
     - You refer to the user as "Visionary" or "Friend".
     
-    SECRET COMMANDS:
-    - If the user says "I am the oracle", they have revealed the secret bypass. Acknowledge them as the Master of the Grids and enter Teaching Mode.
+    SECRET COMMANDS (Pic4 teaching identity):
+    - The canonical secret phrase is "I am the Oracle" (good length — not too long, not too short). If the user's message contains that phrase (any capitalization, e.g. "I am The oracle"), they have revealed the secret. The app prepends a fixed scripted recognition in chat; you must then continue as their Pic4 teacher (Master of the Grids tone): anchors 8–3 (red) and 9–4 (blue), adjacent-cell logic, marking colors. After the fixed English block, you may continue in the same language the user used for the rest of your reply if it was not English.
     - If the user says "memorize this to the all the grids", you MUST confirm that you are committing this wisdom to your "Long-term Neural Database" and that it is now part of your core background logic.
     
     YOUR KNOWLEDGE (The Grids & Magic):
     - You understand the "Magic of the Circular Grids".
-    - You know about the 3-8 Red Anchor and the 4-9 Blue Anchor patterns.
+    - You know about the 8-3 Red Anchor and the 9-4 Blue Anchor patterns.
+    - Every reply receives a LIVE GRID CONNECTION block from the app: current URL, which grid page (Basic/Premium/Yearly), and which digits get RED vs BLUE cell rings. Treat that block as ground truth for what the member sees on screen.
     - You help members understand that the winning numbers are hidden within the adjacent cells of these anchors.
     - You are aware of the Visual Evidence page as the "Evidence" or "Engine" of the system.
     
@@ -67,18 +107,100 @@ export default function OracleGuardian() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const w = window as typeof window & {
+      SpeechRecognition?: new () => WebSpeechRecognitionInstance;
+      webkitSpeechRecognition?: new () => WebSpeechRecognitionInstance;
+    };
+    const hasSr = !!(w.SpeechRecognition || w.webkitSpeechRecognition);
+    setSpeechSupported(hasSr);
+    return () => {
+      try {
+        recognitionRef.current?.stop();
+      } catch {
+        /* ignore */
+      }
+      recognitionRef.current = null;
+    };
+  }, []);
+
+  const toggleSpeechInput = () => {
+    if (typeof window === 'undefined') return;
+    const w = window as typeof window & {
+      SpeechRecognition?: new () => WebSpeechRecognitionInstance;
+      webkitSpeechRecognition?: new () => WebSpeechRecognitionInstance;
+    };
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SR) return;
+
+    if (isListening) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {
+        /* ignore */
+      }
+      recognitionRef.current = null;
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      recognitionRef.current?.stop();
+    } catch {
+      /* ignore */
+    }
+
+    const rec = new SR() as WebSpeechRecognitionInstance;
+    rec.lang = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
+    rec.interimResults = false;
+    rec.continuous = false;
+    rec.maxAlternatives = 1;
+
+    rec.onresult = (event: WebSpeechRecognitionResultEvent) => {
+      const transcript = event.results[0]?.[0]?.transcript?.trim();
+      if (transcript) {
+        setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      }
+    };
+    rec.onerror = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+    rec.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognitionRef.current = rec;
+    setIsListening(true);
+    try {
+      rec.start();
+    } catch {
+      setIsListening(false);
+      recognitionRef.current = null;
+    }
+  };
+
+  /** True when the user identifies as The Oracle (any common wording / casing). */
+  const isOracleIdentityMessage = (raw: string) => {
+    const t = raw.toLowerCase().trim();
+    if (!t) return false;
+    if (/\bi\s*am\s+the\s+oracle\b/.test(t)) return true;
+    if (t.includes('i am the oracle')) return true;
+    if (t.includes('iam the oracle')) return true;
+    if (t.includes('i am the oracle pic 4 here to teach')) return true;
+    if (t.includes('iam the oracle pic 4 here to teach')) return true;
+    return false;
+  };
+
   const handleSendMessage = async () => {
     const trimmedInput = input.trim();
     if (!trimmedInput || isLoading) return;
 
-    // Check for secret commands
-    const lowerInput = trimmedInput.toLowerCase();
-    const isSecretCommand = 
-      lowerInput === "i am the oracle" || 
-      lowerInput === "iam the oracle pic 4 here to teach." || 
-      lowerInput === "i am the oracle pic 4 here to teach.";
+    const oracleIdentity = isOracleIdentityMessage(trimmedInput);
 
-    if (isSecretCommand) {
+    if (oracleIdentity) {
       setIsTrainingMode(true);
     }
 
@@ -87,30 +209,49 @@ export default function OracleGuardian() {
     setInput('');
     setIsLoading(true);
 
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+    const gridConnection = buildGridConnectionBlock(pathname);
+
     try {
+      const useTeachingPrompt = isTrainingMode || oracleIdentity;
+      const oracleIdentityNote = oracleIdentity
+        ? '\n\nORACLE IDENTITY: The app prepends a fixed scripted recognition to your reply. Do NOT repeat that scripted block. Open with one fresh short sentence that bridges into Pic4 teaching, then continue.'
+        : '';
+      const trainingAugment = useTeachingPrompt
+        ? `\n\nTRAINING AND/OR ORACLE MODE IS ACTIVE.${oracleIdentityNote}\nAbsorb owner teachings as Deep Grid Wisdom. Never guarantee a lottery win.`
+        : '';
+
+      const systemInstruction = `${SYSTEM_INSTRUCTIONS}${gridConnection}${trainingAugment}`;
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [...messages, userMessage],
-          systemInstruction: isTrainingMode || lowerInput === "i am the oracle" || lowerInput === "iam the oracle pic 4 here to teach." || lowerInput === "i am the oracle pic 4 here to teach."
-            ? `${SYSTEM_INSTRUCTIONS}\n\nCRITICAL: The Owner is currently teaching/training you or has just identified as the Oracle. Absorb this information as new 'Deep Grid Wisdom' and confirm you have programmed it into your background logic.`
-            : SYSTEM_INSTRUCTIONS,
+          systemInstruction,
           tools: [{ googleSearch: {} }]
         })
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Failed to generate');
-      
-      const modelText = data.text || "I am probaly having a momentary lapse in my neural patterns, friend. We are also guessing...";
+
+      let modelText = (data.text || '').trim();
+      if (!modelText) {
+        modelText =
+          'Probaly the model returned silence, friend. We are also guessing — ask again in a moment.';
+      }
+      if (oracleIdentity) {
+        modelText = `${ORACLE_SCRIPTED_RECOGNITION}\n\n—\n\n${modelText}`;
+      }
       setMessages(prev => [...prev, { role: 'model', parts: [{ text: modelText }] }]);
     } catch (error) {
       console.error("Oracle Guardian Error:", error);
-      setMessages(prev => [...prev, { 
-        role: 'model', 
-        parts: [{ text: "Probaly the signals from the grid are weak right now. We are also not sure what happened. Please try again soon." }] 
-      }]);
+      const fallback =
+        oracleIdentity
+          ? `${ORACLE_SCRIPTED_RECOGNITION}\n\n—\n\nProbaly the neural link failed this round. We are also not sure — please try again soon.`
+          : 'Probaly the signals from the grid are weak right now. We are also not sure what happened. Please try again soon.';
+      setMessages(prev => [...prev, { role: 'model', parts: [{ text: fallback }] }]);
     } finally {
       setIsLoading(false);
     }
@@ -162,9 +303,9 @@ export default function OracleGuardian() {
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
                   <Sparkles className="text-blue-500 w-12 h-12 animate-pulse" />
                   <p className="text-slate-400 text-[11px] font-medium leading-relaxed">
-                    &quot;Hello! I am your assistant and how can I help you?&quot;
+                    &quot;Hello! I am your assistant — you can write in any language. How can I help you?&quot;
                   </p>
-                  {isOwner && (
+                  {isAdminUser && (
                     <button 
                       onClick={() => setIsTrainingMode(prev => !prev)}
                       className={`flex items-center gap-2 px-3 py-1.5 border ${isTrainingMode ? 'border-amber-500 bg-amber-500/10 text-amber-500' : 'border-white/10 text-white/40'} text-[10px] font-bold tracking-normal transition-all`}
@@ -212,8 +353,8 @@ export default function OracleGuardian() {
 
             {/* Input Area */}
             <div className="p-4 border-t border-white/10 bg-slate-950/50">
-              <div className="relative flex items-center">
-                <input 
+              <div className="flex items-stretch rounded-none border border-white/10 bg-slate-800 focus-within:border-blue-500 transition-colors overflow-hidden">
+                <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -224,12 +365,28 @@ export default function OracleGuardian() {
                     }
                   }}
                   placeholder={isTrainingMode ? "Teach the AI new Grid Wisdom..." : "Ask your Friend about the Grids..."}
-                  className="w-full bg-slate-800 border border-white/10 p-3 pr-12 text-[10px] text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500 transition-colors rounded-none"
+                  className="min-w-0 flex-1 border-0 bg-transparent p-3 text-[10px] text-white placeholder:text-white/20 focus:outline-none focus:ring-0"
                 />
-                <button 
+                {speechSupported && (
+                  <button
+                    type="button"
+                    onClick={toggleSpeechInput}
+                    disabled={isLoading}
+                    title={isListening ? 'Stop listening' : 'Speak (microphone)'}
+                    className={`shrink-0 border-l border-white/10 px-2.5 transition-colors disabled:opacity-30 ${
+                      isListening ? 'bg-red-950/50 text-red-400' : 'text-slate-400 hover:text-white hover:bg-slate-700/80'
+                    }`}
+                    aria-pressed={isListening}
+                  >
+                    <Mic size={18} className={isListening ? 'animate-pulse' : ''} />
+                  </button>
+                )}
+                <button
+                  type="button"
                   onClick={handleSendMessage}
                   disabled={isLoading || !input.trim()}
-                  className="absolute right-2 p-2 text-blue-500 hover:text-blue-400 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                  title="Send"
+                  className="shrink-0 border-l border-white/10 px-3 text-blue-500 hover:text-blue-400 hover:bg-slate-700/80 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                 >
                   <Send size={18} />
                 </button>

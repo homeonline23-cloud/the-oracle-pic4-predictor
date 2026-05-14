@@ -2,12 +2,13 @@
 
 import { useEffect } from 'react';
 import { motion } from 'motion/react';
-import Image from 'next/image';
 import PayPalButton from '@/components/PayPalButton';
 import StripeCheckoutButton from '@/components/StripeCheckoutButton';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
+import { WINDOW_OUTER_SHELL } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 export default function PricingPage() {
   useScrollReveal();
@@ -56,7 +57,12 @@ export default function PricingPage() {
 
         {/* Pricing/Advantage Grid */}
         <div id="pricing-plans" className="w-full max-w-3xl px-2 md:px-6">
-          <div className="relative rounded-none border-2 border-red-600/55 bg-[#29465B] p-2 shadow-[0_6px_24px_rgba(0,0,0,0.5)] backdrop-blur-md md:p-4">
+          <div
+            className={cn(
+              'relative rounded-none bg-[#29465B] p-2 backdrop-blur-md md:p-4',
+              WINDOW_OUTER_SHELL
+            )}
+          >
             <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
               {/* Standard Plan */}
               <div className="relative group/plan">
@@ -161,7 +167,12 @@ export default function PricingPage() {
                 payments: paypal commerce and/or stripe checkout (card subscriptions)
               </p>
             </div>
-            <div className="mt-2 rounded-none border-2 border-red-600/55 bg-[#29465B] p-4 shadow-[0_6px_24px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all hover:scale-[1.02] md:p-5">
+            <div
+              className={cn(
+                'mt-2 rounded-none bg-[#29465B] p-4 backdrop-blur-md transition-all hover:scale-[1.02] md:p-5',
+                WINDOW_OUTER_SHELL
+              )}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/creditcards%20logo.jpg"

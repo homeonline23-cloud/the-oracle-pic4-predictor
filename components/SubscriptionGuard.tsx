@@ -8,20 +8,30 @@ import { motion } from 'motion/react';
 interface SubscriptionGuardProps {
   children: React.ReactNode;
   requiredTier: 'standard' | 'premium' | 'yearly';
+  /** When true, visitors can open the page without signing in; tier checks still apply when logged in. */
+  allowGuestView?: boolean;
 }
 
 import { ADMIN_EMAIL } from '@/lib/constants';
 import { useAuth } from '@/hooks/useAuth';
 
-export default function SubscriptionGuard({ children, requiredTier }: SubscriptionGuardProps) {
+export default function SubscriptionGuard({
+  children,
+  requiredTier,
+  allowGuestView = false,
+}: SubscriptionGuardProps) {
   const { user, profile, loading: authLoading, userRole: contextRole } = useAuth();
   const [loading, setLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const isDev = process.env.NODE_ENV === 'development';
 
   useEffect(() => {
+    if (isDev) return;
+
     if (authLoading) return;
 
     if (!user) {
+      setIsAuthorized(allowGuestView);
       setLoading(false);
       return;
     }
@@ -38,12 +48,14 @@ export default function SubscriptionGuard({ children, requiredTier }: Subscripti
     const userTierIndex = tiers.indexOf(profile?.subscription_tier || 'free');
     const requiredTierIndex = tiers.indexOf(requiredTier);
 
-    if (userTierIndex >= requiredTierIndex) {
-      setIsAuthorized(true);
-    }
-    
+    setIsAuthorized(userTierIndex >= requiredTierIndex);
     setLoading(false);
-  }, [authLoading, user, profile, contextRole, requiredTier]);
+  }, [isDev, authLoading, user, profile, contextRole, requiredTier, allowGuestView]);
+
+  // Local `next dev`: full access without tier checks (logged-in free tier was still blocked before).
+  if (isDev) {
+    return <>{children}</>;
+  }
 
   if (loading || authLoading) {
     return (
@@ -56,7 +68,7 @@ export default function SubscriptionGuard({ children, requiredTier }: Subscripti
     );
   }
 
-  if (!user) {
+  if (!user && !allowGuestView) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center p-6 text-center">
         <motion.div 

@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { VIDEO_SHELL } from '@/lib/constants';
+import { NAV_BAND_FILL, NAV_BAND_SHELL, VIDEO_SHELL } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 export default function GridButtons() {
   const scrollToTop = () => {
@@ -13,7 +14,13 @@ export default function GridButtons() {
     <div className="w-full flex justify-center py-1.5 md:py-2 relative z-[100]">
       <div className={`${VIDEO_SHELL} relative font-sans`}>
         {/* Dark bar matching the navbar/video window style */}
-        <div className="relative border border-red-600/55 bg-gradient-to-b from-slate-900 via-slate-950 to-black px-3 py-2 shadow-[0_6px_24px_rgba(0,0,0,0.5)] backdrop-blur-md">
+        <div
+          className={cn(
+            'relative px-3 py-2',
+            NAV_BAND_FILL,
+            NAV_BAND_SHELL
+          )}
+        >
           {/* Blue-white-red stripe — sticks out left (blue) and right (red) beyond the buttons */}
           <div
             className="pointer-events-none absolute -inset-x-1 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-90 shadow-[0_0_10px_rgba(255,255,255,0.2)]"

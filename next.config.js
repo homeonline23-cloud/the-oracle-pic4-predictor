@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /** Self-host (Namecheap Node, VPS, etc.): zip `.next/standalone` after build + copy `public` + `.next/static` — see README_DEPLOY_STANDALONE.txt */
+  output: 'standalone',
   typescript: {
     ignoreBuildErrors: true,
   },

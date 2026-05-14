@@ -35,9 +35,12 @@ function LoginContent() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      window.location.href = '/';
+      const raw = searchParams?.get('next');
+      const next =
+        raw && raw.startsWith('/') && !raw.startsWith('//') ? raw : '/';
+      window.location.href = next;
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, searchParams]);
 
   useEffect(() => {
     if (searchParams) {

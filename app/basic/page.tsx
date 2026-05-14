@@ -8,6 +8,8 @@ import SubscriptionGuard from '@/components/SubscriptionGuard';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
 import { getSubtractCircleAnchors, SUBTRACT_CIRCLE_MOUNT_FALLBACK } from '@/lib/subtractCircles';
+import { WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 export default function BasicGridPage() {
   const [input, setInput] = useState('');
@@ -152,7 +154,7 @@ export default function BasicGridPage() {
   const circleFb = SUBTRACT_CIRCLE_MOUNT_FALLBACK;
 
   return (
-    <SubscriptionGuard requiredTier="standard">
+    <SubscriptionGuard requiredTier="standard" allowGuestView>
       <main className="relative flex min-h-screen min-w-0 flex-col items-center overflow-x-clip p-0 font-sans">
         <PageHeader />
         <div className="mb-4 md:mb-8 w-full">
@@ -165,7 +167,12 @@ export default function BasicGridPage() {
           <div className="absolute -inset-4 md:-inset-10 bg-gradient-to-r from-blue-600/20 via-white/10 to-red-600/20 rounded-[2rem] md:rounded-[4rem] blur-[60px] md:blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
           
           {/* Red Outer Border - Standard Size Window */}
-          <div className="relative border border-red-600/60 md:border-2 p-1 md:p-2 rounded-none shadow-2xl bg-slate-900/40 backdrop-blur-sm">
+          <div
+            className={cn(
+              'relative rounded-none bg-slate-900/40 p-1 backdrop-blur-sm md:p-2',
+              WINDOW_OUTER_SHELL_RESPONSIVE
+            )}
+          >
             {/* Content without forced vertical scroll */}
             <div className="relative p-3 md:p-8 rounded-none bg-slate-900/80 backdrop-blur-xl shadow-inner flex flex-col items-center space-y-4">
               <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-white to-red-600 mb-4 rounded-none opacity-80"></div>
@@ -212,9 +219,12 @@ export default function BasicGridPage() {
               />
             </div>
 
-            {/* Subtraction Circles (Large Row) */}
-            <div className="relative flex items-center justify-center space-x-6 h-20 mb-4 scale-90 sm:scale-100">
-              <div className="relative z-10 w-16 h-16 rounded-full border-[6px] border-red-600 flex flex-col items-center justify-center bg-transparent shadow-[0_0_15px_rgba(220,38,38,0.3)] text-red-600 shrink-0">
+            {/* Subtraction Circles (Large Row): LEFT = RED 8–3, RIGHT = BLUE 9–4 */}
+            <div className="relative flex items-center justify-center space-x-6 h-20 mb-1 scale-90 sm:scale-100">
+              <div
+                className="relative z-10 w-16 h-16 rounded-full border-[6px] border-red-600 flex flex-col items-center justify-center bg-transparent shadow-[0_0_15px_rgba(220,38,38,0.3)] text-red-600 shrink-0"
+                title="RED anchor: 8 (top) and 3 (bottom) — red ring only"
+              >
                 <span className="text-lg font-bold leading-none">{mounted ? anchorRedTop : circleFb.anchorRedTop}</span>
                 <span className="text-lg font-bold leading-none">-</span>
                 <span className="text-lg font-bold leading-none">{mounted ? anchorRedBottom : circleFb.anchorRedBottom}</span>
@@ -227,12 +237,20 @@ export default function BasicGridPage() {
                 </svg>
               </div>
 
-              <div className="relative z-10 w-16 h-16 rounded-full border-[6px] border-blue-600 flex flex-col items-center justify-center bg-transparent shadow-[0_0_15px_rgba(37,99,235,0.3)] text-blue-600 shrink-0">
+              <div
+                className="relative z-10 w-16 h-16 rounded-full border-[6px] border-blue-600 flex flex-col items-center justify-center bg-transparent shadow-[0_0_15px_rgba(37,99,235,0.35)] text-blue-600 shrink-0"
+                title="BLUE anchor: 9 (top) and 4 (bottom) — blue ring only"
+              >
                 <span className="text-lg font-bold leading-none">{mounted ? anchorBlueTop : circleFb.anchorBlueTop}</span>
                 <span className="text-lg font-bold leading-none">-</span>
                 <span className="text-lg font-bold leading-none">{mounted ? anchorBlueBottom : circleFb.anchorBlueBottom}</span>
               </div>
             </div>
+            <p className="mb-3 text-center text-[9px] sm:text-[10px] font-bold tracking-wide text-slate-800">
+              <span className="text-red-700">8–3 = RED</span>
+              <span className="text-slate-500 mx-1.5 sm:mx-2">|</span>
+              <span className="text-blue-700">9–4 = BLUE</span>
+            </p>
 
             {/* Combined Input & Marking Tool Box */}
             <div className="flex flex-col items-center space-y-2 bg-[#94B6C7] p-2.5 md:p-4 rounded-none shadow-md border border-[#94B6C7] w-full max-w-[230px] sm:max-w-[300px]">

@@ -4,9 +4,11 @@ import Image from 'next/image';
 import { BrainCircuit, LayoutGrid, History, Database, ShieldCheck, Target, AlertTriangle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
-import { PUBLIC_THE_ORACLE_2_IMAGE } from '@/lib/constants';
+import { PUBLIC_THE_ORACLE_2_IMAGE, WINDOW_OUTER_SHELL } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
+import SiteDisclaimer from '@/components/SiteDisclaimer';
 
 /** Blue–white–red divider between methodology “windows” (balanced vertical padding). */
 function MethodologyStripe() {
@@ -60,7 +62,12 @@ export default function HowItWorksPage() {
           <div className="absolute -inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
           
           {/* Red Outer Border - Standard Size Window */}
-          <div className="relative border-2 border-red-600/80 p-2 rounded-none shadow-2xl bg-slate-900/20 backdrop-blur-sm">
+          <div
+            className={cn(
+              'relative rounded-none bg-slate-900/20 p-2 backdrop-blur-sm',
+              WINDOW_OUTER_SHELL
+            )}
+          >
             
             {/* Main Content Box — one gutter matches methodology panel below */}
             <div className="relative rounded-none bg-slate-950/40 px-5 pb-5 pt-8 backdrop-blur-xl md:px-8 md:pb-6">
@@ -137,19 +144,18 @@ export default function HowItWorksPage() {
                 <MethodologyStripe />
 
                 <div className="pb-1 text-center md:text-left">
-                  <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">How it Works!</h2>
+                  <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">How it Works</h2>
                 </div>
 
                 <div className="space-y-3 text-center md:text-left">
                   <h3 className="flex flex-col items-center gap-2 text-lg font-semibold tracking-normal text-white sm:flex-row sm:gap-4 md:text-xl md:justify-start">
                     <span className="shrink-0 font-bold text-blue-500 tabular-nums">01.</span>
                     <span>
-                      The Oracle <span className="font-bold text-red-600">Pic 4</span> AI learns from your numbers
+                      The Oracle <span className="font-bold text-red-600">Pic 4</span> system organizes your numbers
                     </span>
                   </h3>
                   <p className="text-sm leading-relaxed text-slate-300 md:text-[15px]">
-                    <span className="font-semibold text-white">The Oracle <span className="text-red-600">Pic 4</span> AI</span> isn&apos;t just randomly guessing. It starts learning as soon as you enter winning 4-digit numbers. Every number is{' '}
-                    <strong className="font-semibold text-white">recorded and analyzed</strong>, helping the AI understand patterns and make <strong className="font-semibold text-blue-400">better predictions over time</strong>.
+                    The Oracle <span className="font-bold text-red-600">Pic 4</span> system records the numbers you enter and uses them to build a clear historical view. This makes it easier to review past results and observe possible patterns.
                   </p>
                 </div>
 
@@ -158,11 +164,10 @@ export default function HowItWorksPage() {
                 <div className="space-y-3 text-center md:text-left">
                   <h3 className="flex flex-col items-center gap-2 text-lg font-semibold tracking-normal text-white sm:flex-row sm:gap-4 md:text-xl md:justify-start">
                     <span className="shrink-0 font-bold text-blue-500 tabular-nums">02.</span>
-                    Tell the AI where you play
+                    Choose your display settings
                   </h3>
                   <p className="text-sm leading-relaxed text-slate-300 md:text-[15px]">
-                    Before predictions can start, select your <strong className="font-semibold text-white">country or state</strong>. The AI tailors its analysis to your region, giving you{' '}
-                    <strong className="font-semibold text-blue-400">probability-based insights</strong> instead of generic guesses.
+                    Select the options that match your preferred format, and the system will adjust the display to show the information in a way that is easier to compare and understand.
                   </p>
                 </div>
 
@@ -282,14 +287,15 @@ export default function HowItWorksPage() {
                   <div className="absolute inset-0 bg-blue-600/5 transition-colors group-hover/secret:bg-blue-600/10"></div>
                   <div className="relative z-10 mx-auto max-w-3xl space-y-5">
                     <h3 className="text-xl font-semibold tracking-tight text-white md:text-2xl">
-                      Unlock the <span className="text-blue-500">four-grid</span> secret
+                      Unlock the <span className="text-blue-500">four grid</span> secret
                     </h3>
                     <p className="text-sm leading-relaxed text-slate-300 md:text-[15px]">
-                      Two grids. Two echoes. Repeated hits often sit beside obvious anchors. Wherever your draw runs,{' '}
-                      <span className="font-semibold text-red-600">Pic 4</span> odds surface when mirrors line up—not from luck alone, but from rhythm you can practise seeing.
+                      The layout is built so paired views and mirrored relationships are easier to scan side by side. For{' '}
+                      <span className="font-bold text-red-600">Pic 4</span>
+                      {' '}draws, the aim is steadier comparison over time—watching how anchors and colours shift from session to session instead of leaning on guesswork alone.
                     </p>
-                    <p className="text-sm font-medium leading-relaxed text-slate-400 md:text-[15px]">
-                      Discipline beats hope: catalogue what you observe, honour the lattice, revisit evidence. Hundreds of archival shots already agree—the grid rewards patient eyes.
+                    <p className="text-sm leading-relaxed text-slate-300 md:text-[15px]">
+                      A calm routine beats rushed picks: note what you actually see, review on a schedule you can keep, and focus on structure rather than impulse. Consistent practice tends to read clearer than chasing shortcuts.
                     </p>
                   </div>
                 </div>
@@ -301,7 +307,7 @@ export default function HowItWorksPage() {
                   <p className="mx-auto mb-6 max-w-2xl text-center text-sm leading-relaxed text-slate-300 md:mb-7 md:text-[15px]">
                     Treat{' '}
                     <span className="font-semibold text-white">
-                      The Oracle <span className="text-red-600">Pic 4</span> Predictor
+                      The Oracle <span className="font-bold text-red-600">Pic 4</span> Predictor
                     </span>{' '}
                     like a disciplined map—you explore structure before you wager emotion.
                   </p>
@@ -338,6 +344,8 @@ export default function HowItWorksPage() {
                     <AlertTriangle size={18} className="shrink-0 fill-yellow-500/25 text-yellow-500" aria-hidden />
                   </motion.p>
                 </div>
+
+                <SiteDisclaimer className="mt-8" />
               </div>
             </div>
           </div>

@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import { motion } from 'motion/react';
-import { VIDEO_SHELL, PUBLIC_ORACLE_HERO_VIDEO } from '@/lib/constants';
+import { VIDEO_SHELL, PUBLIC_ORACLE_HERO_VIDEO, WINDOW_OUTER_SHELL } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 import EditableVideo from './EditableVideo';
-import MusicPlayer from './MusicPlayer';
 
 type PageHeaderProps = {
   /** Default: oracle hero clip. Ignored when `heroImageSrc` is set. */
@@ -28,7 +28,12 @@ export default function PageHeader({
         className="relative group"
       >
         <div className="pointer-events-none absolute -inset-4 md:-inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[60px] md:blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
-        <div className="relative border-2 border-red-600/80 p-1 md:p-2 rounded-none shadow-2xl bg-slate-900/20 backdrop-blur-sm min-h-0">
+        <div
+          className={cn(
+            'relative rounded-none bg-slate-900/20 p-1 backdrop-blur-sm md:p-2 min-h-0',
+            WINDOW_OUTER_SHELL
+          )}
+        >
           <div className="relative flex min-h-0 w-full flex-col bg-slate-950/40 p-2 backdrop-blur-xl md:p-4 h-auto rounded-none">
             <div className="mb-2 h-0.5 w-full bg-gradient-to-r from-blue-600 via-white to-red-600 rounded-none opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)] md:mb-4 shrink-0"></div>
             <div className="min-h-0 w-full shrink-0">
@@ -54,7 +59,6 @@ export default function PageHeader({
                 />
               )}
             </div>
-            <MusicPlayer isFixed={false} />
           </div>
         </div>
       </motion.div>

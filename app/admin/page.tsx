@@ -7,6 +7,8 @@ import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, A
 import { createClient } from '@/lib/supabase/client';
 import { Activity, ShieldAlert } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
+import { WINDOW_OUTER_SHELL } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 interface DashboardStats {
   totalHits: number;
@@ -37,7 +39,7 @@ const generateMockData = () => {
 };
 
 export default function AdminDashboard() {
-  const { userRole, loading } = useAuth();
+  const { user, userRole, loading } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats>({
     totalHits: 0,
@@ -50,10 +52,15 @@ export default function AdminDashboard() {
   const supabase = createClient();
 
   useEffect(() => {
-    if (!loading && userRole !== 'admin') {
-      router.push('/');
+    if (loading) return;
+    if (!user) {
+      router.replace('/login?next=/admin');
+      return;
     }
-  }, [userRole, loading, router]);
+    if (userRole !== 'admin') {
+      router.replace('/');
+    }
+  }, [loading, user, userRole, router]);
 
   useEffect(() => {
     async function fetchDashboardData() {
@@ -108,27 +115,11 @@ export default function AdminDashboard() {
     }
   }, [userRole, supabase]);
 
-  if (loading || (isDataLoading && stats.totalHits === 0)) {
+  if (loading || !user || userRole !== 'admin' || (isDataLoading && stats.totalHits === 0)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
-    );
-  }
-
-  if (userRole !== 'admin') {
-    return (
-      <main className="flex flex-col items-center justify-center min-h-screen pt-24 px-6 bg-black lowercase">
-        <ShieldAlert size={64} className="text-red-600 mb-6 animate-bounce" />
-        <h1 className="text-4xl font-bold text-white tracking-normal mb-4 italic">access denied</h1>
-        <p className="text-slate-400 text-center max-w-md">this zone is restricted to authorized oracle guardians. unauthorized access has been recorded.</p>
-        <button 
-          onClick={() => router.push('/')}
-          className="mt-8 px-8 py-3 bg-blue-600 text-white font-bold rounded-none hover:bg-blue-700 transition-all border-2 border-white shadow-[0_0_15px_rgba(37,99,235,0.4)]"
-        >
-          back to hub
-        </button>
-      </main>
     );
   }
 
@@ -145,7 +136,12 @@ export default function AdminDashboard() {
         {/* main dashboard window - matching welcome style exactly */}
         <div className="relative group mt-12">
           <div className="absolute -inset-4 md:-inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[60px] md:blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
-          <div className="relative border-2 border-red-600/80 p-1 md:p-2 rounded-none shadow-2xl bg-slate-900/20 backdrop-blur-sm min-h-0">
+          <div
+            className={cn(
+              'relative rounded-none bg-slate-900/20 p-1 backdrop-blur-sm md:p-2 min-h-0',
+              WINDOW_OUTER_SHELL
+            )}
+          >
             <div className="relative bg-slate-950/40 backdrop-blur-xl rounded-none p-4 md:p-12 h-auto flex flex-col gap-8">
               
               {/* system status banner */}
@@ -180,7 +176,7 @@ export default function AdminDashboard() {
               {/* chart section */}
               <div className="space-y-4 mb-10">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xs font-bold text-white/80 border-l-2 border-red-600 pl-2 lowercase tracking-wider">traffic velocity</h2>
+                  <h2 className="text-xs font-bold text-white/80 border-l-2 border-blue-500 pl-2 lowercase tracking-wider">traffic velocity</h2>
                   <Activity size={12} className="text-blue-500 opacity-50" />
                 </div>
                 <div className="h-[220px] w-full bg-black/30 p-2 border border-white/5">

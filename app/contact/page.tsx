@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
+import { WINDOW_OUTER_SHELL } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 export default function ContactPage() {
   const [name, setName] = useState('');
@@ -30,7 +32,7 @@ export default function ContactPage() {
       <div className="relative z-10 w-full flex flex-col items-center px-2 md:px-6">
         <div className="w-full max-w-3xl px-2 md:px-6">
           {/* Banner */}
-          <div className="mb-6 overflow-hidden rounded-none border-2 border-red-600/55">
+          <div className={cn('mb-6 overflow-hidden rounded-none', WINDOW_OUTER_SHELL)}>
             <img
               src="/banner-email-window.png"
               alt="Contact The Oracle Pic 4"
@@ -39,7 +41,12 @@ export default function ContactPage() {
           </div>
 
           {/* Contact Form Window */}
-          <div className="rounded-none border-2 border-red-600/55 bg-[#29465B] p-6 shadow-[0_6px_24px_rgba(0,0,0,0.5)] backdrop-blur-md md:p-8">
+          <div
+            className={cn(
+              'rounded-none bg-[#29465B] p-6 backdrop-blur-md md:p-8',
+              WINDOW_OUTER_SHELL
+            )}
+          >
             <h1 className="mb-2 text-center text-2xl font-bold tracking-tight text-white md:text-3xl">
               Contact Us
             </h1>

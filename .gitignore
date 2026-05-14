@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Local deploy bundles — do not commit to GitHub
+*.zip

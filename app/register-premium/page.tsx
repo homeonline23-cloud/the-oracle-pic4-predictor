@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { CheckCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { WINDOW_OUTER_SHELL } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 export default function RegisterPremiumPage() {
   const { user, signUp, loading } = useAuth();
@@ -68,8 +70,8 @@ export default function RegisterPremiumPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="relative z-10 w-full max-w-md"
         >
-          {/* Red Outer Border */}
-          <div className="relative border-2 border-red-600/60 p-1.5 rounded-none shadow-2xl overflow-hidden">
+          {/* Outer frame */}
+          <div className={cn('relative overflow-hidden rounded-none p-1.5', WINDOW_OUTER_SHELL)}>
             {/* Content */}
             <div className="relative bg-slate-900/80 backdrop-blur-xl rounded-none p-10 text-center">
               <div className="w-20 h-20 bg-green-500/20 rounded-none flex items-center justify-center mx-auto mb-6">
@@ -99,8 +101,8 @@ export default function RegisterPremiumPage() {
         {/* Ambient Glows - Red, White, Blue */}
         <div className="absolute -inset-8 bg-gradient-to-r from-blue-600/20 via-white/10 to-red-600/20 rounded-none blur-2xl opacity-40 group-hover:opacity-80 transition duration-1000"></div>
         
-        {/* Red Outer Border */}
-        <div className="relative border-2 border-red-600/60 p-1 rounded-none shadow-2xl overflow-hidden">
+        {/* Outer frame */}
+        <div className={cn('relative overflow-hidden rounded-none p-1', WINDOW_OUTER_SHELL)}>
           {/* Content */}
           <div className="relative bg-slate-900/80 backdrop-blur-xl rounded-none p-4 shadow-2xl text-center">
           <div className="relative z-10 flex flex-col items-center mb-4">
