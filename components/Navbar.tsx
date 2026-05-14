@@ -57,13 +57,6 @@ export default function Navbar() {
   const navBtnShell =
     'rounded-none transition-all duration-200 font-bold tracking-wide border leading-tight shrink-0';
 
-  /** Auth: quiet utility row — not two extra nav tiles. */
-  const authSignInClass =
-    'relative z-10 shrink-0 px-2 py-1.5 text-[11px] sm:text-xs font-normal text-slate-400 hover:text-slate-100 transition-colors underline-offset-4 decoration-white/25 hover:decoration-white/50 hover:underline';
-
-  const authSignUpClass =
-    'relative z-10 shrink-0 border border-white/20 bg-transparent px-2.5 py-1.5 text-[10px] sm:text-xs font-medium text-slate-200/95 hover:text-white hover:border-white/35 hover:bg-white/[0.04] transition-all rounded-none';
-
   const authMobileSignInClass =
     'flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-normal text-slate-400 hover:text-slate-100 rounded-none border-0 bg-transparent hover:bg-white/[0.04] transition-colors';
 
@@ -97,7 +90,7 @@ export default function Navbar() {
       aria-label="Main navigation"
     >
       <div className={`relative z-10 ${VIDEO_SHELL} pointer-events-auto`}>
-        {/* Mobile top bar — menu left; Sign In / Sign Out on the right */}
+        {/* Mobile top bar — menu opens sheet (auth lives in menu only; no duplicate buttons) */}
         <div
           className={cn(
             'relative flex min-h-[44px] w-full items-center justify-between gap-2 px-3 py-1.5 md:hidden',
@@ -119,37 +112,8 @@ export default function Navbar() {
           >
             {mobileOpen ? <X className="h-5 w-5" strokeWidth={2.5} /> : <Menu className="h-5 w-5" strokeWidth={2.5} />}
           </button>
-          <div className="relative z-10 flex min-w-0 flex-1 items-center justify-end">
-            {mounted && !user && (
-              <div className="flex max-w-[55vw] items-center justify-end gap-2 sm:gap-2.5">
-                <Link href="/login" onClick={scrollToTop} className={authSignInClass}>
-                  Sign in
-                </Link>
-                <Link href="/signup" onClick={scrollToTop} className={authSignUpClass}>
-                  Sign up
-                </Link>
-              </div>
-            )}
-            {mounted && user && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleSignOut();
-                    scrollToTop();
-                  }}
-                  className={`${navBtnShell} inline-flex min-h-[36px] h-9 shrink-0 items-center justify-center whitespace-nowrap border border-white/35 bg-[linear-gradient(180deg,rgb(30,41,59)_0%,rgb(15,23,42)_100%)] px-3 py-1.5 text-[10px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-blue-400/55 hover:text-white sm:px-3.5 sm:text-xs`}
-                >
-                  Sign Out
-                </button>
-                {userRole === 'admin' && (
-                  <Link href="/admin" onClick={scrollToTop} className={getNavLinkClass('/admin')}>
-                    Admin
-                  </Link>
-                )}
-              </>
-            )}
-          </div>
+          {/* Mobile: auth only inside menu — avoids duplicate Sign in / Sign out on screen */}
+          <div className="min-w-0 flex-1 md:hidden" aria-hidden />
         </div>
 
         {/* Desktop — one row, equal gaps between every control (no flex-1 holes) */}
@@ -171,32 +135,40 @@ export default function Navbar() {
               </Link>
             ))}
             {mounted && !user && (
-              <div className="relative z-10 ml-1 flex items-center gap-3 sm:ml-2 sm:gap-3.5">
-                <span className="hidden h-4 w-px shrink-0 bg-white/20 sm:block" aria-hidden />
-                <Link href="/login" onClick={scrollToTop} className={authSignInClass}>
-                  Sign in
-                </Link>
-                <Link href="/signup" onClick={scrollToTop} className={authSignUpClass}>
-                  Sign up
-                </Link>
+              <div className="relative z-10 ml-1 flex items-center sm:ml-2">
+                <span className="mr-2 hidden h-4 w-px shrink-0 bg-white/20 sm:block" aria-hidden />
+                <span className="text-[11px] sm:text-xs font-normal tracking-normal text-slate-400">
+                  <Link href="/login" onClick={scrollToTop} className="text-slate-300 hover:text-white hover:underline underline-offset-4">
+                    Log in
+                  </Link>
+                  <span className="mx-1.5 text-white/25" aria-hidden>
+                    ·
+                  </span>
+                  <Link href="/signup" onClick={scrollToTop} className="text-slate-300 hover:text-white hover:underline underline-offset-4">
+                    Join
+                  </Link>
+                </span>
               </div>
             )}
             {mounted && user && (
-              <button
-                type="button"
-                onClick={() => {
-                  handleSignOut();
-                  scrollToTop();
-                }}
-                className={`${navBtnShell} relative z-10 inline-flex min-h-[36px] h-9 items-center justify-center whitespace-nowrap border border-white/35 bg-[linear-gradient(180deg,rgb(30,41,59)_0%,rgb(15,23,42)_100%)] px-3 py-1.5 text-[10px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-blue-400/55 hover:text-white sm:px-3.5 sm:text-xs`}
-              >
-                Sign Out
-              </button>
-            )}
-            {mounted && user && userRole === 'admin' && (
-              <Link href="/admin" onClick={scrollToTop} className={getNavLinkClass('/admin')}>
-                Admin
-              </Link>
+              <div className="relative z-10 ml-1 flex flex-wrap items-center justify-center gap-2 sm:ml-2 sm:gap-2.5">
+                <span className="hidden h-4 w-px shrink-0 bg-white/20 sm:block" aria-hidden />
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSignOut();
+                    scrollToTop();
+                  }}
+                  className="text-[11px] sm:text-xs font-medium text-slate-400 hover:text-white hover:underline underline-offset-4 transition-colors"
+                >
+                  Sign out
+                </button>
+                {userRole === 'admin' && (
+                  <Link href="/admin" onClick={scrollToTop} className={getNavLinkClass('/admin')}>
+                    Admin
+                  </Link>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -242,7 +214,7 @@ export default function Navbar() {
                     }}
                     className={authMobileSignInClass}
                   >
-                    Sign in
+                    Log in
                   </Link>
                   <Link
                     href="/signup"
@@ -252,36 +224,38 @@ export default function Navbar() {
                     }}
                     className={authMobileSignUpClass}
                   >
-                    Sign up
+                    Join
                   </Link>
                 </div>
               )}
 
               {mounted && user && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleSignOut();
-                    scrollToTop();
-                    closeMobile();
-                  }}
-                  className="flex w-full items-center justify-center min-h-[48px] px-4 text-sm rounded-none border border-white/35 bg-[linear-gradient(180deg,rgb(30,41,59)_0%,rgb(15,23,42)_100%)] font-bold tracking-wide text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] active:border-blue-500/50 active:text-white"
-                >
-                  Sign Out
-                </button>
-              )}
-
-              {mounted && user && userRole === 'admin' && (
-                <Link
-                  href="/admin"
-                  onClick={() => {
-                    scrollToTop();
-                    closeMobile();
-                  }}
-                  className={getMobileLinkClass('/admin')}
-                >
-                  Admin
-                </Link>
+                <div className="mt-1 flex flex-col gap-1 border-t border-white/10 pt-2">
+                  <p className="px-1 text-[9px] font-bold uppercase tracking-wider text-slate-500">Account</p>
+                  {userRole === 'admin' && (
+                    <Link
+                      href="/admin"
+                      onClick={() => {
+                        scrollToTop();
+                        closeMobile();
+                      }}
+                      className={getMobileLinkClass('/admin')}
+                    >
+                      Admin
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleSignOut();
+                      scrollToTop();
+                      closeMobile();
+                    }}
+                    className="flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-medium text-slate-400 hover:text-white rounded-none border border-white/15 bg-transparent hover:bg-white/[0.06] transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </div>
               )}
             </div>
           </>
