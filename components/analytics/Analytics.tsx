@@ -1,6 +1,7 @@
 'use client';
 
 import Script from 'next/script';
+import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
 
 export function Analytics() {
   if (process.env.NODE_ENV !== 'production') return null;
@@ -23,6 +24,9 @@ export function Analytics() {
           }}
         />
       )}
+      
+      {/* Vercel Web Analytics */}
+      <VercelAnalytics />
     </>
   );
 }
