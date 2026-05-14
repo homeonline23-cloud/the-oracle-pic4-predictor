@@ -65,7 +65,7 @@ export default function Navbar() {
   const navDesktopInnerPanelClass = `${navBtnShell} relative z-0 inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-2 px-2 py-1.5 sm:gap-x-2.5 sm:gap-y-2 sm:px-2.5 sm:py-2 ${authClusterInactiveShell}`;
 
   const authDesktopLinkClass =
-    'inline-flex min-h-[36px] flex-1 items-center justify-center px-2.5 text-[10px] font-bold tracking-wide text-slate-100 transition-colors hover:bg-white/[0.07] hover:text-white sm:px-3 sm:text-xs';
+    'inline-flex min-h-[36px] shrink-0 items-center justify-center whitespace-nowrap px-2.5 text-[10px] font-bold tracking-wide text-slate-100 transition-colors hover:bg-white/[0.07] hover:text-white sm:px-3 sm:text-xs';
 
   const authMobileClusterClass = `${navBtnShell} flex flex-col overflow-hidden ${authClusterInactiveShell}`;
 
@@ -152,7 +152,7 @@ export default function Navbar() {
               </div>
               {mounted && !user && (
                 <div
-                  className="relative z-10 flex min-h-[36px] items-stretch border-l border-white/20 pl-2 sm:pl-2.5"
+                  className="relative z-10 flex min-h-[36px] shrink-0 items-stretch border-l border-white/20 pl-2 sm:pl-2.5"
                   aria-label="Account"
                 >
                   <Link href="/login" onClick={scrollToTop} className={authDesktopLinkClass}>
@@ -172,7 +172,7 @@ export default function Navbar() {
                       handleSignOut();
                       scrollToTop();
                     }}
-                    className="inline-flex min-h-[36px] items-center px-1 text-[10px] font-bold tracking-wide text-slate-300 transition-colors hover:bg-white/[0.07] hover:text-white sm:text-xs"
+                    className="inline-flex min-h-[36px] shrink-0 items-center whitespace-nowrap px-1 text-[10px] font-bold tracking-wide text-slate-300 transition-colors hover:bg-white/[0.07] hover:text-white sm:text-xs"
                   >
                     Sign out
                   </button>
