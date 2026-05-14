@@ -125,15 +125,18 @@ export default function Navbar() {
               NAV_BAND_SHELL
             )}
           >
-            <div
-              className="pointer-events-none absolute inset-x-2 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-90 shadow-[0_0_10px_rgba(255,255,255,0.2)] sm:inset-x-3"
-              aria-hidden
-            />
-            {PRIMARY_LINKS.map(({ href, label }) => (
-              <Link key={href} href={href} onClick={scrollToTop} className={getNavLinkClass(href)}>
-                {label}
-              </Link>
-            ))}
+            {/* Stripe only behind primary pills — not across Log in / Join (was reading as a strike-through) */}
+            <div className="relative z-0 inline-flex flex-wrap items-center justify-center gap-x-2.5 gap-y-2 sm:gap-x-3">
+              <div
+                className="pointer-events-none absolute inset-x-0 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-90 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+                aria-hidden
+              />
+              {PRIMARY_LINKS.map(({ href, label }) => (
+                <Link key={href} href={href} onClick={scrollToTop} className={getNavLinkClass(href)}>
+                  {label}
+                </Link>
+              ))}
+            </div>
             {mounted && !user && (
               <div className="relative z-10 ml-1 flex items-center sm:ml-2">
                 <span className="mr-2 hidden h-4 w-px shrink-0 bg-white/20 sm:block" aria-hidden />
