@@ -57,11 +57,22 @@ export default function Navbar() {
   const navBtnShell =
     'rounded-none transition-all duration-200 font-bold tracking-wide border leading-tight shrink-0';
 
+  /** Same inactive “window” chrome as primary nav pills — keeps Log in / Join visually balanced. */
+  const authClusterInactiveShell =
+    'border-blue-600/55 bg-[linear-gradient(180deg,rgb(24,32,48)_0%,rgb(15,23,42)_45%,rgb(10,15,28)_100%)] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_3px_12px_rgba(0,0,0,0.5)] transition-all hover:border-blue-400/70 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_22px_rgba(59,130,246,0.28)] active:scale-[0.97]';
+
+  const authDesktopClusterClass = `${navBtnShell} group relative z-10 inline-flex min-h-[36px] h-9 items-stretch overflow-hidden ${authClusterInactiveShell}`;
+
+  const authDesktopLinkClass =
+    'inline-flex min-h-[36px] flex-1 items-center justify-center px-2.5 text-[10px] font-bold tracking-wide text-slate-100 transition-colors hover:bg-white/[0.07] hover:text-white sm:px-3 sm:text-xs';
+
+  const authMobileClusterClass = `${navBtnShell} flex flex-col overflow-hidden ${authClusterInactiveShell}`;
+
   const authMobileSignInClass =
-    'flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-normal text-slate-400 hover:text-slate-100 rounded-none border-0 bg-transparent hover:bg-white/[0.04] transition-colors';
+    'flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-bold tracking-wide text-slate-200 hover:text-white rounded-none border-0 border-b border-white/12 bg-transparent hover:bg-white/[0.05] transition-colors';
 
   const authMobileSignUpClass =
-    'flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-medium text-slate-100 rounded-none border border-white/22 bg-transparent hover:border-white/35 hover:bg-white/[0.06] transition-colors';
+    'flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-bold tracking-wide text-slate-100 hover:text-white rounded-none border-0 bg-transparent hover:bg-white/[0.06] transition-colors';
 
   const getNavLinkClass = (path: string) => {
     const normalize = (p: string) => (p ? p.replace(/\/$/, '') || '/' : '/');
@@ -138,19 +149,16 @@ export default function Navbar() {
               ))}
             </div>
             {mounted && !user && (
-              <div className="relative z-10 ml-1 flex items-center sm:ml-2">
-                <span className="mr-2 hidden h-4 w-px shrink-0 bg-white/20 sm:block" aria-hidden />
-                <span className="text-[11px] sm:text-xs font-normal tracking-normal text-slate-400">
-                  <Link href="/login" onClick={scrollToTop} className="text-slate-300 hover:text-white hover:underline underline-offset-4">
+              <div className="relative z-10 ml-1 flex items-center sm:ml-2" aria-label="Account">
+                <div className={authDesktopClusterClass}>
+                  <Link href="/login" onClick={scrollToTop} className={authDesktopLinkClass}>
                     Log in
                   </Link>
-                  <span className="mx-1.5 text-white/25" aria-hidden>
-                    ·
-                  </span>
-                  <Link href="/signup" onClick={scrollToTop} className="text-slate-300 hover:text-white hover:underline underline-offset-4">
+                  <span className="w-px shrink-0 self-stretch bg-white/15" aria-hidden />
+                  <Link href="/signup" onClick={scrollToTop} className={authDesktopLinkClass}>
                     Join
                   </Link>
-                </span>
+                </div>
               </div>
             )}
             {mounted && user && (
@@ -207,28 +215,30 @@ export default function Navbar() {
               ))}
 
               {mounted && !user && (
-                <div className="mt-1 flex flex-col gap-1 border-t border-white/10 pt-2">
+                <div className="mt-1 border-t border-white/10 pt-2">
                   <p className="px-1 text-[9px] font-bold uppercase tracking-wider text-slate-500">Account</p>
-                  <Link
-                    href="/login"
-                    onClick={() => {
-                      scrollToTop();
-                      closeMobile();
-                    }}
-                    className={authMobileSignInClass}
-                  >
-                    Log in
-                  </Link>
-                  <Link
-                    href="/signup"
-                    onClick={() => {
-                      scrollToTop();
-                      closeMobile();
-                    }}
-                    className={authMobileSignUpClass}
-                  >
-                    Join
-                  </Link>
+                  <div className={`${authMobileClusterClass} mt-1`}>
+                    <Link
+                      href="/login"
+                      onClick={() => {
+                        scrollToTop();
+                        closeMobile();
+                      }}
+                      className={authMobileSignInClass}
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      href="/signup"
+                      onClick={() => {
+                        scrollToTop();
+                        closeMobile();
+                      }}
+                      className={authMobileSignUpClass}
+                    >
+                      Join
+                    </Link>
+                  </div>
                 </div>
               )}
 
