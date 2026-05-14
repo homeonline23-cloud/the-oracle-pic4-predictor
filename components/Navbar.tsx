@@ -57,18 +57,18 @@ export default function Navbar() {
   const navBtnShell =
     'rounded-none transition-all duration-200 font-bold tracking-wide border leading-tight shrink-0';
 
-  /** Auth: light sign-in + single blue CTA (not two heavy nav chrome buttons). */
+  /** Auth: quiet utility row — not two extra nav tiles. */
   const authSignInClass =
-    'relative z-10 inline-flex min-h-[36px] h-9 shrink-0 items-center justify-center px-3 py-1.5 text-[10px] sm:px-3.5 sm:text-xs font-medium tracking-normal text-slate-200/95 hover:text-white border border-transparent hover:border-white/20 hover:bg-white/[0.06] rounded-none transition-all active:scale-[0.98]';
+    'relative z-10 shrink-0 px-2 py-1.5 text-[11px] sm:text-xs font-normal text-slate-400 hover:text-slate-100 transition-colors underline-offset-4 decoration-white/25 hover:decoration-white/50 hover:underline';
 
   const authSignUpClass =
-    'relative z-10 inline-flex min-h-[36px] h-9 shrink-0 items-center justify-center px-3.5 py-1.5 text-[10px] sm:px-4 sm:text-xs font-semibold tracking-normal text-white bg-blue-600 hover:bg-blue-500 border border-blue-400/50 hover:border-blue-300/60 rounded-none shadow-[0_2px_12px_rgba(37,99,235,0.35)] transition-all active:scale-[0.98]';
+    'relative z-10 shrink-0 border border-white/20 bg-transparent px-2.5 py-1.5 text-[10px] sm:text-xs font-medium text-slate-200/95 hover:text-white hover:border-white/35 hover:bg-white/[0.04] transition-all rounded-none';
 
   const authMobileSignInClass =
-    'flex w-full items-center justify-center min-h-[48px] px-4 text-sm font-medium tracking-normal rounded-none border border-white/15 bg-transparent text-slate-200 hover:bg-white/[0.06] hover:text-white transition-colors';
+    'flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-normal text-slate-400 hover:text-slate-100 rounded-none border-0 bg-transparent hover:bg-white/[0.04] transition-colors';
 
   const authMobileSignUpClass =
-    'flex w-full items-center justify-center min-h-[48px] px-4 text-sm font-semibold tracking-normal rounded-none border border-blue-400/45 bg-blue-600 text-white hover:bg-blue-500 transition-colors shadow-[0_4px_20px_rgba(37,99,235,0.25)]';
+    'flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-medium text-slate-100 rounded-none border border-white/22 bg-transparent hover:border-white/35 hover:bg-white/[0.06] transition-colors';
 
   const getNavLinkClass = (path: string) => {
     const normalize = (p: string) => (p ? p.replace(/\/$/, '') || '/' : '/');
@@ -119,16 +119,16 @@ export default function Navbar() {
           >
             {mobileOpen ? <X className="h-5 w-5" strokeWidth={2.5} /> : <Menu className="h-5 w-5" strokeWidth={2.5} />}
           </button>
-          <div className="relative z-10 flex min-w-0 flex-1 items-center justify-end gap-2">
+          <div className="relative z-10 flex min-w-0 flex-1 items-center justify-end">
             {mounted && !user && (
-              <>
+              <div className="flex max-w-[55vw] items-center justify-end gap-2 sm:gap-2.5">
                 <Link href="/login" onClick={scrollToTop} className={authSignInClass}>
                   Sign in
                 </Link>
                 <Link href="/signup" onClick={scrollToTop} className={authSignUpClass}>
                   Sign up
                 </Link>
-              </>
+              </div>
             )}
             {mounted && user && (
               <>
@@ -171,14 +171,15 @@ export default function Navbar() {
               </Link>
             ))}
             {mounted && !user && (
-              <>
+              <div className="relative z-10 ml-1 flex items-center gap-3 sm:ml-2 sm:gap-3.5">
+                <span className="hidden h-4 w-px shrink-0 bg-white/20 sm:block" aria-hidden />
                 <Link href="/login" onClick={scrollToTop} className={authSignInClass}>
                   Sign in
                 </Link>
                 <Link href="/signup" onClick={scrollToTop} className={authSignUpClass}>
                   Sign up
                 </Link>
-              </>
+              </div>
             )}
             {mounted && user && (
               <button
@@ -231,7 +232,8 @@ export default function Navbar() {
               ))}
 
               {mounted && !user && (
-                <>
+                <div className="mt-1 flex flex-col gap-1 border-t border-white/10 pt-2">
+                  <p className="px-1 text-[9px] font-bold uppercase tracking-wider text-slate-500">Account</p>
                   <Link
                     href="/login"
                     onClick={() => {
@@ -252,7 +254,7 @@ export default function Navbar() {
                   >
                     Sign up
                   </Link>
-                </>
+                </div>
               )}
 
               {mounted && user && (
