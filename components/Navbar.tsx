@@ -57,32 +57,26 @@ export default function Navbar() {
   const navBtnShell =
     'rounded-none transition-all duration-200 font-bold tracking-wide border leading-tight shrink-0';
 
-  /** Matte inner tray: subtle neutral rim only — primary pills keep their own blue “window” chrome. */
+  /** Matte inner tray behind the whole pill row (outer bar still carries main blue glow). */
   const navInnerMatteShell =
     'border border-white/16 bg-[linear-gradient(180deg,rgb(16,20,30)_0%,rgb(10,13,20)_48%,rgb(6,8,14)_100%)] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_6px_22px_rgba(0,0,0,0.55)] transition-all hover:border-white/26 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_8px_28px_rgba(0,0,0,0.5)] active:scale-[0.99]';
 
-  /** One shared inner panel behind pills + account (desktop) — no second blue halo (outer band already glows). */
   const navDesktopInnerPanelClass = `${navBtnShell} relative z-0 inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-2 px-2 py-1.5 sm:gap-x-2.5 sm:gap-y-2 sm:px-2.5 sm:py-2 ${navInnerMatteShell}`;
 
-  const authDesktopLinkClass =
-    'inline-flex min-h-[36px] shrink-0 items-center justify-center whitespace-nowrap px-2.5 text-[10px] font-medium tracking-wide text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white sm:px-3 sm:text-xs';
+  const navDesktopPillActive =
+    'border border-white bg-gradient-to-b from-blue-500 via-blue-600 to-blue-800 text-white shadow-[0_0_20px_rgba(59,130,246,0.55),inset_0_1px_0_rgba(255,255,255,0.28)] hover:brightness-105';
 
-  const authMobileClusterClass = `${navBtnShell} flex flex-col overflow-hidden ${navInnerMatteShell}`;
+  const navDesktopPillInactive =
+    'border-blue-600/55 bg-[linear-gradient(180deg,rgb(24,32,48)_0%,rgb(15,23,42)_45%,rgb(10,15,28)_100%)] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_3px_12px_rgba(0,0,0,0.5)] hover:border-blue-400/70 hover:text-white hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_22px_rgba(59,130,246,0.28)] active:scale-[0.97]';
 
-  const authMobileSignInClass =
-    'flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-bold tracking-wide text-slate-200 hover:text-white rounded-none border-0 border-b border-white/12 bg-transparent hover:bg-white/[0.05] transition-colors';
-
-  const authMobileSignUpClass =
-    'flex w-full items-center justify-center min-h-[42px] px-4 text-sm font-bold tracking-wide text-slate-100 hover:text-white rounded-none border-0 bg-transparent hover:bg-white/[0.06] transition-colors';
+  const signOutDesktopPillClass = `${navBtnShell} relative z-10 inline-flex min-h-[36px] h-9 cursor-pointer items-center justify-center whitespace-nowrap px-3 py-1.5 text-[10px] sm:px-3.5 sm:text-xs ${navDesktopPillInactive}`;
 
   const getNavLinkClass = (path: string) => {
     const normalize = (p: string) => (p ? p.replace(/\/$/, '') || '/' : '/');
     const isActive = normalize(pathname) === normalize(path);
 
-    return `${navBtnShell} relative z-10 inline-flex min-h-[36px] h-9 items-center justify-center px-3 py-1.5 text-[10px] sm:px-3.5 sm:text-xs ${
-      isActive
-        ? 'border border-white bg-gradient-to-b from-blue-500 via-blue-600 to-blue-800 text-white shadow-[0_0_20px_rgba(59,130,246,0.55),inset_0_1px_0_rgba(255,255,255,0.28)] hover:brightness-105'
-        : 'border-blue-600/55 bg-[linear-gradient(180deg,rgb(24,32,48)_0%,rgb(15,23,42)_45%,rgb(10,15,28)_100%)] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_3px_12px_rgba(0,0,0,0.5)] hover:border-blue-400/70 hover:text-white hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_22px_rgba(59,130,246,0.28)] active:scale-[0.97]'
+    return `${navBtnShell} relative z-10 inline-flex min-h-[36px] h-9 items-center justify-center whitespace-nowrap px-3 py-1.5 text-[10px] sm:px-3.5 sm:text-xs ${
+      isActive ? navDesktopPillActive : navDesktopPillInactive
     }`;
   };
 
@@ -152,27 +146,26 @@ export default function Navbar() {
               </div>
               {mounted && !user && (
                 <div
-                  className="relative z-10 flex min-h-[36px] shrink-0 items-stretch border-l border-white/20 pl-2 sm:pl-2.5"
+                  className="relative z-10 inline-flex shrink-0 flex-wrap items-center gap-x-2.5 gap-y-2 sm:gap-x-3"
                   aria-label="Account"
                 >
-                  <Link href="/login" onClick={scrollToTop} className={authDesktopLinkClass}>
+                  <Link href="/login" onClick={scrollToTop} className={getNavLinkClass('/login')}>
                     Log in
                   </Link>
-                  <span className="w-px shrink-0 self-stretch bg-white/15" aria-hidden />
-                  <Link href="/signup" onClick={scrollToTop} className={authDesktopLinkClass}>
+                  <Link href="/signup" onClick={scrollToTop} className={getNavLinkClass('/signup')}>
                     Join
                   </Link>
                 </div>
               )}
               {mounted && user && (
-                <div className="relative z-10 flex min-h-[36px] flex-wrap items-center justify-center gap-2 border-l border-white/20 pl-2 sm:gap-2.5 sm:pl-2.5">
+                <div className="relative z-10 inline-flex shrink-0 flex-wrap items-center gap-x-2.5 gap-y-2 sm:gap-x-3">
                   <button
                     type="button"
                     onClick={() => {
                       handleSignOut();
                       scrollToTop();
                     }}
-                    className="inline-flex min-h-[36px] shrink-0 items-center whitespace-nowrap px-1 text-[10px] font-medium tracking-wide text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white sm:text-xs"
+                    className={signOutDesktopPillClass}
                   >
                     Sign out
                   </button>
@@ -220,28 +213,26 @@ export default function Navbar() {
               {mounted && !user && (
                 <div className="mt-1 border-t border-white/10 pt-2">
                   <p className="px-1 text-[9px] font-bold uppercase tracking-wider text-slate-500">Account</p>
-                  <div className={`${authMobileClusterClass} mt-1`}>
-                    <Link
-                      href="/login"
-                      onClick={() => {
-                        scrollToTop();
-                        closeMobile();
-                      }}
-                      className={authMobileSignInClass}
-                    >
-                      Log in
-                    </Link>
-                    <Link
-                      href="/signup"
-                      onClick={() => {
-                        scrollToTop();
-                        closeMobile();
-                      }}
-                      className={authMobileSignUpClass}
-                    >
-                      Join
-                    </Link>
-                  </div>
+                  <Link
+                    href="/login"
+                    onClick={() => {
+                      scrollToTop();
+                      closeMobile();
+                    }}
+                    className={getMobileLinkClass('/login')}
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => {
+                      scrollToTop();
+                      closeMobile();
+                    }}
+                    className={getMobileLinkClass('/signup')}
+                  >
+                    Join
+                  </Link>
                 </div>
               )}
 
