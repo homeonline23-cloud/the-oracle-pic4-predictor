@@ -57,6 +57,19 @@ export default function Navbar() {
   const navBtnShell =
     'rounded-none transition-all duration-200 font-bold tracking-wide border leading-tight shrink-0';
 
+  /** Auth: light sign-in + single blue CTA (not two heavy nav chrome buttons). */
+  const authSignInClass =
+    'relative z-10 inline-flex min-h-[36px] h-9 shrink-0 items-center justify-center px-3 py-1.5 text-[10px] sm:px-3.5 sm:text-xs font-medium tracking-normal text-slate-200/95 hover:text-white border border-transparent hover:border-white/20 hover:bg-white/[0.06] rounded-none transition-all active:scale-[0.98]';
+
+  const authSignUpClass =
+    'relative z-10 inline-flex min-h-[36px] h-9 shrink-0 items-center justify-center px-3.5 py-1.5 text-[10px] sm:px-4 sm:text-xs font-semibold tracking-normal text-white bg-blue-600 hover:bg-blue-500 border border-blue-400/50 hover:border-blue-300/60 rounded-none shadow-[0_2px_12px_rgba(37,99,235,0.35)] transition-all active:scale-[0.98]';
+
+  const authMobileSignInClass =
+    'flex w-full items-center justify-center min-h-[48px] px-4 text-sm font-medium tracking-normal rounded-none border border-white/15 bg-transparent text-slate-200 hover:bg-white/[0.06] hover:text-white transition-colors';
+
+  const authMobileSignUpClass =
+    'flex w-full items-center justify-center min-h-[48px] px-4 text-sm font-semibold tracking-normal rounded-none border border-blue-400/45 bg-blue-600 text-white hover:bg-blue-500 transition-colors shadow-[0_4px_20px_rgba(37,99,235,0.25)]';
+
   const getNavLinkClass = (path: string) => {
     const normalize = (p: string) => (p ? p.replace(/\/$/, '') || '/' : '/');
     const isActive = normalize(pathname) === normalize(path);
@@ -106,14 +119,14 @@ export default function Navbar() {
           >
             {mobileOpen ? <X className="h-5 w-5" strokeWidth={2.5} /> : <Menu className="h-5 w-5" strokeWidth={2.5} />}
           </button>
-          <div className="relative z-10 flex min-w-0 flex-1 items-center justify-end gap-3">
+          <div className="relative z-10 flex min-w-0 flex-1 items-center justify-end gap-2">
             {mounted && !user && (
               <>
-                <Link href="/login" onClick={scrollToTop} className={getNavLinkClass('/login')}>
-                  Sign In
+                <Link href="/login" onClick={scrollToTop} className={authSignInClass}>
+                  Sign in
                 </Link>
-                <Link href="/signup" onClick={scrollToTop} className={getNavLinkClass('/signup')}>
-                  Sign Up
+                <Link href="/signup" onClick={scrollToTop} className={authSignUpClass}>
+                  Sign up
                 </Link>
               </>
             )}
@@ -159,11 +172,11 @@ export default function Navbar() {
             ))}
             {mounted && !user && (
               <>
-                <Link href="/login" onClick={scrollToTop} className={getNavLinkClass('/login')}>
-                  Sign In
+                <Link href="/login" onClick={scrollToTop} className={authSignInClass}>
+                  Sign in
                 </Link>
-                <Link href="/signup" onClick={scrollToTop} className={getNavLinkClass('/signup')}>
-                  Sign Up
+                <Link href="/signup" onClick={scrollToTop} className={authSignUpClass}>
+                  Sign up
                 </Link>
               </>
             )}
@@ -225,9 +238,9 @@ export default function Navbar() {
                       scrollToTop();
                       closeMobile();
                     }}
-                    className={getMobileLinkClass('/login')}
+                    className={authMobileSignInClass}
                   >
-                    Sign In
+                    Sign in
                   </Link>
                   <Link
                     href="/signup"
@@ -235,9 +248,9 @@ export default function Navbar() {
                       scrollToTop();
                       closeMobile();
                     }}
-                    className={getMobileLinkClass('/signup')}
+                    className={authMobileSignUpClass}
                   >
-                    Sign Up
+                    Sign up
                   </Link>
                 </>
               )}
