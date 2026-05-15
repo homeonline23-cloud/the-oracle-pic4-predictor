@@ -2,12 +2,11 @@ export const ADMIN_EMAIL =
   process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'homeonline23@gmail.com';
 
 /**
- * Navbar / broad sections: wider column (`max-w-4xl`).
- * Grid tier buttons intentionally use {@link VIDEO_SHELL} so they line up with hero + framed windows (`max-w-3xl`).
+ * Broader sections only (e.g. wide copy blocks). Nav + hero + framed windows use {@link VIDEO_SHELL}.
  */
 export const CONTENT_SHELL = 'w-full max-w-4xl mx-auto px-2 md:px-6';
 
-/** Hero oracle video + auxiliary videos + 2/10/20 Grids Boxes row — same width as main content windows. */
+/** Top nav, hero video, grid row, and main “window” panels — keep the same width (`max-w-3xl`). */
 export const VIDEO_SHELL = 'w-full max-w-3xl mx-auto px-2 md:px-6';
 
 /**

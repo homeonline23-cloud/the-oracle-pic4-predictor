@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
-import { CONTENT_SHELL, NAV_BAND_FILL, NAV_BAND_SHELL } from '@/lib/constants';
+import { NAV_BAND_FILL, NAV_BAND_SHELL, VIDEO_SHELL } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -64,13 +64,13 @@ export default function Navbar() {
   const navDesktopPillInactive =
     'border-blue-600/55 bg-[linear-gradient(180deg,rgb(24,32,48)_0%,rgb(15,23,42)_45%,rgb(10,15,28)_100%)] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_3px_12px_rgba(0,0,0,0.5)] hover:border-blue-400/70 hover:text-white hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_22px_rgba(59,130,246,0.28)] active:scale-[0.97]';
 
-  const signOutDesktopPillClass = `${navBtnShell} relative z-10 inline-flex min-h-[36px] h-9 shrink-0 cursor-pointer items-center justify-center whitespace-nowrap px-2.5 py-1.5 text-[10px] sm:px-3 sm:text-xs ${navDesktopPillInactive}`;
+  const signOutDesktopPillClass = `${navBtnShell} relative z-10 inline-flex min-h-[36px] h-9 shrink-0 cursor-pointer items-center justify-center whitespace-nowrap px-2 py-1.5 text-[9px] sm:px-2.5 sm:text-[10px] md:px-3 md:text-xs ${navDesktopPillInactive}`;
 
   const getNavLinkClass = (path: string) => {
     const normalize = (p: string) => (p ? p.replace(/\/$/, '') || '/' : '/');
     const isActive = normalize(pathname) === normalize(path);
 
-    return `${navBtnShell} relative z-10 inline-flex min-h-[36px] h-9 shrink-0 items-center justify-center whitespace-nowrap px-2.5 py-1.5 text-[10px] sm:px-3 sm:text-xs ${
+    return `${navBtnShell} relative z-10 inline-flex min-h-[36px] h-9 shrink-0 items-center justify-center whitespace-nowrap px-2 py-1.5 text-[9px] sm:px-2.5 sm:text-[10px] md:px-3 md:text-xs ${
       isActive ? navDesktopPillActive : navDesktopPillInactive
     }`;
   };
@@ -90,7 +90,7 @@ export default function Navbar() {
       className="fixed inset-x-0 top-0 z-[190] flex justify-center py-2 sm:py-2.5 pointer-events-none"
       aria-label="Main navigation"
     >
-      <div className={`relative z-10 ${CONTENT_SHELL} pointer-events-auto`}>
+      <div className={`relative z-10 ${VIDEO_SHELL} pointer-events-auto`}>
         {/* Mobile top bar — menu opens sheet (auth lives in menu only; no duplicate buttons) */}
         <div
           className={cn(
@@ -131,7 +131,7 @@ export default function Navbar() {
               className="pointer-events-none absolute -inset-x-1 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-90 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
               aria-hidden
             />
-            <div className="relative z-10 flex w-full min-w-0 flex-nowrap items-center justify-center gap-x-1.5 overflow-x-auto overscroll-x-contain sm:gap-x-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="relative z-10 flex w-full min-w-0 flex-nowrap items-center justify-center gap-x-1 sm:gap-x-1.5 md:gap-x-2">
               {PRIMARY_LINKS.map(({ href, label }) => (
                 <Link key={href} href={href} onClick={scrollToTop} className={getNavLinkClass(href)}>
                   {label}
