@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 const PRIMARY_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
+  { href: '/visual-evidence', label: 'Evidence' },
   { href: '/how-it-works', label: 'Process' },
   { href: '/pricing', label: 'Pricing' },
 ] as const;
@@ -56,12 +57,6 @@ export default function Navbar() {
 
   const navBtnShell =
     'rounded-none transition-all duration-200 font-bold tracking-wide border leading-tight shrink-0';
-
-  /** Matte inner tray behind the whole pill row (outer bar still carries main blue glow). */
-  const navInnerMatteShell =
-    'border border-white/16 bg-[linear-gradient(180deg,rgb(16,20,30)_0%,rgb(10,13,20)_48%,rgb(6,8,14)_100%)] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_6px_22px_rgba(0,0,0,0.55)] transition-all hover:border-white/26 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_8px_28px_rgba(0,0,0,0.5)] active:scale-[0.99]';
-
-  const navDesktopInnerPanelClass = `${navBtnShell} relative z-0 inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-2 px-2 py-1.5 sm:gap-x-2.5 sm:gap-y-2 sm:px-2.5 sm:py-2 ${navInnerMatteShell}`;
 
   const navDesktopPillActive =
     'border border-white bg-gradient-to-b from-blue-500 via-blue-600 to-blue-800 text-white shadow-[0_0_20px_rgba(59,130,246,0.55),inset_0_1px_0_rgba(255,255,255,0.28)] hover:brightness-105';
@@ -131,34 +126,29 @@ export default function Navbar() {
               NAV_BAND_SHELL
             )}
           >
-            <div className={navDesktopInnerPanelClass}>
-              {/* Stripe only across primary pills — not through account column */}
-              <div className="relative z-0 inline-flex flex-wrap items-center justify-center gap-x-2.5 gap-y-2 sm:gap-x-3">
-                <div
-                  className="pointer-events-none absolute inset-x-0 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-90 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                  aria-hidden
-                />
-                {PRIMARY_LINKS.map(({ href, label }) => (
-                  <Link key={href} href={href} onClick={scrollToTop} className={getNavLinkClass(href)}>
-                    {label}
-                  </Link>
-                ))}
-              </div>
+            {/* BWR stripe through button gaps — same pattern as GridButtons row */}
+            <div
+              className="pointer-events-none absolute -inset-x-1 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-90 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+              aria-hidden
+            />
+            <div className="relative z-10 inline-flex max-w-full flex-wrap items-center justify-center gap-x-2.5 gap-y-2 sm:gap-x-3">
+              {PRIMARY_LINKS.map(({ href, label }) => (
+                <Link key={href} href={href} onClick={scrollToTop} className={getNavLinkClass(href)}>
+                  {label}
+                </Link>
+              ))}
               {mounted && !user && (
-                <div
-                  className="relative z-10 inline-flex shrink-0 flex-wrap items-center gap-x-2.5 gap-y-2 sm:gap-x-3"
-                  aria-label="Account"
-                >
+                <>
                   <Link href="/login" onClick={scrollToTop} className={getNavLinkClass('/login')}>
                     Log in
                   </Link>
                   <Link href="/signup" onClick={scrollToTop} className={getNavLinkClass('/signup')}>
                     Join
                   </Link>
-                </div>
+                </>
               )}
               {mounted && user && (
-                <div className="relative z-10 inline-flex shrink-0 flex-wrap items-center gap-x-2.5 gap-y-2 sm:gap-x-3">
+                <>
                   <button
                     type="button"
                     onClick={() => {
@@ -174,7 +164,7 @@ export default function Navbar() {
                       Admin
                     </Link>
                   )}
-                </div>
+                </>
               )}
             </div>
           </div>
