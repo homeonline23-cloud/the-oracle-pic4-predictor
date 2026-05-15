@@ -18,6 +18,12 @@ const outfit = Outfit({
   variable: '--font-outfit',
 });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://theoraclepic4.com'),
   title: {
@@ -85,7 +91,7 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
-      <body className="font-sans antialiased text-slate-200">
+      <body className="min-h-screen overflow-x-clip font-sans antialiased text-slate-200">
         <Providers>
           <div className="relative min-h-screen flex flex-col bg-transparent">
             {/* Dedicated Background Layer */}

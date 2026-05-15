@@ -71,8 +71,19 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ url: session.url });
-  } catch (e) {
+  } catch (e: unknown) {
     console.error('Stripe checkout.session.create failed:', e);
-    return NextResponse.json({ error: 'Could not start Stripe checkout.' }, { status: 500 });
+    const stripeMessage =
+      e && typeof e === 'object' && 'message' in e && typeof (e as { message: string }).message === 'string'
+        ? (e as { message: string }).message
+        : null;
+    return NextResponse.json(
+      {
+        error:
+          stripeMessage ||
+          'Could not start Stripe checkout. Check live STRIPE_SECRET_KEY and STRIPE_PRICE_* on Vercel.',
+      },
+      { status: 500 }
+    );
   }
 }
