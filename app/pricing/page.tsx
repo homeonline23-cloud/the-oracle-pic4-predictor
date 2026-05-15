@@ -28,7 +28,7 @@ export default function PricingPage() {
   }, []);
 
   return (
-    <main className="relative flex min-w-0 flex-col items-center overflow-x-clip p-0 pb-0 pt-4 font-sans">
+    <main className="relative flex min-w-0 flex-col items-center overflow-x-hidden p-0 pb-0 pt-4 font-sans">
       <PageHeader />
       <div className="mb-4 md:mb-8 w-full">
         <GridButtons />

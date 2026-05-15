@@ -91,29 +91,24 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
-      <body className="min-h-screen overflow-x-clip font-sans antialiased text-slate-200">
+      <body className="min-h-screen w-full overflow-x-hidden overflow-y-auto font-sans antialiased text-slate-200">
         <Providers>
-          <div className="relative min-h-screen flex flex-col bg-transparent">
+          <div className="relative min-h-screen w-full bg-transparent">
             {/* Dedicated Background Layer */}
-            <div 
-              className="fixed inset-0 z-[-1] pointer-events-none"
+            <div
+              className="pointer-events-none fixed inset-0 z-[-1] bg-[#020617] bg-cover bg-center"
               style={{
-                backgroundColor: '#020617',
                 backgroundImage: `linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 0.6)), url('https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=1920&q=80')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundAttachment: 'fixed'
               }}
-            ></div>
+              aria-hidden
+            />
             {/* Background Texture Overlay */}
             <div className="fixed inset-0 z-0 pointer-events-none opacity-10 bg-texture-carbon"></div>
             
             <Navbar />
             <div className="relative z-0 mt-[4.75rem] sm:mt-[5rem] md:mt-[5.25rem] shrink-0" aria-hidden="true" />
             
-            <main className="relative z-0 min-h-0 min-w-0 flex-1">
-              {children}
-            </main>
+            <div className="relative z-10 w-full min-w-0">{children}</div>
 
             <Footer />
             <OracleGuardian />

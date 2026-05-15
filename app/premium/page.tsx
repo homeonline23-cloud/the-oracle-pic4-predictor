@@ -139,7 +139,7 @@ export default function PremiumTenGridPage() {
 
   return (
     <SubscriptionGuard requiredTier="premium" allowGuestView>
-      <main className="relative flex min-h-screen min-w-0 flex-col items-center overflow-x-clip p-0 pb-20 font-sans">
+      <main className="relative flex min-h-screen min-w-0 flex-col items-center overflow-x-hidden p-0 pb-20 font-sans">
         <PageHeader />
         <div className="mb-4 md:mb-8 w-full">
           <GridButtons />

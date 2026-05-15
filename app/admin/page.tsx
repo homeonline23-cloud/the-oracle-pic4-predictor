@@ -126,7 +126,7 @@ export default function AdminDashboard() {
   const mockChartData = generateMockData();
 
   return (
-    <main className="relative flex w-full min-w-0 flex-grow flex-col items-center overflow-x-clip p-0 pb-20 pt-0 font-sans lowercase transition-all duration-500">
+    <main className="relative flex w-full min-w-0 flex-grow flex-col items-center overflow-x-hidden p-0 pb-20 pt-0 font-sans lowercase transition-all duration-500">
       
       {/* Page Header with The Oracle Video - Matching Layout of other pages */}
       <PageHeader />

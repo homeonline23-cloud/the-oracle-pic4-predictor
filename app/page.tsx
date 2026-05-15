@@ -13,7 +13,7 @@ export default function HomePage() {
   useScrollReveal();
 
   return (
-    <main className="relative flex w-full min-w-0 flex-grow flex-col items-center overflow-x-clip p-0 pb-0 pt-0 font-sans transition-all duration-500">
+    <main className="relative flex w-full min-w-0 flex-grow flex-col items-center overflow-x-hidden p-0 pb-0 pt-0 font-sans transition-all duration-500">
       {/* Content Wrapper */}
       <div className="relative z-10 w-full flex flex-col items-center">
         {/* Video Section - Moved to top of content */}
