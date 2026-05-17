@@ -25,7 +25,7 @@ export interface AuthContextType {
   loading: boolean;
   userRole: string | null;
   signOut: () => Promise<void>;
-  signInWithGoogle: () => Promise<string | void>;
+  signInWithGoogle: () => Promise<void>;
   signInWithMagicLink: (email: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
@@ -39,7 +39,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   userRole: null,
   signOut: async () => {},
-  signInWithGoogle: async () => undefined,
+  signInWithGoogle: async () => {},
   signInWithMagicLink: async () => {},
   signInWithEmail: async () => {},
   signUp: async () => {},
@@ -137,52 +137,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    try {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      
-      const width = 600;
-      const height = 700;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2;
-      
-      let popup: Window | null = null;
-      
-      if (isMobile) {
-         popup = window.open('', '_blank');
-      } else {
-         popup = window.open(
-           '',
-           'google-signin',
-           `width=${width},height=${height},left=${left},top=${top}`
-         );
-      }
-      
-      if (popup) {
-         popup.document.write('<p>Loading...</p>');
-      }
-      
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          skipBrowserRedirect: true,
-        },
-      });
-
-      if (error) {
-        if (popup) popup.close();
-        throw error;
-      }
-      
-      if (data?.url) {
-        if (popup) {
-          popup.location.href = data.url;
-        } else {
-          console.warn('Popup blocked, returning URL for manual interaction');
-          return data.url;
-        }
-      }
-    } catch (error) {
+    const redirectTo = `${window.location.origin}/auth/callback`;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo },
+    });
+    if (error) {
       console.error('Google Sign-In Error:', error);
       throw error;
     }

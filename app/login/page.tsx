@@ -14,7 +14,7 @@ function LoginContent() {
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [manualAuthUrl, setManualAuthUrl] = useState<string | null>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
@@ -51,17 +51,14 @@ function LoginContent() {
     }
   }, [searchParams]);
 
-  const handleOAuth = async (provider: 'google') => {
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setGoogleLoading(true);
     try {
-      if (provider === 'google') {
-        const url = await signInWithGoogle();
-        if (url) {
-          setManualAuthUrl(url);
-        }
-      }
+      await signInWithGoogle();
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'OAuth error';
-      setError(errorMessage);
+      setError(err instanceof Error ? err.message : 'Google sign-in failed');
+      setGoogleLoading(false);
     }
   };
 
@@ -98,20 +95,7 @@ function LoginContent() {
           </motion.div>
         )}
 
-        {manualAuthUrl ? (
-          <motion.div className="bg-yellow-500/10 border-2 border-yellow-500 text-yellow-500 text-sm font-bold p-4 rounded-none mb-6 text-center tracking-normal flex flex-col gap-4">
-            <p>Popups are blocked by your browser. Please click the button below to sign in:</p>
-            <a 
-              href={manualAuthUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-yellow-500 text-black px-4 py-3 tracking-normal font-bold transition-transform active:scale-95"
-            >
-              Open Sign In Window
-            </a>
-          </motion.div>
-        ) : (
-          <>
+        <>
             <form onSubmit={handleEmailSignIn} className="flex flex-col gap-4 mt-4 space-y-1">
               <motion.div>
                 <label className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">Email</label>
@@ -162,16 +146,18 @@ function LoginContent() {
 
             <motion.div className="flex flex-col gap-4">
               <button
-                onClick={() => handleOAuth('google')}
+                onClick={handleGoogleSignIn}
                 type="button"
-                className="flex items-center justify-center gap-3 bg-slate-600 hover:bg-slate-700 border border-white/10 text-white rounded-none py-4 px-2 transition-all active:scale-95"
+                disabled={googleLoading}
+                className="flex items-center justify-center gap-3 bg-slate-600 hover:bg-slate-700 border border-white/10 text-white rounded-none py-4 px-2 transition-all active:scale-95 disabled:opacity-50"
               >
                 <Image src="https://www.google.com/favicon.ico" width={20} height={20} className="w-5 h-5 shrink-0" alt="Google" />
-                <span className="text-[10px] sm:text-xs font-bold tracking-normal text-center">Sign in with Google</span>
+                <span className="text-[10px] sm:text-xs font-bold tracking-normal text-center">
+                  {googleLoading ? 'Redirecting to Google…' : 'Sign in with Google'}
+                </span>
               </button>
             </motion.div>
-          </>
-        )}
+        </>
 
         <p className="mt-10 text-center text-[10px] font-bold text-slate-400 tracking-normal opacity-50">
           Use email and password or Google sign-in.

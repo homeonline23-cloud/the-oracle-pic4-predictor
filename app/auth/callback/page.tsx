@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 export default function AuthCallback() {
-  const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
@@ -16,6 +14,10 @@ export default function AuthCallback() {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
         if (exchangeError) {
           console.error('OAuth code exchange failed:', exchangeError);
+          window.location.replace(
+            `/login?message=${encodeURIComponent(exchangeError.message)}`
+          );
+          return;
         }
       } else {
         const { error } = await supabase.auth.getSession();
@@ -24,16 +26,22 @@ export default function AuthCallback() {
         }
       }
 
-      if (window.opener) {
-        window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, '*');
+      const rawNext = url.searchParams.get('next');
+      const next =
+        rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/';
+
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, window.location.origin);
         window.close();
-      } else {
-        router.push('/');
+        return;
       }
+
+      // Full navigation helps Edge/IE apply auth cookies reliably (popup flow legacy).
+      window.location.replace(next);
     };
 
     void handleAuth();
-  }, [router, supabase.auth]);
+  }, [supabase.auth]);
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
