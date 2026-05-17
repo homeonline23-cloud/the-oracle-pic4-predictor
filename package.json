@@ -3,13 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3002",
-    "dev:3002": "next dev -p 3002",
-    "open:dev": "start http://localhost:3002",
+    "dev": "next dev -p 3002 -H 0.0.0.0",
+    "dev:3002": "next dev -p 3002 -H 0.0.0.0",
+    "dev:clean": "node -e \"try{require('fs').rmSync('.next',{recursive:true,force:true})}catch(e){}\" && next dev -p 3002 -H 0.0.0.0",
+    "open:dev": "start http://127.0.0.1:3002",
     "build": "cross-env NODE_ENV=production next build",
     "start": "next start",
     "lint": "eslint .",
-    "clean": "next clean"
+    "clean": "next clean",
+    "pack:deploy": "node scripts/pack-deploy.mjs",
+    "pack:login-patch": "node scripts/pack-login-patch.mjs",
+    "deploy:ftp": "node scripts/pack-deploy.mjs && node scripts/deploy-ftp.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.17.0",

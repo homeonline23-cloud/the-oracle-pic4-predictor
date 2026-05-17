@@ -26,7 +26,6 @@ export interface AuthContextType {
   userRole: string | null;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<string | void>;
-  forceAdminBypass: () => void;
   signInWithMagicLink: (email: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
@@ -41,12 +40,17 @@ const AuthContext = createContext<AuthContextType>({
   userRole: null,
   signOut: async () => {},
   signInWithGoogle: async () => undefined,
-  forceAdminBypass: () => {},
   signInWithMagicLink: async () => {},
   signInWithEmail: async () => {},
   signUp: async () => {},
   sendPasswordResetEmail: async () => {},
 });
+
+function clearLegacyBypassStorage() {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(MOCK_OWNER_SESSION_KEY);
+  localStorage.removeItem(LEGACY_ADMIN_BYPASS_KEY);
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -75,48 +79,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     let subscription: { unsubscribe: () => void } | null = null;
 
-    const mockUser = {
-      id: 'admin-bypass-id',
-      email: ADMIN_EMAIL,
-      user_metadata: { full_name: 'Master Oracle Admin' },
-    } as unknown as User;
-
-    const mockProfile: Profile = {
-      id: 'admin-bypass-id',
-      full_name: 'Master Oracle Admin',
-      subscription_tier: 'admin',
-      subscription_status: 'active',
-      predictions_limit: 99999,
-      predictions_used: 0,
-      grids_limit: 99999,
-      grids_used: 0,
-      created_at: new Date().toISOString(),
-    };
-
     void (async () => {
       try {
         if (typeof window === 'undefined') return;
 
-        const searchParams = new URLSearchParams(window.location.search);
-        const bypassKey = searchParams.get('oracle_key');
-        const envBypassKey = process.env.NEXT_PUBLIC_ADMIN_BYPASS_KEY || 'visionary';
-        const mockOwnerActive =
-          bypassKey === envBypassKey ||
-          localStorage.getItem(MOCK_OWNER_SESSION_KEY) === 'true';
-
-        if (mockOwnerActive) {
-          localStorage.setItem(MOCK_OWNER_SESSION_KEY, 'true');
-          localStorage.removeItem(LEGACY_ADMIN_BYPASS_KEY);
-          if (cancelled) return;
-          setSession(null);
-          setUser(mockUser);
-          setProfile(mockProfile);
-          setLoading(false);
-          return;
-        }
-
-        // Legacy flag used to skip the real JWT after Google login — remove so refresh keeps session
-        localStorage.removeItem(LEGACY_ADMIN_BYPASS_KEY);
+        clearLegacyBypassStorage();
 
         const {
           data: { session: initialSession },
@@ -134,14 +101,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: { subscription: sub },
         } = supabase.auth.onAuthStateChange(async (_event, session) => {
           if (cancelled) return;
-
-          if (
-            localStorage.getItem(MOCK_OWNER_SESSION_KEY) === 'true' &&
-            !session?.user
-          ) {
-            if (!cancelled) setLoading(false);
-            return;
-          }
 
           setSession(session);
           setUser(session?.user ?? null);
@@ -177,12 +136,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
-  const forceAdminBypass = () => {
-    localStorage.setItem(MOCK_OWNER_SESSION_KEY, 'true');
-    localStorage.removeItem(LEGACY_ADMIN_BYPASS_KEY);
-    window.location.reload();
-  };
-
   const signInWithGoogle = async () => {
     try {
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -192,7 +145,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const left = window.screenX + (window.outerWidth - width) / 2;
       const top = window.screenY + (window.outerHeight - height) / 2;
       
-      // Open window synchronously before any async call to prevent popup blocker
       let popup: Window | null = null;
       
       if (isMobile) {
@@ -277,18 +229,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    localStorage.removeItem(MOCK_OWNER_SESSION_KEY);
-    localStorage.removeItem(LEGACY_ADMIN_BYPASS_KEY);
+    clearLegacyBypassStorage();
     await supabase.auth.signOut();
     window.location.href = '/';
   };
 
-  const isMockOwnerSession =
-    typeof window !== 'undefined' &&
-    localStorage.getItem(MOCK_OWNER_SESSION_KEY) === 'true';
-
   const userRole =
-    user?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase() || isMockOwnerSession
+    user?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()
       ? 'admin'
       : (profile?.subscription_tier || 'free');
 
@@ -301,7 +248,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       userRole,
       signOut, 
       signInWithGoogle, 
-      forceAdminBypass,
       signInWithMagicLink,
       signInWithEmail,
       signUp,

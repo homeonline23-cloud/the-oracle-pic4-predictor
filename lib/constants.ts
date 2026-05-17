@@ -60,8 +60,8 @@ export const PUBLIC_EVIDENCE_HERO_IMAGE = '/upserving-the-worldglobe.png';
 /** Same asset path as PUBLIC_EVIDENCE_HERO_IMAGE (worldglobe art), for optional image heroes. */
 export const PUBLIC_SITE_HERO_IMAGE = PUBLIC_EVIDENCE_HERO_IMAGE;
 
-/** Only Fast Login / ?oracle_key= mock mode — never paired with real Google JWT. Keeps refresh working. */
+/** Cleared on load/sign-out — legacy Fast Login / mock owner session (removed from UI). */
 export const MOCK_OWNER_SESSION_KEY = 'oracle_fast_owner_mock';
 
-/** Old key cleared on startup for real OAuth users (it used to force mock mode after Google sign-in). */
+/** Cleared on load/sign-out — legacy admin bypass flag. */
 export const LEGACY_ADMIN_BYPASS_KEY = 'oracle_admin_bypass';

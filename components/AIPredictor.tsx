@@ -56,7 +56,8 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
   const [historicalData, setHistoricalData] = useState<string[]>([]);
   const lastAutoRecordedRef = useRef<string | null>(null);
   const supabase = createClient();
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
+  const isAdmin = userRole === 'admin';
 
   // Reset recorded state when input changes and handle automatic recording
   useEffect(() => {
@@ -78,26 +79,16 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
         lastAutoRecordedRef.current = inputKey;
         setRecording(true);
         try {
-          // If in admin bypass mode, don't attempt real DB insert
-          const isAdminBypass = user.id === 'admin-bypass-id';
-          
-          if (!isAdminBypass) {
-            const { error } = await supabase.from('winning_numbers').insert({
-              number: currentInput,
-              location: selectedLocation || 'Global',
-              recorded_by: user.id
-            });
-            if (error) throw error;
-          } else {
-            // Mock success for admin bypass
-            await new Promise(resolve => setTimeout(resolve, 500));
-          }
+          const { error } = await supabase.from('winning_numbers').insert({
+            number: currentInput,
+            location: selectedLocation || 'Global',
+            recorded_by: user.id
+          });
+          if (error) throw error;
           setRecorded(true);
         } catch (err: unknown) {
           lastAutoRecordedRef.current = null;
           console.error("Auto-recording error:", err);
-          // If real DB fails but we are "admin", let's still show it as recorded visually
-          if (user.id === 'admin-bypass-id') setRecorded(true);
         } finally {
           setRecording(false);
         }
@@ -121,16 +112,12 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
 
     try {
       lastAutoRecordedRef.current = `${selectedLocation}-${currentInput}`;
-      if (user.id !== 'admin-bypass-id') {
-        const { error } = await supabase.from('winning_numbers').insert({
-          number: currentInput,
-          location: selectedLocation || 'Global',
-          recorded_by: user.id
-        });
-        if (error) throw error;
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 800));
-      }
+      const { error } = await supabase.from('winning_numbers').insert({
+        number: currentInput,
+        location: selectedLocation || 'Global',
+        recorded_by: user.id
+      });
+      if (error) throw error;
       setRecorded(true);
     } catch (err: unknown) {
       console.error("Error recording winning number:", err);
@@ -155,8 +142,8 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
     setError(null);
 
     try {
-      // 1. Check Usage Limits
-      if (user.id !== 'admin-bypass-id') {
+      // 1. Check Usage Limits (admin account is exempt)
+      if (!isAdmin) {
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
         if (profile && profile.predictions_used >= profile.predictions_limit) {
           setError("Monthly prediction limit reached. Please upgrade your plan.");
@@ -166,21 +153,15 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
       }
 
       // 2. Fetch History
-      let history: string[] = [];
-      if (user.id !== 'admin-bypass-id') {
-        const { data: historyData } = await supabase
-          .from('winning_numbers')
-          .select('number')
-          .eq('location', selectedLocation)
-          .order('created_at', { ascending: false })
-          .limit(20);
-        
-        history = historyData?.map(h => h.number) || [];
-        setHistoricalData(history);
-      } else {
-        history = ["1234", "5678", "9012"]; // Mock history for admin
-        setHistoricalData(history);
-      }
+      const { data: historyData } = await supabase
+        .from('winning_numbers')
+        .select('number')
+        .eq('location', selectedLocation)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      const history = historyData?.map(h => h.number) || [];
+      setHistoricalData(history);
 
       const prompt = `
         You are an expert pattern recognition AI for "The Oracle Pick 4".
@@ -275,14 +256,14 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
       setPredictions(result);
 
       // 3. Save Prediction History & Increment Usage
-      if (user.id !== 'admin-bypass-id') {
-        await supabase.from('predictions').insert({
-          user_id: user.id,
-          predictions: result,
-          location: selectedLocation || 'Global',
-          input_numbers: currentInput
-        });
+      await supabase.from('predictions').insert({
+        user_id: user.id,
+        predictions: result,
+        location: selectedLocation || 'Global',
+        input_numbers: currentInput
+      });
 
+      if (!isAdmin) {
         await supabase.rpc('increment_predictions_used');
       }
 
