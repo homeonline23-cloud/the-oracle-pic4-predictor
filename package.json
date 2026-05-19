@@ -13,9 +13,14 @@
     "clean": "next clean",
     "pack:deploy": "node scripts/pack-deploy.mjs",
     "pack:login-patch": "node scripts/pack-login-patch.mjs",
-    "deploy:ftp": "node scripts/pack-deploy.mjs && node scripts/deploy-ftp.mjs"
+    "deploy:ftp": "node scripts/pack-deploy.mjs && node scripts/deploy-ftp.mjs",
+    "android:setup": "node scripts/setup-google-play.mjs",
+    "android:sync": "npx cap sync android",
+    "android:open": "npx cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^7.6.5",
+    "@capacitor/core": "^7.6.5",
     "@google/genai": "^1.17.0",
     "@hookform/resolvers": "^5.2.1",
     "@paypal/react-paypal-js": "^9.1.1",
@@ -45,6 +50,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.6.5",
     "@types/node": "^20",
     "@types/nodemailer": "^8.0.0",
     "@types/react": "^19",

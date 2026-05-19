@@ -1,5 +1,10 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
+import {
+  getRequiredTierForPath,
+  hasPaidGridAccess,
+  isAdminEmail,
+} from '@/lib/gridAccess';
 
 export const updateSession = async (request: NextRequest) => {
   // Create an unmodified response
@@ -65,9 +70,36 @@ export const updateSession = async (request: NextRequest) => {
     }
   );
 
-  // This will refresh session if expired - required for Server Components
-  // https://supabase.com/docs/guides/auth/server-side/nextjs
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+  const requiredTier = getRequiredTierForPath(pathname);
+
+  if (requiredTier) {
+    if (!user) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = '/login';
+      loginUrl.searchParams.set('next', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (!isAdminEmail(user.email)) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('subscription_tier, subscription_status')
+        .eq('id', user.id)
+        .single();
+
+      if (!hasPaidGridAccess(profile, requiredTier, user.email)) {
+        const pricingUrl = request.nextUrl.clone();
+        pricingUrl.pathname = '/pricing';
+        pricingUrl.searchParams.set('required', requiredTier);
+        return NextResponse.redirect(pricingUrl);
+      }
+    }
+  }
 
   return response;
 };

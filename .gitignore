@@ -9,3 +9,11 @@ coverage/
 
 # Local deploy bundles — do not commit to GitHub
 *.zip
+
+# Android / Capacitor (keep android/ in repo; ignore local SDK noise)
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.keystore
+!android/.gitkeep

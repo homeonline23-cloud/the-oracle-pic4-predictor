@@ -190,7 +190,7 @@ export default function HowItWorksPage() {
                       </div>
                       <h4 className="text-sm font-bold uppercase tracking-wide text-white">Red &amp; Blue circles</h4>
                       <p className="flex-grow text-sm leading-relaxed text-slate-400">
-                        Each number has a mirror number (e.g., 8 mirrors 3). You may see <span className="font-semibold text-red-500">Red: 8–3</span> one day and <span className="font-semibold text-blue-500">Blue: 9–4</span> the next.
+                        Each number has a mirror number (e.g., 3 pairs with 8). You may see <span className="font-semibold text-red-500">Red: 3–8</span> one day and <span className="font-semibold text-blue-500">Blue: 4–9</span> the next.
                       </p>
                     </div>
                     <div className="flex min-h-[11rem] flex-col gap-3 rounded-none border border-white/10 bg-slate-900/65 p-5 backdrop-blur-sm">

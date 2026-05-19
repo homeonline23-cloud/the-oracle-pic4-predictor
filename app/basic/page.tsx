@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Clock, Calendar } from 'lucide-react';
 import Grid from '@/components/Grid';
+import AnchorConnectorLines from '@/components/AnchorConnectorLines';
 import AIPredictor from '@/components/AIPredictor';
 import SubscriptionGuard from '@/components/SubscriptionGuard';
 import PageHeader from '@/components/PageHeader';
@@ -154,7 +155,7 @@ export default function BasicGridPage() {
   const circleFb = SUBTRACT_CIRCLE_MOUNT_FALLBACK;
 
   return (
-    <SubscriptionGuard requiredTier="standard" allowGuestView>
+    <SubscriptionGuard requiredTier="standard">
       <main className="relative flex min-h-screen min-w-0 flex-col items-center overflow-x-hidden p-0 font-sans">
         <PageHeader />
         <div className="mb-4 md:mb-8 w-full">
@@ -219,27 +220,21 @@ export default function BasicGridPage() {
               />
             </div>
 
-            {/* Subtraction Circles (Large Row): LEFT = RED 8–3, RIGHT = BLUE 9–4 */}
-            <div className="relative flex items-center justify-center space-x-6 h-20 mb-1 scale-90 sm:scale-100">
+            {/* Subtraction Circles (Large Row): LEFT = RED 3–8, RIGHT = BLUE 4–9 */}
+            <div className="relative mb-1 flex h-24 w-[11.5rem] scale-90 items-center justify-between sm:w-[13rem] sm:scale-100">
+              <AnchorConnectorLines />
               <div
                 className="relative z-10 w-16 h-16 rounded-full border-[6px] border-red-600 flex flex-col items-center justify-center bg-transparent shadow-[0_0_15px_rgba(220,38,38,0.3)] text-red-600 shrink-0"
-                title="RED anchor: 8 (top) and 3 (bottom) — red ring only"
+                title="RED anchor: 3 (top) and 8 (bottom) — red ring only"
               >
                 <span className="text-lg font-bold leading-none">{mounted ? anchorRedTop : circleFb.anchorRedTop}</span>
                 <span className="text-lg font-bold leading-none">-</span>
                 <span className="text-lg font-bold leading-none">{mounted ? anchorRedBottom : circleFb.anchorRedBottom}</span>
               </div>
 
-              <div className="flex items-center justify-center w-8 h-8 shrink-0">
-                <svg width="32" height="32" viewBox="0 0 100 100" className="overflow-visible">
-                  <line x1="10" y1="90" x2="90" y2="10" stroke="#FF0000" strokeWidth="16" strokeLinecap="butt" />
-                  <line x1="10" y1="10" x2="90" y2="90" stroke="#0000FF" strokeWidth="16" strokeLinecap="butt" />
-                </svg>
-              </div>
-
               <div
                 className="relative z-10 w-16 h-16 rounded-full border-[6px] border-blue-600 flex flex-col items-center justify-center bg-transparent shadow-[0_0_15px_rgba(37,99,235,0.35)] text-blue-600 shrink-0"
-                title="BLUE anchor: 9 (top) and 4 (bottom) — blue ring only"
+                title="BLUE anchor: 4 (top) and 9 (bottom) — blue ring only"
               >
                 <span className="text-lg font-bold leading-none">{mounted ? anchorBlueTop : circleFb.anchorBlueTop}</span>
                 <span className="text-lg font-bold leading-none">-</span>
@@ -247,9 +242,9 @@ export default function BasicGridPage() {
               </div>
             </div>
             <p className="mb-3 text-center text-[9px] sm:text-[10px] font-bold tracking-wide text-slate-800">
-              <span className="text-red-700">8–3 = RED</span>
+              <span className="text-red-700">3–8 = RED</span>
               <span className="text-slate-500 mx-1.5 sm:mx-2">|</span>
-              <span className="text-blue-700">9–4 = BLUE</span>
+              <span className="text-blue-700">4–9 = BLUE</span>
             </p>
 
             {/* Combined Input & Marking Tool Box */}

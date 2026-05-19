@@ -6,6 +6,7 @@ import { Clock, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import Grid from '@/components/Grid';
+import AnchorConnectorLines from '@/components/AnchorConnectorLines';
 import AIPredictor from '@/components/AIPredictor';
 import SubscriptionGuard from '@/components/SubscriptionGuard';
 import PageHeader from '@/components/PageHeader';
@@ -140,7 +141,7 @@ export default function YearlyTwentyGridPage() {
   const circleFb = SUBTRACT_CIRCLE_MOUNT_FALLBACK;
 
   return (
-    <SubscriptionGuard requiredTier="yearly" allowGuestView>
+    <SubscriptionGuard requiredTier="yearly">
       <main className="relative flex min-h-screen min-w-0 flex-col items-center overflow-x-hidden p-0 pb-20 font-sans">
         <PageHeader />
         <div className="mb-4 md:mb-8 w-full">
@@ -237,27 +238,21 @@ export default function YearlyTwentyGridPage() {
                   return (
                     <div key={pairIndex} className="flex flex-col items-center space-y-1.5 w-full border-b border-slate-100/10 pb-2 last:border-0">
                       
-                      {/* Subtraction circles: LEFT = RED 8–3, RIGHT = BLUE 9–4 */}
-                      <div className="relative flex items-center justify-center space-x-6 h-20 mb-4 scale-90 sm:scale-100">
+                      {/* Subtraction circles: LEFT = RED 3–8, RIGHT = BLUE 4–9 */}
+                      <div className="relative mb-4 flex h-24 w-[11.5rem] scale-90 items-center justify-between sm:w-[13rem] sm:scale-100">
+                        <AnchorConnectorLines />
                         <div
                           className="relative z-10 w-16 h-16 rounded-full border-[6px] border-red-600 flex flex-col items-center justify-center bg-transparent shadow-[0_0_15px_rgba(220,38,38,0.3)] text-red-600 shrink-0"
-                          title="RED anchor: 8 over 3 (red ring only)"
+                          title="RED anchor: 3 over 8 (red ring only)"
                         >
                           <span className="text-lg font-bold leading-none">{mounted ? anchorRedTop : circleFb.anchorRedTop}</span>
                           <span className="text-lg font-bold leading-none">-</span>
                           <span className="text-lg font-bold leading-none">{mounted ? anchorRedBottom : circleFb.anchorRedBottom}</span>
                         </div>
 
-                        <div className="flex items-center justify-center w-8 h-8 shrink-0">
-                          <svg width="32" height="32" viewBox="0 0 100 100" className="overflow-visible">
-                            <line x1="10" y1="90" x2="90" y2="10" stroke="#FF0000" strokeWidth="16" strokeLinecap="butt" />
-                            <line x1="10" y1="10" x2="90" y2="90" stroke="#0000FF" strokeWidth="16" strokeLinecap="butt" />
-                          </svg>
-                        </div>
-
                         <div
                           className="relative z-10 w-16 h-16 rounded-full border-[6px] border-blue-600 flex flex-col items-center justify-center bg-transparent shadow-[0_0_15px_rgba(37,99,235,0.35)] text-blue-600 shrink-0"
-                          title="BLUE anchor: 9 over 4 (blue ring only)"
+                          title="BLUE anchor: 4 over 9 (blue ring only)"
                         >
                           <span className="text-lg font-bold leading-none">{mounted ? anchorBlueTop : circleFb.anchorBlueTop}</span>
                           <span className="text-lg font-bold leading-none">-</span>

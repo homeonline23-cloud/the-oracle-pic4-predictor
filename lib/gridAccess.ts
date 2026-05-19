@@ -1,0 +1,38 @@
+import { ADMIN_EMAIL } from '@/lib/constants';
+
+export type GridTier = 'standard' | 'premium' | 'yearly';
+
+export const GRID_ROUTE_TIERS: Record<string, GridTier> = {
+  '/basic': 'standard',
+  '/premium': 'premium',
+  '/yearly': 'yearly',
+};
+
+const TIER_ORDER = ['free', 'standard', 'premium', 'yearly'] as const;
+
+export function isAdminEmail(email: string | null | undefined): boolean {
+  return !!email && email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+}
+
+export function hasPaidGridAccess(
+  profile: {
+    subscription_tier?: string | null;
+    subscription_status?: string | null;
+  } | null | undefined,
+  requiredTier: GridTier,
+  email?: string | null
+): boolean {
+  if (isAdminEmail(email)) return true;
+  if (!profile || profile.subscription_status !== 'active') return false;
+
+  const userIdx = TIER_ORDER.indexOf(
+    (profile.subscription_tier || 'free') as (typeof TIER_ORDER)[number]
+  );
+  const requiredIdx = TIER_ORDER.indexOf(requiredTier);
+  if (userIdx < 0 || requiredIdx < 0) return false;
+  return userIdx >= requiredIdx;
+}
+
+export function getRequiredTierForPath(pathname: string): GridTier | null {
+  return GRID_ROUTE_TIERS[pathname] ?? null;
+}
