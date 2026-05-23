@@ -6,14 +6,14 @@ import { Clock, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import Grid from '@/components/Grid';
-import AnchorConnectorLines from '@/components/AnchorConnectorLines';
+import AnchorSubtractionCircles from '@/components/AnchorSubtractionCircles';
 import AIPredictor from '@/components/AIPredictor';
 import SubscriptionGuard from '@/components/SubscriptionGuard';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
 import { ADMIN_EMAIL, WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import { getSubtractCircleAnchors, SUBTRACT_CIRCLE_MOUNT_FALLBACK } from '@/lib/subtractCircles';
+import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 
 export default function YearlyTwentyGridPage() {
   const { user, userRole } = useAuth();
@@ -136,12 +136,11 @@ export default function YearlyTwentyGridPage() {
     { name: 'purple', class: 'bg-purple-300 border-purple-500 border-2 shadow-[0_0_8px_rgba(168,85,247,0.3)]' },
   ];
 
-  const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } =
-    getSubtractCircleAnchors(selectedDate);
-  const circleFb = SUBTRACT_CIRCLE_MOUNT_FALLBACK;
+  const anchors = getSubtractCircleAnchors(selectedDate);
+  const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } = anchors;
 
   return (
-    <SubscriptionGuard requiredTier="yearly">
+    <SubscriptionGuard requiredTier="yearly" allowGuestView>
       <main className="relative flex min-h-screen min-w-0 flex-col items-center overflow-x-hidden p-0 pb-20 font-sans">
         <PageHeader />
         <div className="mb-4 md:mb-8 w-full">
@@ -238,27 +237,11 @@ export default function YearlyTwentyGridPage() {
                   return (
                     <div key={pairIndex} className="flex flex-col items-center space-y-1.5 w-full border-b border-slate-100/10 pb-2 last:border-0">
                       
-                      {/* Subtraction circles: LEFT = RED 3–8, RIGHT = BLUE 4–9 */}
-                      <div className="relative mb-4 flex h-24 w-[11.5rem] scale-90 items-center justify-between sm:w-[13rem] sm:scale-100">
-                        <AnchorConnectorLines />
-                        <div
-                          className="relative z-10 w-16 h-16 rounded-full border-[6px] border-red-600 flex flex-col items-center justify-center bg-transparent shadow-[0_0_15px_rgba(220,38,38,0.3)] text-red-600 shrink-0"
-                          title="RED anchor: 3 over 8 (red ring only)"
-                        >
-                          <span className="text-lg font-bold leading-none">{mounted ? anchorRedTop : circleFb.anchorRedTop}</span>
-                          <span className="text-lg font-bold leading-none">-</span>
-                          <span className="text-lg font-bold leading-none">{mounted ? anchorRedBottom : circleFb.anchorRedBottom}</span>
-                        </div>
-
-                        <div
-                          className="relative z-10 w-16 h-16 rounded-full border-[6px] border-blue-600 flex flex-col items-center justify-center bg-transparent shadow-[0_0_15px_rgba(37,99,235,0.35)] text-blue-600 shrink-0"
-                          title="BLUE anchor: 4 over 9 (blue ring only)"
-                        >
-                          <span className="text-lg font-bold leading-none">{mounted ? anchorBlueTop : circleFb.anchorBlueTop}</span>
-                          <span className="text-lg font-bold leading-none">-</span>
-                          <span className="text-lg font-bold leading-none">{mounted ? anchorBlueBottom : circleFb.anchorBlueBottom}</span>
-                        </div>
-                      </div>
+                      <AnchorSubtractionCircles
+                        anchors={anchors}
+                        mounted={mounted}
+                        className="mb-4"
+                      />
 
                       {/* Combined Input & Marking Tool Box */}
                       <div className="flex flex-col items-center space-y-2 bg-[#94B6C7] p-2.5 md:p-4 rounded-none shadow-md border border-[#94B6C7] w-full max-w-[230px] sm:max-w-[300px]">

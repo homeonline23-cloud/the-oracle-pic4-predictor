@@ -4,8 +4,8 @@ import { useId } from 'react';
 
 /**
  * Anchor visuals between subtraction circles:
- *   • Diagonal: red 8→blue 4, blue 9→red 3 (BWR gradient)
- *   • Top / bottom bubbles: red + blue arrows both point to the same center (3↔4, 8↔9)
+ *   • Diagonal: red bottom→blue top, blue bottom→red top (BWR gradient)
+ *   • Top / bottom bubbles: red + blue arrows meet at center (top pair ↔ bottom pair)
  */
 export default function AnchorConnectorLines() {
   const uid = useId().replace(/:/g, '');
@@ -112,7 +112,7 @@ export default function AnchorConnectorLines() {
         </filter>
       </defs>
 
-      {/* Top bubble: both arrows meet at center (3↔4) */}
+      {/* Top bubble: red top ↔ blue top */}
       <path
         d="M 52 10 Q 76 6 100 2"
         stroke={`url(#${gradHorizTop})`}
@@ -125,7 +125,7 @@ export default function AnchorConnectorLines() {
         markerEnd={`url(#${arrowBlue})`}
       />
 
-      {/* Bottom bubble: both arrows meet at center (8↔9) */}
+      {/* Bottom bubble: red bottom ↔ blue bottom */}
       <path
         d="M 52 90 Q 76 94 100 98"
         stroke={`url(#${gradHorizBottom})`}
@@ -138,7 +138,7 @@ export default function AnchorConnectorLines() {
         markerEnd={`url(#${arrowBlue})`}
       />
 
-      {/* Red 8 → Blue 4 */}
+      {/* Red bottom → Blue top */}
       <line
         x1="34"
         y1="78"
@@ -149,7 +149,7 @@ export default function AnchorConnectorLines() {
         strokeLinecap="round"
         filter={`url(#${glow})`}
       />
-      {/* Blue 9 → Red 3 */}
+      {/* Blue bottom → Red top */}
       <line
         x1="166"
         y1="78"

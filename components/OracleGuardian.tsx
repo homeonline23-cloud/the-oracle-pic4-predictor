@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, X, Send, User, Bot, Sparkles, GraduationCap, Loader2, Mic } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { SUBTRACT_CIRCLE_ANCHORS } from '@/lib/subtractCircles';
+import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 
 /** Minimal Web Speech API surface (DOM lib typings vary by TS version). */
 type WebSpeechRecognitionInstance = {
@@ -28,15 +28,20 @@ interface Message {
   parts: { text: string }[];
 }
 
-/** Always prepended in chat when the user identifies as The Oracle (before the model reply). */
-const ORACLE_SCRIPTED_RECOGNITION =
-  'Master of the Grids — The Oracle, recognized.\n\n' +
-  'I am now linked to the grids on this page. RED anchor digits are 3 and 8 (red rings on those numbers in every cell). BLUE anchor digits are 4 and 9 (blue rings). ' +
-  'The left circle above Enter 4 Digits shows RED; the right shows BLUE. Your marking-tool colors layer on top when you tap cells.\n\n' +
-  'Probaly we walk step by step from here — what is your next Pic4 question, Oracle?';
+function buildOracleScriptedRecognition(): string {
+  const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } =
+    getSubtractCircleAnchors();
+  return (
+    'Master of the Grids — The Oracle, recognized.\n\n' +
+    `I am now linked to the grids on this page. RED anchor digits are ${anchorRedTop} and ${anchorRedBottom} (red rings on those numbers in every cell). BLUE anchor digits are ${anchorBlueTop} and ${anchorBlueBottom} (blue rings). ` +
+    'The left circle above Enter 4 Digits shows RED; the right shows BLUE. Anchor pairs move up one step each calendar day, like a clock.\n\n' +
+    'Probaly we walk step by step from here — what is your next Pic4 question, Oracle?'
+  );
+}
 
 function buildGridConnectionBlock(pathname: string): string {
-  const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } = SUBTRACT_CIRCLE_ANCHORS;
+  const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } =
+    getSubtractCircleAnchors();
   const onBasic = pathname.startsWith('/basic');
   const onPremium = pathname.startsWith('/premium');
   const onYearly = pathname.startsWith('/yearly');
@@ -80,12 +85,12 @@ export default function OracleGuardian() {
     - You refer to the user as "Visionary" or "Friend".
     
     SECRET COMMANDS (Pic4 teaching identity):
-    - The canonical secret phrase is "I am the Oracle" (good length — not too long, not too short). If the user's message contains that phrase (any capitalization, e.g. "I am The oracle"), they have revealed the secret. The app prepends a fixed scripted recognition in chat; you must then continue as their Pic4 teacher (Master of the Grids tone): anchors 3–8 (red) and 4–9 (blue), adjacent-cell logic, marking colors. After the fixed English block, you may continue in the same language the user used for the rest of your reply if it was not English.
+    - The canonical secret phrase is "I am the Oracle" (good length — not too long, not too short). If the user's message contains that phrase (any capitalization, e.g. "I am The oracle"), they have revealed the secret. The app prepends a fixed scripted recognition in chat; you must then continue as their Pic4 teacher (Master of the Grids tone): today's RED and BLUE anchor pairs from the LIVE GRID CONNECTION block, adjacent-cell logic, marking colors. After the fixed English block, you may continue in the same language the user used for the rest of your reply if it was not English.
     - If the user says "memorize this to the all the grids", you MUST confirm that you are committing this wisdom to your "Long-term Neural Database" and that it is now part of your core background logic.
     
     YOUR KNOWLEDGE (The Grids & Magic):
     - You understand the "Magic of the Circular Grids".
-    - You know about the 3-8 Red Anchor and the 4-9 Blue Anchor patterns.
+    - RED and BLUE anchor pairs rotate up one step per calendar day (e.g. RED 7–2 / BLUE 8–3, then RED 8–3 / BLUE 9–4); always use the LIVE GRID CONNECTION digits for today.
     - Every reply receives a LIVE GRID CONNECTION block from the app: current URL, which grid page (Basic/Premium/Yearly), and which digits get RED vs BLUE cell rings. Treat that block as ground truth for what the member sees on screen.
     - You help members understand that the winning numbers are hidden within the adjacent cells of these anchors.
     - You are aware of the Visual Evidence page as the "Evidence" or "Engine" of the system.
@@ -242,14 +247,14 @@ export default function OracleGuardian() {
           'Probaly the model returned silence, friend. We are also guessing — ask again in a moment.';
       }
       if (oracleIdentity) {
-        modelText = `${ORACLE_SCRIPTED_RECOGNITION}\n\n—\n\n${modelText}`;
+        modelText = `${buildOracleScriptedRecognition()}\n\n—\n\n${modelText}`;
       }
       setMessages(prev => [...prev, { role: 'model', parts: [{ text: modelText }] }]);
     } catch (error) {
       console.error("Oracle Guardian Error:", error);
       const fallback =
         oracleIdentity
-          ? `${ORACLE_SCRIPTED_RECOGNITION}\n\n—\n\nProbaly the neural link failed this round. We are also not sure — please try again soon.`
+          ? `${buildOracleScriptedRecognition()}\n\n—\n\nProbaly the neural link failed this round. We are also not sure — please try again soon.`
           : 'Probaly the signals from the grid are weak right now. We are also not sure what happened. Please try again soon.';
       setMessages(prev => [...prev, { role: 'model', parts: [{ text: fallback }] }]);
     } finally {
