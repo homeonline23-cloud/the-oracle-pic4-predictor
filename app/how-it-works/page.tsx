@@ -190,7 +190,7 @@ export default function HowItWorksPage() {
                       </div>
                       <h4 className="text-sm font-bold uppercase tracking-wide text-white">Red &amp; Blue circles</h4>
                       <p className="flex-grow text-sm leading-relaxed text-slate-400">
-                        Each day the anchor pairs move up one step like a clock — for example <span className="font-semibold text-red-500">Red: 1–6</span> with <span className="font-semibold text-blue-500">Blue: 2–7</span>, then the next day <span className="font-semibold text-red-500">Red: 2–7</span> and <span className="font-semibold text-blue-500">Blue: 3–8</span>.
+                        Each day the anchor pairs move up one step like a clock — for example <span className="font-semibold text-red-500">Red: 0–5</span> with <span className="font-semibold text-blue-500">Blue: 1–6</span>, then the next day <span className="font-semibold text-red-500">Red: 1–6</span> and <span className="font-semibold text-blue-500">Blue: 2–7</span>.
                       </p>
                     </div>
                     <div className="flex min-h-[11rem] flex-col gap-3 rounded-none border border-white/10 bg-slate-900/65 p-5 backdrop-blur-sm">
