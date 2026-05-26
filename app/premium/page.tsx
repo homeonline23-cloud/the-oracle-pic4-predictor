@@ -14,6 +14,7 @@ import GridButtons from '@/components/GridButtons';
 import { ADMIN_EMAIL, WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
+import { useAnchorClockTick } from '@/hooks/useAnchorClockTick';
 
 export default function PremiumTenGridPage() {
   const { user, userRole } = useAuth();
@@ -134,6 +135,7 @@ export default function PremiumTenGridPage() {
     { name: 'purple', class: 'bg-purple-300 border-purple-500 border-2 shadow-[0_0_8px_rgba(168,85,247,0.3)]' },
   ];
 
+  useAnchorClockTick();
   const anchors = getSubtractCircleAnchors(selectedDate);
   const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } = anchors;
 

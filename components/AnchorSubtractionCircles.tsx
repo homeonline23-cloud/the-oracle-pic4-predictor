@@ -16,8 +16,8 @@ type Props = {
 };
 
 /**
- * RED (left): top digit over bottom — e.g. 7 over 2
- * BLUE (right): top digit over bottom — e.g. 8 over 3
+ * RED (left): top digit over bottom — e.g. 1 over 6
+ * BLUE (right): top digit over bottom — e.g. 2 over 7
  */
 export default function AnchorSubtractionCircles({
   anchors,
@@ -49,7 +49,7 @@ export default function AnchorSubtractionCircles({
       >
         <AnchorConnectorLines />
 
-        {/* RED circle — 7 over 2 */}
+        {/* RED circle — 1 over 6 */}
         <div
           className="relative z-10 flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-full border-[6px] border-red-600 bg-transparent text-red-600 shadow-[0_0_15px_rgba(220,38,38,0.3)]"
           title={`RED: ${redTop} (top) and ${redBottom} (bottom)`}
@@ -59,7 +59,7 @@ export default function AnchorSubtractionCircles({
           <span className="text-lg font-bold leading-none">{redBottom}</span>
         </div>
 
-        {/* BLUE circle — 8 over 3 */}
+        {/* BLUE circle — 2 over 7 */}
         <div
           className="relative z-10 flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-full border-[6px] border-blue-600 bg-transparent text-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.35)]"
           title={`BLUE: ${blueTop} (top) and ${blueBottom} (bottom)`}

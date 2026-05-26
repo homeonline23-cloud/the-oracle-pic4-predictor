@@ -1,8 +1,8 @@
 /**
  * Oracle anchor pairs — LEFT red circle, RIGHT blue circle.
  *
- * Day 0 (today on the grid calendar): RED 7 over 2, BLUE 8 over 3
- * Each +1 day on the picker: both pairs step up (8–3 red, 9–4 blue, …)
+ * Day 0 (today on the grid calendar): RED 1 over 6, BLUE 2 over 7
+ * Each +1 day on the picker: both pairs step up (2–7 red, 3–8 blue, …)
  */
 
 export type SubtractCircleAnchors = {
@@ -12,9 +12,9 @@ export type SubtractCircleAnchors = {
   anchorBlueBottom: number;
 };
 
-/** Day-0 anchors — RED 7–2, BLUE 8–3 */
-export const RED_ANCHOR_DAY_ZERO = { top: 7, bottom: 2 } as const;
-export const BLUE_ANCHOR_DAY_ZERO = { top: 8, bottom: 3 } as const;
+/** Day-0 anchors — RED 1–6, BLUE 2–7 */
+export const RED_ANCHOR_DAY_ZERO = { top: 1, bottom: 6 } as const;
+export const BLUE_ANCHOR_DAY_ZERO = { top: 2, bottom: 7 } as const;
 
 const BASE_ANCHORS: SubtractCircleAnchors = {
   anchorRedTop: RED_ANCHOR_DAY_ZERO.top,
