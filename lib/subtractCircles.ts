@@ -1,8 +1,9 @@
 /**
  * Oracle anchor pairs — LEFT red circle, RIGHT blue circle.
  *
- * Day 0 (today on the grid calendar): RED 0 over 5, BLUE 1 over 6
- * Each +1 day on the picker: both pairs step up (1–6 red, 2–7 blue, …)
+ * Epoch day (May 26, 2026): RED 0 over 5, BLUE 1 over 6
+ * Each calendar day after that: both pairs step up (+1 mod 10)
+ * May 27 → RED 1–6, BLUE 2–7 | May 28 → RED 2–7, BLUE 3–8 …
  */
 
 export type SubtractCircleAnchors = {
@@ -11,6 +12,9 @@ export type SubtractCircleAnchors = {
   anchorBlueTop: number;
   anchorBlueBottom: number;
 };
+
+/** First calendar day with RED 0–5 / BLUE 1–6 (local midnight). */
+export const ANCHOR_ROTATION_EPOCH = new Date(2026, 4, 26);
 
 /** Day-0 anchors — RED 0–5, BLUE 1–6 */
 export const RED_ANCHOR_DAY_ZERO = { top: 0, bottom: 5 } as const;
@@ -26,7 +30,7 @@ const BASE_ANCHORS: SubtractCircleAnchors = {
 export const SUBTRACT_CIRCLE_ANCHORS = { ...BASE_ANCHORS };
 export const SUBTRACT_CIRCLE_MOUNT_FALLBACK = { ...BASE_ANCHORS };
 
-function startOfLocalDay(date: Date): Date {
+export function startOfLocalDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
@@ -34,11 +38,11 @@ function mod10(n: number): number {
   return ((n % 10) + 10) % 10;
 }
 
-/** Days ahead of today (today = 0, tomorrow = 1). */
+/** Whole calendar days since epoch (epoch day = 0, next day = 1, …). */
 export function getAnchorDayOffset(date: Date = new Date()): number {
-  const today = startOfLocalDay(new Date());
+  const epoch = startOfLocalDay(ANCHOR_ROTATION_EPOCH);
   const day = startOfLocalDay(date);
-  const diff = Math.round((day.getTime() - today.getTime()) / 86_400_000);
+  const diff = Math.round((day.getTime() - epoch.getTime()) / 86_400_000);
   return Math.max(0, diff);
 }
 

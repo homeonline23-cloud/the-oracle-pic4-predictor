@@ -9,14 +9,14 @@ import SubscriptionGuard from '@/components/SubscriptionGuard';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
-import { useAnchorClockTick } from '@/hooks/useAnchorClockTick';
+import { useAnchorClockTick, useSyncGridDateAtMidnight } from '@/hooks/useAnchorClockTick';
 import { WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 export default function BasicGridPage() {
   const [input, setInput] = useState('');
-  const [currentTime, setCurrentTime] = useState(new Date(2026, 3, 3, 12, 0, 0));
-  const [selectedDate, setSelectedDate] = useState(new Date(2026, 3, 3));
+  const [currentTime, setCurrentTime] = useState(() => new Date());
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [mounted, setMounted] = useState(false);
   const [selectedMarkColor, setSelectedMarkColor] = useState<string | null>(null);
   const [markedCells, setMarkedCells] = useState<{ [key: string]: { [index: number]: string } }>({
@@ -151,7 +151,8 @@ export default function BasicGridPage() {
     { name: 'purple', class: 'bg-purple-300 border-purple-500 border-2 shadow-[0_0_8px_rgba(168,85,247,0.3)]' },
   ];
 
-  useAnchorClockTick();
+  const anchorTick = useAnchorClockTick();
+  useSyncGridDateAtMidnight(setSelectedDate, setCurrentTime, anchorTick);
   const anchors = getSubtractCircleAnchors(selectedDate);
   const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } = anchors;
 

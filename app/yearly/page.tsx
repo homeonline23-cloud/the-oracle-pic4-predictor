@@ -14,14 +14,14 @@ import GridButtons from '@/components/GridButtons';
 import { ADMIN_EMAIL, WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
-import { useAnchorClockTick } from '@/hooks/useAnchorClockTick';
+import { useAnchorClockTick, useSyncGridDateAtMidnight } from '@/hooks/useAnchorClockTick';
 
 export default function YearlyTwentyGridPage() {
   const { user, userRole } = useAuth();
   // 10 pairs of inputs for 20 grids
   const [inputs, setInputs] = useState(['', '', '', '', '', '', '', '', '', '']);
-  const [currentTime, setCurrentTime] = useState(new Date(2026, 3, 3, 12, 0, 0));
-  const [selectedDate, setSelectedDate] = useState(new Date(2026, 3, 3));
+  const [currentTime, setCurrentTime] = useState(() => new Date());
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [mounted, setMounted] = useState(false);
   const [selectedMarkColor, setSelectedMarkColor] = useState<string | null>(null);
   
@@ -137,7 +137,8 @@ export default function YearlyTwentyGridPage() {
     { name: 'purple', class: 'bg-purple-300 border-purple-500 border-2 shadow-[0_0_8px_rgba(168,85,247,0.3)]' },
   ];
 
-  useAnchorClockTick();
+  const anchorTick = useAnchorClockTick();
+  useSyncGridDateAtMidnight(setSelectedDate, setCurrentTime, anchorTick);
   const anchors = getSubtractCircleAnchors(selectedDate);
   const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } = anchors;
 

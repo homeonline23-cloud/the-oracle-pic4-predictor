@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { startOfLocalDay } from '@/lib/subtractCircles';
 
 /** Re-render at each local midnight so anchor digits advance like a clock. */
 export function useAnchorClockTick(): number {
@@ -23,4 +24,17 @@ export function useAnchorClockTick(): number {
   }, []);
 
   return tick;
+}
+
+/** Keep grid date on today when the clock ticks at midnight. */
+export function useSyncGridDateAtMidnight(
+  setSelectedDate: (d: Date) => void,
+  setCurrentTime?: (d: Date) => void,
+  anchorTick?: number
+): void {
+  useEffect(() => {
+    const today = startOfLocalDay(new Date());
+    setSelectedDate(today);
+    setCurrentTime?.(new Date());
+  }, [anchorTick, setSelectedDate, setCurrentTime]);
 }
