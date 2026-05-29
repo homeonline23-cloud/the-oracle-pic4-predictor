@@ -28,7 +28,7 @@ export default function Footer() {
         />
         <div className="flex flex-col items-center gap-2 text-center pt-7">
           <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-600 via-white to-blue-600 tracking-tight text-[13px] sm:text-sm md:text-base whitespace-nowrap max-w-full overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            The Oracle Pic 4 Predictor
+            The Oracle Pic 4
           </span>
           <span className="text-white/85 text-[11px] md:text-[12px] font-semibold tracking-wide">
             © All rights reserved
