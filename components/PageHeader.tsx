@@ -12,19 +12,21 @@ type PageHeaderProps = {
   /** When set, shows a static hero image instead of video (reliable on all browsers). */
   heroImageSrc?: string;
   heroImageAlt?: string;
+  /** Sharp logo + title layout over video (home page). */
+  showHeroTitleCard?: boolean;
 };
 
 export default function PageHeader({
   heroVideoSrc = PUBLIC_ORACLE_HERO_VIDEO,
   heroImageSrc,
   heroImageAlt = 'The Oracle Pic 4 — grid intelligence and analysis.',
+  showHeroTitleCard = false,
 }: PageHeaderProps) {
   return (
     <div className={`${VIDEO_SHELL} mb-8 mt-4 md:mt-6`}>
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 1, scale: 1 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8 }}
         className="relative group"
       >
         <div className="pointer-events-none absolute -inset-4 md:-inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[60px] md:blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
@@ -56,6 +58,8 @@ export default function PageHeader({
                   className="aspect-video min-h-[10rem] w-full rounded-none"
                   defaultSrc={heroVideoSrc}
                   locked={true}
+                  showLogoOverlay={false}
+                  showHeroTitleCard={showHeroTitleCard}
                 />
               )}
             </div>

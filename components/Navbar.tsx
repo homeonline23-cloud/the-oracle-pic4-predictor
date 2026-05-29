@@ -131,13 +131,13 @@ export default function Navbar() {
               className="pointer-events-none absolute -inset-x-1 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-90 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
               aria-hidden
             />
-            <div className="relative z-10 flex w-full min-w-0 flex-nowrap items-center justify-center gap-x-1 sm:gap-x-1.5 md:gap-x-2">
+            <div className="relative z-10 flex w-full min-w-0 flex-wrap items-center justify-center gap-x-1 gap-y-1 sm:gap-x-1.5 md:gap-x-2">
               {PRIMARY_LINKS.map(({ href, label }) => (
                 <Link key={href} href={href} onClick={scrollToTop} className={getNavLinkClass(href)}>
                   {label}
                 </Link>
               ))}
-              {mounted && !user && (
+              {!user && (
                 <>
                   <Link href="/login" onClick={scrollToTop} className={getNavLinkClass('/login')}>
                     Log in
@@ -147,7 +147,7 @@ export default function Navbar() {
                   </Link>
                 </>
               )}
-              {mounted && user && (
+              {user && (
                 <>
                   {userRole === 'admin' && (
                     <Link href="/admin" onClick={scrollToTop} className={getNavLinkClass('/admin')}>
@@ -200,7 +200,7 @@ export default function Navbar() {
                 </Link>
               ))}
 
-              {mounted && !user && (
+              {!user && (
                 <div className="mt-1 border-t border-white/10 pt-2">
                   <p className="px-1 text-[9px] font-bold uppercase tracking-wider text-slate-500">Account</p>
                   <Link
@@ -226,7 +226,7 @@ export default function Navbar() {
                 </div>
               )}
 
-              {mounted && user && (
+              {user && (
                 <div className="mt-1 flex flex-col gap-1 border-t border-white/10 pt-2">
                   <p className="px-1 text-[9px] font-bold uppercase tracking-wider text-slate-500">Account</p>
                   {userRole === 'admin' && (

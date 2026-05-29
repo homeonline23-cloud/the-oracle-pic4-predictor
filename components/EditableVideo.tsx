@@ -1,19 +1,29 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import { Upload } from 'lucide-react';
+import { PUBLIC_LOGO_VIDEO_OVERLAY } from '@/lib/constants';
+import HeroVideoTitleOverlay from './HeroVideoTitleOverlay';
 
 interface EditableVideoProps {
   defaultSrc?: string;
   className?: string;
   locked?: boolean;
+  /** Sharp logo only (center). */
+  showLogoOverlay?: boolean;
+  /** Sharp title + logo layout over video (home hero). */
+  showHeroTitleCard?: boolean;
 }
 
 export default function EditableVideo({
   defaultSrc = '',
   className = '',
   locked = false,
+  showLogoOverlay,
+  showHeroTitleCard = false,
 }: EditableVideoProps) {
+  const overlay = showLogoOverlay ?? false;
   const [videoSrc, setVideoSrc] = useState<string>(defaultSrc);
   const [loadError, setLoadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,6 +87,22 @@ export default function EditableVideo({
               </p>
             </div>
           )}
+          {overlay && !loadError && (
+            <div
+              className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center"
+              aria-hidden
+            >
+              <Image
+                src={PUBLIC_LOGO_VIDEO_OVERLAY}
+                alt=""
+                width={512}
+                height={512}
+                className="h-[38%] w-[38%] max-h-52 max-w-52 object-contain drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)]"
+                priority
+              />
+            </div>
+          )}
+          {showHeroTitleCard && !loadError && <HeroVideoTitleOverlay />}
         </>
       ) : (
         <div className="absolute inset-0 z-0 flex flex-col items-center justify-center bg-black/90 p-8 text-center text-slate-500">

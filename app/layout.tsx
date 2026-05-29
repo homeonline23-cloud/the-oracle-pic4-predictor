@@ -26,9 +26,10 @@ export const viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://theoraclepic4.com'),
+  applicationName: 'The Oracle Pic 4',
   title: {
-    default: 'The Oracle Pic 4 | AI-Powered Pick 4 Lottery Prediction System',
-    template: '%s | The Oracle Pic 4',
+    default: 'The Oracle Pic 4',
+    template: '%s — The Oracle Pic 4',
   },
   description:
     'The Oracle Pic 4 uses AI-powered grid analysis and historical pattern recognition to help you identify high-probability Pick 4 lottery combinations. Smarter predictions, not guesswork.',
@@ -63,8 +64,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://theoraclepic4.com',
-    siteName: 'The Oracle Pic 4 Predictor',
-    title: 'The Oracle Pic 4 | AI-Powered Pick 4 Lottery Prediction System',
+    siteName: 'The Oracle Pic 4',
+    title: 'The Oracle Pic 4',
     description:
       'AI-powered grid analysis and historical pattern recognition to identify high-probability Pick 4 lottery combinations. Smarter predictions, not guesswork.',
     images: [
@@ -78,7 +79,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'The Oracle Pic 4 | AI-Powered Pick 4 Prediction',
+    title: 'The Oracle Pic 4',
     description:
       'AI-powered grid analysis and pattern recognition for Pick 4 lottery combinations.',
     images: ['/The Oracle-1.png'],

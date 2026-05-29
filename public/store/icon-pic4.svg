@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <clipPath id="disc">
+      <circle cx="256" cy="256" r="228"/>
+    </clipPath>
+  </defs>
+  <rect width="512" height="512" fill="#000000"/>
+  <!-- Rainbow ring: wide red at top, blue right, green bottom, yellow left -->
+  <g fill="none" stroke-width="10" stroke-linecap="butt">
+    <path d="M 50 137 A 238 238 0 0 1 462 137" stroke="#e53935"/>
+    <path d="M 462 137 A 238 238 0 0 1 409 438" stroke="#1e88e5"/>
+    <path d="M 409 438 A 238 238 0 0 1 103 438" stroke="#43a047"/>
+    <path d="M 103 438 A 238 238 0 0 1 50 137" stroke="#fdd835"/>
+  </g>
+  <circle cx="256" cy="256" r="228" fill="#ffffff"/>
+  <g clip-path="url(#disc)" stroke="#d8d8d8" stroke-width="1.2" opacity="0.85">
+    <line x1="76" y1="76" x2="436" y2="76"/>
+    <line x1="76" y1="136" x2="436" y2="136"/>
+    <line x1="76" y1="196" x2="436" y2="196"/>
+    <line x1="76" y1="256" x2="436" y2="256"/>
+    <line x1="76" y1="316" x2="436" y2="316"/>
+    <line x1="76" y1="376" x2="436" y2="376"/>
+    <line x1="76" y1="436" x2="436" y2="436"/>
+    <line x1="76" y1="76" x2="76" y2="436"/>
+    <line x1="136" y1="76" x2="136" y2="436"/>
+    <line x1="196" y1="76" x2="196" y2="436"/>
+    <line x1="256" y1="76" x2="256" y2="436"/>
+    <line x1="316" y1="76" x2="316" y2="436"/>
+    <line x1="376" y1="76" x2="376" y2="436"/>
+    <line x1="436" y1="76" x2="436" y2="436"/>
+  </g>
+  <g>
+    <circle cx="256" cy="136" r="14" fill="#e53935"/>
+    <circle cx="256" cy="376" r="14" fill="#e53935"/>
+    <circle cx="136" cy="256" r="14" fill="#e53935"/>
+    <circle cx="376" cy="256" r="14" fill="#e53935"/>
+    <circle cx="256" cy="196" r="14" fill="#e53935"/>
+    <circle cx="256" cy="316" r="14" fill="#e53935"/>
+    <circle cx="196" cy="256" r="14" fill="#e53935"/>
+    <circle cx="316" cy="256" r="14" fill="#e53935"/>
+    <circle cx="196" cy="196" r="14" fill="#1e88e5"/>
+    <circle cx="316" cy="196" r="14" fill="#1e88e5"/>
+    <circle cx="196" cy="316" r="14" fill="#1e88e5"/>
+    <circle cx="316" cy="316" r="14" fill="#1e88e5"/>
+    <circle cx="256" cy="256" r="14" fill="#1e88e5"/>
+  </g>
+</svg>

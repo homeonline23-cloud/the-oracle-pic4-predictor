@@ -35,9 +35,15 @@ export const NAV_BAND_SHELL =
 export const NAV_BAND_FILL =
   'bg-[linear-gradient(90deg,rgba(220,38,38,0.5)_0%,rgba(255,255,255,0.26)_50%,rgba(37,99,235,0.5)_100%),linear-gradient(180deg,rgb(40,56,110)_0%,rgb(17,28,62)_50%,rgb(26,44,95)_100%)]';
 
-/** Main hero video in `/public/` (encodeURIComponent handles spaces & hyphens). */
+/** Main hero video in `/public/` — `the-oracle-pic4-clean video.mp4` */
 export const PUBLIC_ORACLE_HERO_VIDEO =
-  '/' + encodeURIComponent('the-oracle-pic-4 predictor-1.mp4');
+  '/' + encodeURIComponent('the-oracle-pic4-clean video.mp4');
+
+/** Sharp logo PNG for video overlays (transparent outside circle). */
+export const PUBLIC_LOGO_VIDEO_OVERLAY = '/logo-pic4-video-overlay.png';
+
+/** Site favicon / manifest icon (512px, black background). */
+export const PUBLIC_LOGO_ICON = '/logo-pic4-modified.png';
 
 /** Robot clip `/robots-hero-h264.mp4` — e.g. admin dashboard feed preview (optional upload when unlocked). */
 export const PUBLIC_ROBOT_ANALYSIS_VIDEO = '/robots-hero-h264.mp4';
