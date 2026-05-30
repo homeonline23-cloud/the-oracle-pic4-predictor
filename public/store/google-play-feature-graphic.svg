@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="500" viewBox="0 0 1024 500">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0c1528"/>
+      <stop offset="100%" stop-color="#060d18"/>
+    </linearGradient>
+    <clipPath id="disc">
+      <circle cx="256" cy="256" r="228"/>
+    </clipPath>
+  </defs>
+
+  <!-- Storm / cloud background (like hero video) -->
+  <rect width="1024" height="500" fill="url(#sky)"/>
+  <ellipse cx="280" cy="120" rx="220" ry="80" fill="#ffffff" opacity="0.06"/>
+  <ellipse cx="760" cy="90" rx="260" ry="70" fill="#ffffff" opacity="0.05"/>
+  <ellipse cx="512" cy="280" rx="400" ry="120" fill="#94a3b8" opacity="0.07"/>
+  <ellipse cx="180" cy="380" rx="200" ry="60" fill="#ffffff" opacity="0.04"/>
+  <ellipse cx="850" cy="400" rx="180" ry="55" fill="#ffffff" opacity="0.05"/>
+
+  <!-- Exact hero layout, centered -->
+  <g transform="translate(512 250)">
+    <!-- Row 1: logo + title on same horizontal line -->
+    <g transform="translate(-219 -108)">
+      <g transform="translate(0 23) scale(0.088) translate(-256 -256)">
+        <g fill="none" stroke-width="10" stroke-linecap="butt">
+          <path d="M 50 137 A 238 238 0 0 1 462 137" stroke="#e53935"/>
+          <path d="M 462 137 A 238 238 0 0 1 409 438" stroke="#1e88e5"/>
+          <path d="M 409 438 A 238 238 0 0 1 103 438" stroke="#43a047"/>
+          <path d="M 103 438 A 238 238 0 0 1 50 137" stroke="#fdd835"/>
+        </g>
+        <circle cx="256" cy="256" r="228" fill="#ffffff"/>
+        <g clip-path="url(#disc)" stroke="#d8d8d8" stroke-width="1.2" opacity="0.85">
+          <line x1="76" y1="76" x2="436" y2="76"/>
+          <line x1="76" y1="136" x2="436" y2="136"/>
+          <line x1="76" y1="196" x2="436" y2="196"/>
+          <line x1="76" y1="256" x2="436" y2="256"/>
+          <line x1="76" y1="316" x2="436" y2="316"/>
+          <line x1="76" y1="376" x2="436" y2="376"/>
+          <line x1="76" y1="436" x2="436" y2="436"/>
+          <line x1="76" y1="76" x2="76" y2="436"/>
+          <line x1="136" y1="76" x2="136" y2="436"/>
+          <line x1="196" y1="76" x2="196" y2="436"/>
+          <line x1="256" y1="76" x2="256" y2="436"/>
+          <line x1="316" y1="76" x2="316" y2="436"/>
+          <line x1="376" y1="76" x2="376" y2="436"/>
+          <line x1="436" y1="76" x2="436" y2="436"/>
+        </g>
+        <g>
+          <circle cx="256" cy="136" r="14" fill="#e53935"/>
+          <circle cx="256" cy="376" r="14" fill="#e53935"/>
+          <circle cx="136" cy="256" r="14" fill="#e53935"/>
+          <circle cx="376" cy="256" r="14" fill="#e53935"/>
+          <circle cx="256" cy="196" r="14" fill="#e53935"/>
+          <circle cx="256" cy="316" r="14" fill="#e53935"/>
+          <circle cx="196" cy="256" r="14" fill="#e53935"/>
+          <circle cx="316" cy="256" r="14" fill="#e53935"/>
+          <circle cx="196" cy="196" r="14" fill="#1e88e5"/>
+          <circle cx="316" cy="196" r="14" fill="#1e88e5"/>
+          <circle cx="196" cy="316" r="14" fill="#1e88e5"/>
+          <circle cx="316" cy="316" r="14" fill="#1e88e5"/>
+          <circle cx="256" cy="256" r="14" fill="#1e88e5"/>
+        </g>
+      </g>
+      <text x="24" y="23" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="900" letter-spacing="0.5">
+        <tspan fill="#ffffff">THE </tspan><tspan fill="#3b82f6">ORACLE </tspan><tspan fill="#ef4444">PIC 4</tspan>
+      </text>
+    </g>
+
+    <text y="-52" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" font-style="italic" fill="#ffffff">Predictor</text>
+
+    <g transform="translate(-121 -8)">
+      <text x="0" y="0" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#ffffff">The World</text>
+      <image xlink:href="{{GLOBE_DATA_URI}}" x="112" y="-15" width="28" height="28"/>
+      <text x="142" y="0" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#ffffff">Globally</text>
+    </g>
+
+    <text y="48" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="500" fill="#ffffff">
+      <tspan>"Billions of dreams, millions of plays. One </tspan>
+      <tspan fill="#ef4444" font-style="italic" font-weight="700">Pic 4</tspan>
+    </text>
+    <text y="76" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="500" fill="#ffffff">that changes everything, That aligned in numbers where</text>
+    <text y="104" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="500" fill="#ffffff">
+      <tspan>every </tspan>
+      <tspan fill="#ef4444" font-style="italic" font-weight="700">Pic 4</tspan>
+      <tspan> holds the power to change your destiny"</tspan>
+    </text>
+  </g>
+</svg>

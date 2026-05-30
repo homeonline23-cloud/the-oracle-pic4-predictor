@@ -42,6 +42,9 @@ export const PUBLIC_ORACLE_HERO_VIDEO =
 /** Sharp logo PNG for video overlays (transparent outside circle). */
 export const PUBLIC_LOGO_VIDEO_OVERLAY = '/logo-pic4-video-overlay.png';
 
+/** Hand-drawn world globe (hero + store graphics). */
+export const PUBLIC_WORLD_GLOBE_IMAGE = '/world-globe.png';
+
 /** Site favicon / manifest icon (512px, black background). */
 export const PUBLIC_LOGO_ICON = '/logo-pic4-modified.png';
 

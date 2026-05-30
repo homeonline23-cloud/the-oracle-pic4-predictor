@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { PUBLIC_LOGO_VIDEO_OVERLAY } from '@/lib/constants';
+import { PUBLIC_LOGO_VIDEO_OVERLAY, PUBLIC_WORLD_GLOBE_IMAGE } from '@/lib/constants';
 
 /**
  * Sharp title card over the hero video — matches the Oracle Pic 4 Predictor intro layout.
@@ -15,7 +15,7 @@ export default function HeroVideoTitleOverlay() {
       <div className="absolute inset-0 bg-gradient-to-b from-slate-950/25 via-transparent to-slate-950/35" />
 
       <div className="relative flex w-full max-w-4xl flex-col items-center gap-2 md:gap-3">
-        <div className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-0 md:gap-0.5">
           <Image
             src={PUBLIC_LOGO_VIDEO_OVERLAY}
             alt=""
@@ -41,8 +41,17 @@ export default function HeroVideoTitleOverlay() {
           Predictor
         </p>
 
-        <p className="text-sm font-bold text-white antialiased drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] md:text-xl lg:text-2xl">
-          The World <span aria-hidden>🌍</span> Globally
+        <p className="flex items-center justify-center gap-2 text-sm font-bold text-white antialiased drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] md:gap-2.5 md:text-xl lg:text-2xl">
+          <span>The World</span>
+          <Image
+            src={PUBLIC_WORLD_GLOBE_IMAGE}
+            alt=""
+            width={48}
+            height={48}
+            className="inline-block h-6 w-6 shrink-0 object-contain md:h-8 md:w-8"
+            priority
+          />
+          <span>Globally</span>
         </p>
 
         <blockquote className="mt-1 max-w-3xl space-y-0.5 px-2 text-[11px] font-medium leading-snug text-white antialiased drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-sm md:mt-2 md:text-base md:leading-relaxed lg:text-lg">

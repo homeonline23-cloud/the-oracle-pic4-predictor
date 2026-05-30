@@ -46,6 +46,29 @@ async function renderWithResvg() {
     path.join(publicDir, 'logo-pic4-video-overlay.png'),
   );
 
+  const featureSvgPath = path.join(storeDir, 'google-play-feature-graphic.svg');
+  if (fs.existsSync(featureSvgPath)) {
+    const globePath = path.join(storeDir, 'world-globe.png');
+    const globePublic = path.join(publicDir, 'world-globe.png');
+    if (fs.existsSync(globePath)) {
+      fs.copyFileSync(globePath, globePublic);
+    }
+    let featureSvg = fs.readFileSync(featureSvgPath, 'utf8');
+    if (fs.existsSync(globePath)) {
+      const globeB64 = fs.readFileSync(globePath).toString('base64');
+      featureSvg = featureSvg.replace(
+        '{{GLOBE_DATA_URI}}',
+        `data:image/png;base64,${globeB64}`,
+      );
+    }
+    const featureResvg = new Resvg(featureSvg, {
+      fitTo: { mode: 'width', value: 1024 },
+    });
+    const featureOut = path.join(storeDir, 'google-play-feature-graphic-1024x500.png');
+    fs.writeFileSync(featureOut, featureResvg.render().asPng());
+    console.log('Wrote', featureOut);
+  }
+
   console.log('Wrote public/logo-pic4-modified.png');
   console.log('Wrote public/logo-pic4-video-overlay.png (use in CapCut / Premiere)');
 }
