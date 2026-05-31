@@ -13,8 +13,8 @@ import SiteDisclaimer from '@/components/SiteDisclaimer';
 /** Blue–white–red divider between methodology “windows” (balanced vertical padding). */
 function MethodologyStripe() {
   return (
-    <div className="shrink-0 py-3 md:py-4" role="separator" aria-hidden>
-      <div className="h-0.5 w-full rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+    <div className="shrink-0 overflow-hidden py-3 md:py-4" role="separator" aria-hidden>
+      <div className="h-0.5 w-full max-w-full rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
     </div>
   );
 }
@@ -64,7 +64,7 @@ export default function HowItWorksPage() {
           {/* Red Outer Border - Standard Size Window */}
           <div
             className={cn(
-              'relative rounded-none bg-slate-900/20 p-2 backdrop-blur-sm',
+              'relative overflow-hidden rounded-none bg-slate-900/20 p-2 backdrop-blur-sm',
               WINDOW_OUTER_SHELL
             )}
           >
@@ -119,9 +119,9 @@ export default function HowItWorksPage() {
               </div>
             </div>
 
-            {/* Blue–white–red divider: in the red shell gap between main panel & methodology (not inside either inner window). */}
-            <div className="shrink-0 px-2 py-3 md:px-3 md:py-4" aria-hidden>
-              <div className="h-0.5 w-full rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+            {/* Blue–white–red divider: aligned with inner panel gutters so red end stays inside the shell. */}
+            <div className="shrink-0 overflow-hidden px-5 py-3 md:px-8 md:py-4" aria-hidden>
+              <div className="h-0.5 w-full max-w-full rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
             </div>
 
             {/* Methodology — same horizontal padding + unified body scale */}
