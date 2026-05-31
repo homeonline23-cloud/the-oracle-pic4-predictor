@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Play, Upload } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import {
   PUBLIC_LOGO_VIDEO_OVERLAY,
   PUBLIC_ORACLE_HERO_VIDEO,
@@ -36,7 +36,7 @@ export default function EditableVideo({
   const [heroSrcIndex, setHeroSrcIndex] = useState(0);
   const [uploadSrc, setUploadSrc] = useState(defaultSrc);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [needsPlay, setNeedsPlay] = useState(true);
+  const [isPaused, setIsPaused] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -50,7 +50,7 @@ export default function EditableVideo({
 
   useEffect(() => {
     setLoadError(null);
-    setNeedsPlay(true);
+    setIsPaused(true);
   }, [activeSrc]);
 
   const attemptPlay = useCallback(async () => {
@@ -60,9 +60,11 @@ export default function EditableVideo({
       el.muted = true;
       const playPromise = el.play();
       if (playPromise) await playPromise;
+      setIsPaused(false);
+      setLoadError(null);
       return true;
     } catch {
-      setNeedsPlay(true);
+      setIsPaused(true);
       return false;
     }
   }, [activeSrc]);
@@ -71,53 +73,44 @@ export default function EditableVideo({
     const el = videoRef.current;
     if (!el || !activeSrc) return;
 
-    el.load();
-
-    const onCanPlay = () => {
+    const tryPlay = () => {
       void attemptPlay();
     };
 
-    el.addEventListener('canplay', onCanPlay);
-    const stuckTimer = window.setTimeout(() => {
-      if (el.paused || el.currentTime < 0.05) {
-        setNeedsPlay(true);
-      }
-    }, 1200);
+    el.load();
+    el.addEventListener('canplay', tryPlay);
+    el.addEventListener('loadeddata', tryPlay);
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') tryPlay();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+
+    const retryTimer = window.setInterval(() => {
+      if (el.paused && el.readyState >= 2) tryPlay();
+    }, 2500);
+
+    window.setTimeout(() => window.clearInterval(retryTimer), 15000);
 
     return () => {
-      el.removeEventListener('canplay', onCanPlay);
-      window.clearTimeout(stuckTimer);
+      el.removeEventListener('canplay', tryPlay);
+      el.removeEventListener('loadeddata', tryPlay);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.clearInterval(retryTimer);
     };
   }, [activeSrc, attemptPlay]);
-
-  const handleTimeUpdate = () => {
-    const el = videoRef.current;
-    if (!el || el.paused || el.currentTime < 0.05) return;
-    setNeedsPlay(false);
-    setLoadError(null);
-  };
 
   const handleVideoError = () => {
     if (locked && heroSrcIndex < HERO_SOURCES.length - 1) {
       setHeroSrcIndex((i) => i + 1);
       return;
     }
-    setLoadError('Video could not load — tap Play, or use Chrome.');
-    setNeedsPlay(true);
+    setLoadError('Video could not load in this browser.');
+    setIsPaused(true);
   };
 
-  const handlePlayClick = async () => {
-    const el = videoRef.current;
-    if (!el) return;
-    setLoadError(null);
-    el.muted = true;
-    try {
-      el.load();
-    } catch {
-      /* ignore */
-    }
-    const ok = await attemptPlay();
-    if (!ok) setNeedsPlay(true);
+  const handlePlayClick = () => {
+    void attemptPlay();
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,7 +121,6 @@ export default function EditableVideo({
     }
   };
 
-  const showPlayOverlay = Boolean(activeSrc) && needsPlay && !loadError;
   const showOverlays = !loadError;
 
   return (
@@ -147,40 +139,27 @@ export default function EditableVideo({
             playsInline
             preload="auto"
             className="absolute inset-0 z-0 size-full object-cover"
-            onTimeUpdate={handleTimeUpdate}
             onPlaying={() => {
-              setNeedsPlay(false);
+              setIsPaused(false);
               setLoadError(null);
             }}
-            onPause={() => setNeedsPlay(true)}
+            onPause={() => setIsPaused(true)}
             onError={handleVideoError}
           />
 
-          {showPlayOverlay && (
+          {locked && isPaused && !loadError && (
             <button
               type="button"
-              onClick={() => void handlePlayClick()}
-              className="absolute inset-0 z-[25] flex cursor-pointer flex-col items-center justify-center gap-3 bg-black/50 text-white"
+              onClick={handlePlayClick}
+              className="absolute inset-0 z-[1] cursor-pointer border-0 bg-transparent p-0"
               aria-label="Play hero video"
-            >
-              <span className="flex size-16 items-center justify-center rounded-full border-2 border-white bg-blue-600 shadow-lg">
-                <Play className="ml-1 size-8 fill-white text-white" />
-              </span>
-              <span className="text-sm font-bold tracking-wide">Tap to play video</span>
-            </button>
+            />
           )}
 
           {loadError && (
-            <div className="absolute inset-x-0 bottom-0 z-[30] bg-black/90 p-3 text-center">
-              <p className="text-[11px] font-semibold leading-snug text-yellow-100">{loadError}</p>
-              <button
-                type="button"
-                onClick={() => void handlePlayClick()}
-                className="mt-2 rounded-none border border-white/30 bg-blue-600 px-4 py-1.5 text-xs font-bold text-white"
-              >
-                Try again
-              </button>
-            </div>
+            <p className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] bg-black/75 px-2 py-1.5 text-center text-[10px] font-medium text-yellow-100/90">
+              {loadError}
+            </p>
           )}
 
           {overlay && showOverlays && (
