@@ -98,3 +98,27 @@ noscript .animate-hidden {
   opacity: 1 !important;
   transform: none !important;
 }
+
+/* PayPal / iDEAL / card buttons — center inside pricing cards */
+.oracle-paypal-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.oracle-paypal-wrap > div {
+  width: 100% !important;
+  max-width: 250px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.oracle-paypal-wrap .paypal-button-container,
+.oracle-paypal-wrap [data-funding-source] {
+  margin-inline: auto !important;
+}
+
+.oracle-paypal-wrap iframe {
+  display: block;
+  margin-inline: auto !important;
+}

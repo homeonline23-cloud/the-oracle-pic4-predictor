@@ -43,7 +43,7 @@ export default function StripeCheckoutButton({ tier }: StripeCheckoutButtonProps
   }
 
   return (
-    <div className="w-full space-y-1.5 pt-1">
+    <div className="mx-auto w-full max-w-[250px] space-y-1.5 pt-1">
       {error && (
         <p className="text-center text-[9px] font-bold leading-snug tracking-normal text-red-400">{error}</p>
       )}

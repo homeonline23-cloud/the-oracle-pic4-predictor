@@ -126,7 +126,7 @@ export default function PayPalButton({ amount, tier, planName }: PayPalButtonPro
   }
 
   return (
-    <div className="relative z-10 w-full min-h-[160px] pb-2">
+    <div className="oracle-paypal-wrap relative z-10 mx-auto w-full max-w-[250px] min-h-[160px] pb-2">
       {status === 'error' && (
         <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-none flex items-center space-x-2 text-red-500">
           <AlertCircle size={16} />
@@ -148,6 +148,7 @@ export default function PayPalButton({ amount, tier, planName }: PayPalButtonPro
           shape: 'rect',
           label: 'paypal',
           tagline: false,
+          height: 42,
         }}
         createOrder={(_data, actions) => {
           return actions.order.create({

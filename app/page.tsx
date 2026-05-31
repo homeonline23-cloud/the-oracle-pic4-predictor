@@ -17,7 +17,7 @@ export default function HomePage() {
       {/* Content Wrapper */}
       <div className="relative z-10 w-full flex flex-col items-center">
         {/* Video Section - Moved to top of content */}
-        <PageHeader showHeroTitleCard />
+        <PageHeader />
 
         {/* Grid Navigation Section */}
         <div className="mb-4 md:mb-8 w-full">

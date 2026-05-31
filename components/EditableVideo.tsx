@@ -1,20 +1,29 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useRef, useEffect } from 'react';
-import { Upload } from 'lucide-react';
-import { PUBLIC_LOGO_VIDEO_OVERLAY } from '@/lib/constants';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Play, Upload } from 'lucide-react';
+import {
+  PUBLIC_LOGO_VIDEO_OVERLAY,
+  PUBLIC_ORACLE_HERO_VIDEO,
+  PUBLIC_ORACLE_HERO_VIDEO_LEGACY,
+  PUBLIC_ORACLE_HERO_VIDEO_FALLBACK,
+} from '@/lib/constants';
 import HeroVideoTitleOverlay from './HeroVideoTitleOverlay';
 
 interface EditableVideoProps {
   defaultSrc?: string;
   className?: string;
   locked?: boolean;
-  /** Sharp logo only (center). */
   showLogoOverlay?: boolean;
-  /** Sharp title + logo layout over video (home hero). */
   showHeroTitleCard?: boolean;
 }
+
+const HERO_SOURCES = [
+  PUBLIC_ORACLE_HERO_VIDEO,
+  PUBLIC_ORACLE_HERO_VIDEO_LEGACY,
+  PUBLIC_ORACLE_HERO_VIDEO_FALLBACK,
+] as const;
 
 export default function EditableVideo({
   defaultSrc = '',
@@ -24,70 +33,157 @@ export default function EditableVideo({
   showHeroTitleCard = false,
 }: EditableVideoProps) {
   const overlay = showLogoOverlay ?? false;
-  const [videoSrc, setVideoSrc] = useState<string>(defaultSrc);
+  const [heroSrcIndex, setHeroSrcIndex] = useState(0);
+  const [uploadSrc, setUploadSrc] = useState(defaultSrc);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [needsPlay, setNeedsPlay] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const activeSrc = locked ? HERO_SOURCES[heroSrcIndex] : uploadSrc;
+
   useEffect(() => {
-    if (!locked) return;
-    setVideoSrc(defaultSrc ?? '');
+    if (!locked) {
+      setUploadSrc(defaultSrc ?? '');
+    }
   }, [defaultSrc, locked]);
 
   useEffect(() => {
     setLoadError(null);
-  }, [videoSrc]);
+    setNeedsPlay(true);
+  }, [activeSrc]);
+
+  const attemptPlay = useCallback(async () => {
+    const el = videoRef.current;
+    if (!el || !activeSrc) return false;
+    try {
+      el.muted = true;
+      const playPromise = el.play();
+      if (playPromise) await playPromise;
+      return true;
+    } catch {
+      setNeedsPlay(true);
+      return false;
+    }
+  }, [activeSrc]);
 
   useEffect(() => {
     const el = videoRef.current;
-    if (!el || !videoSrc) return;
+    if (!el || !activeSrc) return;
+
+    el.load();
+
+    const onCanPlay = () => {
+      void attemptPlay();
+    };
+
+    el.addEventListener('canplay', onCanPlay);
+    const stuckTimer = window.setTimeout(() => {
+      if (el.paused || el.currentTime < 0.05) {
+        setNeedsPlay(true);
+      }
+    }, 1200);
+
+    return () => {
+      el.removeEventListener('canplay', onCanPlay);
+      window.clearTimeout(stuckTimer);
+    };
+  }, [activeSrc, attemptPlay]);
+
+  const handleTimeUpdate = () => {
+    const el = videoRef.current;
+    if (!el || el.paused || el.currentTime < 0.05) return;
+    setNeedsPlay(false);
+    setLoadError(null);
+  };
+
+  const handleVideoError = () => {
+    if (locked && heroSrcIndex < HERO_SOURCES.length - 1) {
+      setHeroSrcIndex((i) => i + 1);
+      return;
+    }
+    setLoadError('Video could not load — tap Play, or use Chrome.');
+    setNeedsPlay(true);
+  };
+
+  const handlePlayClick = async () => {
+    const el = videoRef.current;
+    if (!el) return;
+    setLoadError(null);
+    el.muted = true;
     try {
       el.load();
-      void el.play().catch(() => {});
     } catch {
       /* ignore */
     }
-  }, [videoSrc]);
+    const ok = await attemptPlay();
+    if (!ok) setNeedsPlay(true);
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (locked) return;
     const file = event.target.files?.[0];
     if (file) {
-      const objectUrl = URL.createObjectURL(file);
-      setVideoSrc(objectUrl);
+      setUploadSrc(URL.createObjectURL(file));
     }
   };
+
+  const showPlayOverlay = Boolean(activeSrc) && needsPlay && !loadError;
+  const showOverlays = !loadError;
 
   return (
     <div
       className={`group relative isolate overflow-hidden border border-white/10 rounded-none bg-black ${className}`}
     >
-      {videoSrc ? (
+      {activeSrc ? (
         <>
           <video
             ref={videoRef}
-            src={videoSrc}
+            key={activeSrc}
+            src={activeSrc}
             autoPlay
             loop
             muted
             playsInline
             preload="auto"
-            className="absolute inset-0 z-0 size-full object-cover pointer-events-none"
-            onPlaying={() => setLoadError(null)}
-            onError={() =>
-              setLoadError(
-                'Video laadt niet in deze browser — controleer of het een H.264 (AVC) .mp4 is en of het pad klopt.',
-              )
-            }
+            className="absolute inset-0 z-0 size-full object-cover"
+            onTimeUpdate={handleTimeUpdate}
+            onPlaying={() => {
+              setNeedsPlay(false);
+              setLoadError(null);
+            }}
+            onPause={() => setNeedsPlay(true)}
+            onError={handleVideoError}
           />
-          {locked && loadError && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/90 p-4 text-center">
-              <p className="text-[11px] font-semibold leading-snug tracking-normal text-yellow-100/95">
-                {loadError}
-              </p>
+
+          {showPlayOverlay && (
+            <button
+              type="button"
+              onClick={() => void handlePlayClick()}
+              className="absolute inset-0 z-[25] flex cursor-pointer flex-col items-center justify-center gap-3 bg-black/50 text-white"
+              aria-label="Play hero video"
+            >
+              <span className="flex size-16 items-center justify-center rounded-full border-2 border-white bg-blue-600 shadow-lg">
+                <Play className="ml-1 size-8 fill-white text-white" />
+              </span>
+              <span className="text-sm font-bold tracking-wide">Tap to play video</span>
+            </button>
+          )}
+
+          {loadError && (
+            <div className="absolute inset-x-0 bottom-0 z-[30] bg-black/90 p-3 text-center">
+              <p className="text-[11px] font-semibold leading-snug text-yellow-100">{loadError}</p>
+              <button
+                type="button"
+                onClick={() => void handlePlayClick()}
+                className="mt-2 rounded-none border border-white/30 bg-blue-600 px-4 py-1.5 text-xs font-bold text-white"
+              >
+                Try again
+              </button>
             </div>
           )}
-          {overlay && !loadError && (
+
+          {overlay && showOverlays && (
             <div
               className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center"
               aria-hidden
@@ -102,7 +198,7 @@ export default function EditableVideo({
               />
             </div>
           )}
-          {showHeroTitleCard && !loadError && <HeroVideoTitleOverlay />}
+          {showHeroTitleCard && showOverlays && <HeroVideoTitleOverlay />}
         </>
       ) : (
         <div className="absolute inset-0 z-0 flex flex-col items-center justify-center bg-black/90 p-8 text-center text-slate-500">
@@ -124,11 +220,6 @@ export default function EditableVideo({
             >
               <Upload size={20} />
             </button>
-            <div className="absolute bottom-4 left-0 right-0 text-center">
-              <p className="text-[10px] font-medium tracking-normal text-white/60">
-                Preview only. Upload to public folder for permanent use.
-              </p>
-            </div>
           </div>
           <input
             type="file"

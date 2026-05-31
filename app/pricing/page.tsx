@@ -89,7 +89,7 @@ export default function PricingPage() {
                       2 Grids Boxes
                     </li>
                   </ul>
-                  <div className="space-y-2 pt-0.5">
+                  <div className="flex w-full flex-col items-center space-y-2 pt-0.5">
                     <PayPalButton amount="19.95" tier="standard" planName="2 Grids Boxes" />
                     <StripeCheckoutButton tier="standard" />
                   </div>
@@ -118,7 +118,7 @@ export default function PricingPage() {
                       10 Grids Boxes
                     </li>
                   </ul>
-                  <div className="space-y-2 pt-0.5">
+                  <div className="flex w-full flex-col items-center space-y-2 pt-0.5">
                     <PayPalButton amount="39.95" tier="premium" planName="10 Grids Boxes" />
                     <StripeCheckoutButton tier="premium" />
                   </div>
@@ -147,7 +147,7 @@ export default function PricingPage() {
                       20 Grids Boxes
                     </li>
                   </ul>
-                  <div className="space-y-2 pt-0.5">
+                  <div className="flex w-full flex-col items-center space-y-2 pt-0.5">
                     <PayPalButton amount="379.95" tier="yearly" planName="20 Grids Boxes" />
                     <StripeCheckoutButton tier="yearly" />
                   </div>

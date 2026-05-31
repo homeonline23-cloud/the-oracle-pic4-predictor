@@ -35,9 +35,18 @@ export const NAV_BAND_SHELL =
 export const NAV_BAND_FILL =
   'bg-[linear-gradient(90deg,rgba(220,38,38,0.5)_0%,rgba(255,255,255,0.26)_50%,rgba(37,99,235,0.5)_100%),linear-gradient(180deg,rgb(40,56,110)_0%,rgb(17,28,62)_50%,rgb(26,44,95)_100%)]';
 
-/** Main hero video in `/public/` — `the-oracle-pic4-clean video.mp4` */
-export const PUBLIC_ORACLE_HERO_VIDEO =
-  '/' + encodeURIComponent('the-oracle-pic4-clean video.mp4');
+/** Hero clip on all pages — `public/the-oracle-pic-4 predictor-1.mp4` (Edge: no-space alias). */
+export const PUBLIC_ORACLE_HERO_VIDEO = '/the-oracle-pic-4-predictor-1.mp4';
+
+/** Spaced filename fallback (same clip). */
+export const PUBLIC_ORACLE_HERO_VIDEO_LEGACY =
+  '/' + encodeURIComponent('the-oracle-pic-4 predictor-1.mp4');
+
+/** Alias kept for older imports. */
+export const PUBLIC_ORACLE_HERO_VIDEO_EDGE = PUBLIC_ORACLE_HERO_VIDEO;
+
+/** Backup hero clip if predictor file fails to load (same clip, short URL). */
+export const PUBLIC_ORACLE_HERO_VIDEO_FALLBACK = '/oracle-hero.mp4';
 
 /** Sharp logo PNG for video overlays (transparent outside circle). */
 export const PUBLIC_LOGO_VIDEO_OVERLAY = '/logo-pic4-video-overlay.png';

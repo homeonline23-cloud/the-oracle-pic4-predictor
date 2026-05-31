@@ -54,7 +54,7 @@ export default function HeroVideoTitleOverlay() {
           <span>Globally</span>
         </p>
 
-        <blockquote className="mt-1 max-w-3xl space-y-0.5 px-2 text-[11px] font-medium leading-snug text-white antialiased drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-sm md:mt-2 md:text-base md:leading-relaxed lg:text-lg">
+        <blockquote className="mt-0.5 max-w-3xl space-y-0 px-1 text-[9px] font-medium leading-[1.25] text-white antialiased drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:mt-1 sm:space-y-0.5 sm:px-2 sm:text-[11px] sm:leading-snug md:mt-2 md:text-base md:leading-relaxed lg:text-lg">
           <p>
             &ldquo;Billions of dreams, millions of plays. One{' '}
             <span className="font-bold italic text-red-500">Pic 4</span>
