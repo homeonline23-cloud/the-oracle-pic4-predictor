@@ -65,7 +65,7 @@ function EvidenceGridCard({
         <div
           className={`absolute top-2 right-2 px-1.5 py-0.5 ${color.bg} text-white font-bold text-[7px] md:text-[9px] tracking-normal italic z-20 shadow-lg pointer-events-none`}
         >
-          Verified Hit
+          Verified pattern
         </div>
         {userRole !== 'admin' && process.env.NODE_ENV !== 'development' && (
           <div className="absolute inset-0 bg-black/20 md:bg-black/60 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center z-10 pointer-events-none">
@@ -73,7 +73,7 @@ function EvidenceGridCard({
               className={`flex items-center gap-2 px-6 py-2.5 ${color.bg} text-white rounded-none hover:opacity-90 transition-all font-bold text-[11px] tracking-normal shadow-xl`}
             >
               <ZoomIn size={18} />
-              <span>View Evidence</span>
+              <span>View pattern</span>
             </div>
           </div>
         )}
@@ -130,10 +130,10 @@ export default function EvidencePage() {
               <div className="mb-10 flex flex-col items-center">
                 <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-3 pb-5 text-center">
                   <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">
-                    Winning Evidence
+                    Pattern Gallery
                   </h2>
                   <p className="text-sm font-semibold leading-relaxed text-white md:text-base">
-                    An archive of verified hits decoded by the Oracle Grid engine.
+                    Historical grid layouts for pattern review and comparison.
                   </p>
                 </div>
                 <div className="mx-4 h-0.5 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)] md:mx-8" />

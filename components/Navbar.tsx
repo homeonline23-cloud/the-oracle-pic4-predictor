@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 const PRIMARY_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
-  { href: '/visual-evidence', label: 'Evidence' },
+  { href: '/visual-evidence', label: 'Patterns' },
   { href: '/how-it-works', label: 'Process' },
   { href: '/pricing', label: 'Pricing' },
 ] as const;
