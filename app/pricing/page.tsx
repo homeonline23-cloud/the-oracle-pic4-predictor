@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { motion } from 'motion/react';
-import PayPalButton from '@/components/PayPalButton';
 import StripeCheckoutButton from '@/components/StripeCheckoutButton';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import PageHeader from '@/components/PageHeader';
@@ -89,8 +88,7 @@ export default function PricingPage() {
                       2 Grids Boxes
                     </li>
                   </ul>
-                  <div className="flex w-full flex-col items-center space-y-2 pt-0.5">
-                    <PayPalButton amount="19.95" tier="standard" planName="2 Grids Boxes" />
+                  <div className="flex w-full flex-col items-center pt-0.5">
                     <StripeCheckoutButton tier="standard" />
                   </div>
                 </div>
@@ -118,8 +116,7 @@ export default function PricingPage() {
                       10 Grids Boxes
                     </li>
                   </ul>
-                  <div className="flex w-full flex-col items-center space-y-2 pt-0.5">
-                    <PayPalButton amount="39.95" tier="premium" planName="10 Grids Boxes" />
+                  <div className="flex w-full flex-col items-center pt-0.5">
                     <StripeCheckoutButton tier="premium" />
                   </div>
                 </div>
@@ -147,8 +144,7 @@ export default function PricingPage() {
                       20 Grids Boxes
                     </li>
                   </ul>
-                  <div className="flex w-full flex-col items-center space-y-2 pt-0.5">
-                    <PayPalButton amount="379.95" tier="yearly" planName="20 Grids Boxes" />
+                  <div className="flex w-full flex-col items-center pt-0.5">
                     <StripeCheckoutButton tier="yearly" />
                   </div>
                 </div>
@@ -164,7 +160,7 @@ export default function PricingPage() {
                 100% Secure SSL Payment Processing
               </p>
               <p className="text-[10px] font-semibold leading-relaxed tracking-wide text-white md:text-xs">
-                payments: paypal commerce and/or stripe checkout (card subscriptions)
+                payments: stripe checkout (card subscriptions)
               </p>
             </div>
             <div
