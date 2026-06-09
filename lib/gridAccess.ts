@@ -1,4 +1,5 @@
 import { ADMIN_EMAIL } from '@/lib/constants';
+import { isGrid2DemoEmail } from '@/lib/demoAuth';
 
 export type GridTier = 'standard' | 'premium' | 'yearly';
 
@@ -23,6 +24,8 @@ export function hasPaidGridAccess(
   email?: string | null
 ): boolean {
   if (isAdminEmail(email)) return true;
+  /** Public 2-grid demo — standard tier only, even if profiles row is missing. */
+  if (isGrid2DemoEmail(email)) return requiredTier === 'standard';
   if (!profile || profile.subscription_status !== 'active') return false;
 
   const userIdx = TIER_ORDER.indexOf(

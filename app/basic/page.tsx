@@ -8,6 +8,7 @@ import AIPredictor from '@/components/AIPredictor';
 import SubscriptionGuard from '@/components/SubscriptionGuard';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
+import Grid2DemoBanner from '@/components/Grid2DemoBanner';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { useAnchorClockTick, useSyncGridDateAtMidnight } from '@/hooks/useAnchorClockTick';
 import { WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
@@ -162,6 +163,7 @@ export default function BasicGridPage() {
         <PageHeader />
         <div className="mb-4 md:mb-8 w-full">
           <GridButtons />
+          <Grid2DemoBanner />
         </div>
 
         <div className="relative z-10 w-full flex flex-col items-center pt-2 md:pt-4">

@@ -4,8 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import { NAV_BAND_FILL, NAV_BAND_SHELL, VIDEO_SHELL } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { isGrid2DemoEmail } from '@/lib/demoAuth';
 
 export default function GridButtons() {
+  const { user } = useAuth();
+  const grid2DemoOnly = isGrid2DemoEmail(user?.email);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -32,31 +37,38 @@ export default function GridButtons() {
               onClick={scrollToTop}
               title="2 Grids Boxes"
               aria-label="2 Grids Boxes"
-              className="group flex h-7 min-h-[28px] min-w-0 flex-1 basis-0 items-center justify-center overflow-hidden whitespace-nowrap rounded-none border border-white bg-blue-600 px-1 text-[9px] font-bold leading-none tracking-tight text-white shadow-[0_0_10px_rgba(37,99,235,0.35)] transition-all hover:bg-blue-700 active:scale-[0.99] max-md:text-[9px] md:text-xs"
+              className={cn(
+                'group flex h-7 min-h-[28px] min-w-0 items-center justify-center overflow-hidden whitespace-nowrap rounded-none border border-white bg-blue-600 px-1 text-[9px] font-bold leading-none tracking-tight text-white shadow-[0_0_10px_rgba(37,99,235,0.35)] transition-all hover:bg-blue-700 active:scale-[0.99] max-md:text-[9px] md:text-xs',
+                grid2DemoOnly ? 'flex-1' : 'flex-1 basis-0'
+              )}
             >
               <span className="md:hidden">2 Grids</span>
               <span className="hidden md:inline">2 Grids Boxes</span>
             </Link>
-            <Link
-              href="/premium"
-              onClick={scrollToTop}
-              title="10 Grids Boxes"
-              aria-label="10 Grids Boxes"
-              className="group flex h-7 min-h-[28px] min-w-0 flex-1 basis-0 items-center justify-center overflow-hidden whitespace-nowrap rounded-none border border-white bg-red-600 px-1 text-[9px] font-bold leading-none tracking-tight text-white shadow-[0_0_10px_rgba(220,38,38,0.35)] transition-all hover:bg-red-700 active:scale-[0.99] max-md:text-[9px] md:text-xs"
-            >
-              <span className="md:hidden">10 Grids</span>
-              <span className="hidden md:inline">10 Grids Boxes</span>
-            </Link>
-            <Link
-              href="/yearly"
-              onClick={scrollToTop}
-              title="20 Grids Boxes"
-              aria-label="20 Grids Boxes"
-              className="group flex h-7 min-h-[28px] min-w-0 flex-1 basis-0 items-center justify-center overflow-hidden whitespace-nowrap rounded-none border border-white bg-amber-500 px-1 text-[9px] font-bold leading-none tracking-tight text-white shadow-[0_0_10px_rgba(245,158,11,0.35)] transition-all hover:bg-amber-600 active:scale-[0.99] max-md:text-[9px] md:text-xs"
-            >
-              <span className="md:hidden">20 Grids</span>
-              <span className="hidden md:inline">20 Grids Boxes</span>
-            </Link>
+            {!grid2DemoOnly && (
+              <>
+                <Link
+                  href="/premium"
+                  onClick={scrollToTop}
+                  title="10 Grids Boxes"
+                  aria-label="10 Grids Boxes"
+                  className="group flex h-7 min-h-[28px] min-w-0 flex-1 basis-0 items-center justify-center overflow-hidden whitespace-nowrap rounded-none border border-white bg-red-600 px-1 text-[9px] font-bold leading-none tracking-tight text-white shadow-[0_0_10px_rgba(220,38,38,0.35)] transition-all hover:bg-red-700 active:scale-[0.99] max-md:text-[9px] md:text-xs"
+                >
+                  <span className="md:hidden">10 Grids</span>
+                  <span className="hidden md:inline">10 Grids Boxes</span>
+                </Link>
+                <Link
+                  href="/yearly"
+                  onClick={scrollToTop}
+                  title="20 Grids Boxes"
+                  aria-label="20 Grids Boxes"
+                  className="group flex h-7 min-h-[28px] min-w-0 flex-1 basis-0 items-center justify-center overflow-hidden whitespace-nowrap rounded-none border border-white bg-amber-500 px-1 text-[9px] font-bold leading-none tracking-tight text-white shadow-[0_0_10px_rgba(245,158,11,0.35)] transition-all hover:bg-amber-600 active:scale-[0.99] max-md:text-[9px] md:text-xs"
+                >
+                  <span className="md:hidden">20 Grids</span>
+                  <span className="hidden md:inline">20 Grids Boxes</span>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
