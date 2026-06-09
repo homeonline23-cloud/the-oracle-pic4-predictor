@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
@@ -17,11 +16,10 @@ function LoginContent() {
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
-  const { user, signInWithGoogle, signInWithEmail, loading: authLoading } = useAuth();
+  const { user, signInWithEmail, loading: authLoading } = useAuth();
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,17 +71,6 @@ function LoginContent() {
       }
     }
   }, [searchParams]);
-
-  const handleGoogleSignIn = async () => {
-    setError(null);
-    setGoogleLoading(true);
-    try {
-      await signInWithGoogle();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Google sign-in failed');
-      setGoogleLoading(false);
-    }
-  };
 
   return (
     <div className="flex flex-col items-center justify-start px-6 py-6 relative">
@@ -179,30 +166,10 @@ function LoginContent() {
                 {emailLoading ? 'Signing in...' : 'Sign in with email'}
               </button>
             </form>
-
-            <motion.div className="py-2 flex items-center gap-2 mt-4">
-              <motion.div className="h-px flex-1 bg-white/10" />
-              <span className="text-[9px] text-slate-500 font-bold">or</span>
-              <motion.div className="h-px flex-1 bg-white/10" />
-            </motion.div>
-
-            <motion.div className="flex flex-col gap-4">
-              <button
-                onClick={handleGoogleSignIn}
-                type="button"
-                disabled={googleLoading}
-                className="flex items-center justify-center gap-3 bg-slate-600 hover:bg-slate-700 border border-white/10 text-white rounded-none py-4 px-2 transition-all active:scale-95 disabled:opacity-50"
-              >
-                <Image src="https://www.google.com/favicon.ico" width={20} height={20} className="w-5 h-5 shrink-0" alt="Google" />
-                <span className="text-[10px] sm:text-xs font-bold tracking-normal text-center">
-                  {googleLoading ? 'Redirecting to Google…' : 'Sign in with Google'}
-                </span>
-              </button>
-            </motion.div>
         </>
 
         <p className="mt-10 text-center text-[10px] font-bold text-slate-400 tracking-normal opacity-50">
-          Use email and password or Google sign-in.
+          Members sign in with email and password.
           {' '}
           <Link href="/signup" className="text-red-400/90 hover:text-red-300 underline decoration-red-400/40">
             Create account
