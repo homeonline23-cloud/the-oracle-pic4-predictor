@@ -29,14 +29,14 @@ export default function PageHeader({
         animate={{ opacity: 1, scale: 1 }}
         className="relative group"
       >
-        <div className="pointer-events-none absolute -inset-4 md:-inset-10 bg-gradient-to-r from-blue-600/15 via-white/5 to-red-600/15 rounded-none opacity-50"></div>
+        <div className="pointer-events-none absolute -inset-4 md:-inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[60px] md:blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
         <div
           className={cn(
-            'relative rounded-none bg-slate-950/85 p-1 md:p-2 min-h-0',
+            'relative rounded-none bg-slate-900/20 p-1 backdrop-blur-sm md:p-2 min-h-0',
             WINDOW_OUTER_SHELL
           )}
         >
-          <div className="relative flex min-h-0 w-full flex-col rounded-none bg-black/40 p-2 md:p-4 h-auto">
+          <div className="relative flex min-h-0 w-full flex-col bg-slate-950/40 p-2 backdrop-blur-xl md:p-4 h-auto rounded-none">
             <div className="mb-2 h-0.5 w-full bg-gradient-to-r from-blue-600 via-white to-red-600 rounded-none opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)] md:mb-4 shrink-0"></div>
             <div className="min-h-0 w-full shrink-0">
               {heroImageSrc ? (

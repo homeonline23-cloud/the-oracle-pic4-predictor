@@ -138,7 +138,7 @@ export default function EditableVideo({
             muted
             playsInline
             preload="auto"
-            className="absolute inset-0 z-0 size-full object-cover object-center transform-gpu"
+            className="absolute inset-0 z-0 size-full object-cover"
             onPlaying={() => {
               setIsPaused(false);
               setLoadError(null);
