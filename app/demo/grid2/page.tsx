@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { motion } from 'motion/react';
 import PageHeader from '@/components/PageHeader';
 import { useAuth } from '@/hooks/useAuth';
@@ -59,12 +58,12 @@ export default function Grid2DemoPage() {
           The Oracle Pic 4 Predictor
         </p>
         <h1 className="mt-3 text-2xl font-bold text-white md:text-3xl">
-          Try the <span className="text-blue-400">4-Grid</span> tester demo free
+          <span className="text-blue-400">4-Grid</span> tester website
         </h1>
         <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-slate-300">
-          One tap opens the AI predictor with <strong className="text-white">Grids 1–4</strong>{' '}
-          (two winning-number pairs). See the same patterns across more grids. No email
-          confirmation. 10- and 20-grid tiers stay locked until you subscribe.
+          One tap opens <strong className="text-white">Grids 1–4</strong> with two winning-number
+          pairs. Test patterns across all four grids. Free for testers — no payment, no signup
+          email.
         </p>
 
         {error && (
@@ -87,12 +86,6 @@ export default function Grid2DemoPage() {
           <span className="mt-1 block break-all font-mono text-slate-400">{shareUrl}</span>
         </p>
 
-        <Link
-          href="/pricing"
-          className="mt-4 inline-block text-xs font-bold text-amber-400 hover:text-amber-300"
-        >
-          See full plans (10 &amp; 20 grids)
-        </Link>
       </motion.div>
     </div>
   );

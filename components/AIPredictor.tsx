@@ -46,6 +46,7 @@ interface Prediction {
 }
 
 import { useAuth } from '@/hooks/useAuth';
+import { isGrid2DemoEmail } from '@/lib/demoAuth';
 
 export default function AIPredictor({ gridData, markedCells, anchors, selectedLocation, currentInput, maxPredictions }: AIPredictorProps) {
   const [loading, setLoading] = useState(false);
@@ -58,6 +59,7 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
   const supabase = createClient();
   const { user, userRole } = useAuth();
   const isAdmin = userRole === 'admin';
+  const isTesterDemo = isGrid2DemoEmail(user?.email);
 
   // Reset recorded state when input changes and handle automatic recording
   useEffect(() => {
@@ -142,8 +144,8 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
     setError(null);
 
     try {
-      // 1. Check Usage Limits (admin account is exempt)
-      if (!isAdmin) {
+      // 1. Check Usage Limits (admin + tester demo are exempt)
+      if (!isAdmin && !isTesterDemo) {
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
         if (profile && profile.predictions_used >= profile.predictions_limit) {
           setError("Monthly prediction limit reached. Please upgrade your plan.");

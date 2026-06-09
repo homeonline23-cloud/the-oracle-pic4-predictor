@@ -7,6 +7,7 @@ import { Menu, X } from 'lucide-react';
 import { NAV_BAND_FILL, NAV_BAND_SHELL, VIDEO_SHELL } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { isGrid2DemoEmail } from '@/lib/demoAuth';
 
 const PRIMARY_LINKS = [
   { href: '/', label: 'Home' },
@@ -21,6 +22,10 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, signOut, userRole } = useAuth();
   const pathname = usePathname();
+  const testerMode = isGrid2DemoEmail(user?.email);
+  const navLinks = testerMode
+    ? PRIMARY_LINKS.filter((link) => link.href !== '/pricing')
+    : PRIMARY_LINKS;
 
   useEffect(() => {
     setMounted(true);
@@ -132,7 +137,7 @@ export default function Navbar() {
               aria-hidden
             />
             <div className="relative z-10 flex w-full min-w-0 flex-wrap items-center justify-center gap-x-1 gap-y-1 sm:gap-x-1.5 md:gap-x-2">
-              {PRIMARY_LINKS.map(({ href, label }) => (
+              {navLinks.map(({ href, label }) => (
                 <Link key={href} href={href} onClick={scrollToTop} className={getNavLinkClass(href)}>
                   {label}
                 </Link>
@@ -186,7 +191,7 @@ export default function Navbar() {
               aria-label="Mobile menu"
               className="fixed left-0 right-0 bottom-0 z-[186] top-[4.75rem] sm:top-[5rem] md:hidden flex flex-col gap-1.5 overflow-y-auto border border-white/10 border-t-0 bg-slate-900/97 p-3 pb-8 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl"
             >
-              {PRIMARY_LINKS.map(({ href, label }) => (
+              {navLinks.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}

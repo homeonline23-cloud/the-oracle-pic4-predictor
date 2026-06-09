@@ -42,8 +42,8 @@ export default function GridButtons() {
                 grid2DemoOnly ? 'flex-1' : 'flex-1 basis-0'
               )}
             >
-              <span className="md:hidden">2 Grids</span>
-              <span className="hidden md:inline">2 Grids Boxes</span>
+              <span className="md:hidden">{grid2DemoOnly ? '4 Grids' : '2 Grids'}</span>
+              <span className="hidden md:inline">{grid2DemoOnly ? '4 Grids Boxes' : '2 Grids Boxes'}</span>
             </Link>
             {!grid2DemoOnly && (
               <>
