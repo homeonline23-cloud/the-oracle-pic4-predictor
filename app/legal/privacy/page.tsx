@@ -18,7 +18,7 @@ export default function PrivacyPage() {
             <p>
               When you create an account or subscribe, we may collect your name, email address, and
               account credentials. We do not store credit card or bank details — payments are
-              processed by Stripe and/or PayPal.
+              processed by Stripe.
             </p>
           </section>
           <section>

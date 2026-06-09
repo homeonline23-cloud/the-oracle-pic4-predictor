@@ -42,7 +42,7 @@ export default function DeleteAccountPage() {
           <section>
             <h2 className="text-lg font-bold text-white mb-2">What we may keep</h2>
             <p>
-              Payment and invoice records from Stripe or PayPal may be retained as required by tax
+              Payment and invoice records from Stripe may be retained as required by tax
               and accounting laws (typically up to 7 years). These records are not used for
               marketing after your account is deleted.
             </p>

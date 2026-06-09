@@ -91,7 +91,7 @@ export default function Footer() {
                     <div className="space-y-4 text-sm leading-relaxed text-slate-700">
                       <div>
                         <h3 className="font-bold text-slate-900 text-xs mb-1">1. What Data We Collect</h3>
-                        <p>When you create an account or subscribe, we may collect: your name, email address, and account credentials. We do <strong>not</strong> collect or store credit card numbers, bank details, or other sensitive payment information — all payments are processed securely by third-party providers (Stripe and/or PayPal).</p>
+                        <p>When you create an account or subscribe, we may collect: your name, email address, and account credentials. We do <strong>not</strong> collect or store credit card numbers, bank details, or other sensitive payment information — all payments are processed securely by Stripe.</p>
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900 text-xs mb-1">2. How We Use Your Information</h3>
@@ -99,7 +99,7 @@ export default function Footer() {
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900 text-xs mb-1">3. Payment Processing</h3>
-                        <p>The Oracle <span className="text-red-600 font-bold">Pic 4</span> does not store any sensitive payment details. All transactions are handled by Stripe and/or PayPal under their own privacy policies and PCI-DSS compliance.</p>
+                        <p>The Oracle <span className="text-red-600 font-bold">Pic 4</span> does not store any sensitive payment details. All transactions are handled by Stripe under its privacy policy and PCI-DSS compliance.</p>
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900 text-xs mb-1">4. AI Processing</h3>

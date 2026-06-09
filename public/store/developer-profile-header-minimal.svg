@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4096" height="2304" viewBox="0 0 4096 2304">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c1528"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+  </defs>
+  <rect width="4096" height="2304" fill="url(#sky)"/>
+  <ellipse cx="2048" cy="700" rx="1400" ry="400" fill="#ffffff" opacity="0.05"/>
+  <ellipse cx="2048" cy="1700" rx="1800" ry="500" fill="#3b82f6" opacity="0.08"/>
+
+  <text x="2048" y="980" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="220" font-weight="900" letter-spacing="-4">
+    <tspan fill="#ffffff">The</tspan><tspan fill="#3b82f6">Oracle</tspan><tspan fill="#ef4444">Pic4</tspan>
+  </text>
+  <text x="2048" y="1160" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="140" font-weight="700" font-style="italic" fill="#ffffff">Predictor</text>
+  <text x="2048" y="1340" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="80" font-weight="600" fill="#cbd5e1">AI Pick 4 Grid Analysis</text>
+  <text x="2048" y="1480" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="500" fill="#94a3b8">theoraclepic4.com</text>
+</svg>

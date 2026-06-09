@@ -122,3 +122,28 @@ noscript .animate-hidden {
   display: block;
   margin-inline: auto !important;
 }
+
+.oracle-paypal-sdk .paypal-button-tagline,
+.oracle-paypal-sdk [class*="tagline"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Readable “Powered by PayPal” — single grey bar (PayPal SDK tagline hidden) */
+.oracle-paypal-powered {
+  width: 100%;
+  max-width: 250px;
+  margin: 0.35rem auto 0;
+  padding: 0.4rem 0.5rem;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  color: #334155;
+  background: rgba(203, 213, 225, 0.92);
+}

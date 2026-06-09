@@ -18,7 +18,9 @@
     "android:sync": "npx cap sync android",
     "android:open": "npx cap open android",
     "store-icon": "node scripts/render-store-icon.mjs",
-    "store-feature": "node scripts/render-store-icon.mjs"
+    "store-feature": "node scripts/render-store-icon.mjs",
+    "indiegogo:pack": "node scripts/build-indiegogo-pack.mjs",
+    "indiegogo:thumbnail": "node scripts/render-indiegogo-thumbnail.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.6.5",

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4096" height="2304" viewBox="0 0 4096 2304">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0c1528"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <clipPath id="disc"><circle cx="256" cy="256" r="200"/></clipPath>
+  </defs>
+  <rect width="4096" height="2304" fill="url(#sky)"/>
+  <ellipse cx="1000" cy="500" rx="800" ry="250" fill="#ffffff" opacity="0.06"/>
+  <ellipse cx="3000" cy="400" rx="900" ry="220" fill="#ffffff" opacity="0.05"/>
+  <ellipse cx="2048" cy="1400" rx="1600" ry="500" fill="#64748b" opacity="0.08"/>
+
+  <g transform="translate(700 920)">
+    <circle cx="200" cy="200" r="200" fill="#ffffff"/>
+    <g transform="translate(200 200)">
+      <g clip-path="url(#disc)" stroke="#c8c8c8" stroke-width="1.2" transform="translate(-256 -256)">
+        <line x1="96" y1="96" x2="416" y2="96"/><line x1="96" y1="152" x2="416" y2="152"/>
+        <line x1="96" y1="208" x2="416" y2="208"/><line x1="96" y1="256" x2="416" y2="256"/>
+        <line x1="96" y1="312" x2="416" y2="312"/><line x1="96" y1="368" x2="416" y2="368"/>
+        <line x1="96" y1="416" x2="416" y2="416"/><line x1="96" y1="96" x2="96" y2="416"/>
+        <line x1="152" y1="96" x2="152" y2="416"/><line x1="208" y1="96" x2="208" y2="416"/>
+        <line x1="256" y1="96" x2="256" y2="416"/><line x1="312" y1="96" x2="312" y2="416"/>
+        <line x1="368" y1="96" x2="368" y2="416"/><line x1="416" y1="96" x2="416" y2="416"/>
+      </g>
+      <g transform="translate(-256 -256)">
+        <circle cx="256" cy="120" r="12" fill="#e53935"/><circle cx="256" cy="392" r="12" fill="#e53935"/>
+        <circle cx="120" cy="256" r="12" fill="#e53935"/><circle cx="392" cy="256" r="12" fill="#e53935"/>
+        <circle cx="256" cy="184" r="12" fill="#e53935"/><circle cx="256" cy="328" r="12" fill="#e53935"/>
+        <circle cx="184" cy="256" r="12" fill="#e53935"/><circle cx="328" cy="256" r="12" fill="#e53935"/>
+        <circle cx="184" cy="184" r="12" fill="#1e88e5"/><circle cx="328" cy="184" r="12" fill="#1e88e5"/>
+        <circle cx="184" cy="328" r="12" fill="#1e88e5"/><circle cx="328" cy="328" r="12" fill="#1e88e5"/>
+        <circle cx="256" cy="256" r="12" fill="#1e88e5"/>
+      </g>
+    </g>
+  </g>
+
+  <text x="1200" y="980" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="200" font-weight="900" letter-spacing="-2">
+    <tspan fill="#ffffff">The</tspan><tspan fill="#3b82f6">Oracle</tspan><tspan fill="#ef4444">Pic4</tspan>
+  </text>
+  <text x="1200" y="1120" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="120" font-weight="700" font-style="italic" fill="#ffffff">Predictor</text>
+  <text x="1200" y="1260" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="600" fill="#94a3b8">AI Pick 4 Grid Analysis</text>
+  <text x="1200" y="1380" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="500" fill="#64748b">theoraclepic4.com</text>
+</svg>
