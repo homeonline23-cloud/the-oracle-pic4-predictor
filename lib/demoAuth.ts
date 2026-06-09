@@ -1,9 +1,13 @@
+function cleanEnv(value: string | undefined): string {
+  return (value?.trim() || '').replace(/^["']|["']$/g, '');
+}
+
 /** Owner/admin demo — full grid access. */
 export const DEMO_EMAIL =
-  process.env.NEXT_PUBLIC_DEMO_EMAIL?.trim() || 'homeonline23@gmail.com';
+  cleanEnv(process.env.NEXT_PUBLIC_DEMO_EMAIL) || 'homeonline23@gmail.com';
 
 export const DEMO_PASSWORD =
-  process.env.NEXT_PUBLIC_DEMO_PASSWORD?.trim() || 'OracleDemo2026!';
+  cleanEnv(process.env.NEXT_PUBLIC_DEMO_PASSWORD) || 'OracleDemo2026!';
 
 export const DEMO_LOGIN_ENABLED =
   process.env.NEXT_PUBLIC_DEMO_LOGIN_ENABLED !== 'false';
@@ -13,10 +17,10 @@ export const TESTER_DEMO_GRID_COUNT = 4;
 
 /** Public tester demo — shareable ad/Fiverr link; no access to 10- or 20-grid tiers. */
 export const GRID2_DEMO_EMAIL =
-  process.env.NEXT_PUBLIC_GRID2_DEMO_EMAIL?.trim() || 'try-grid2@theoraclepic4.com';
+  cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_EMAIL) || 'try-grid2@theoraclepic4.com';
 
 export const GRID2_DEMO_PASSWORD =
-  process.env.NEXT_PUBLIC_GRID2_DEMO_PASSWORD?.trim() || 'TryGrid2Demo2026!';
+  cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_PASSWORD) || 'TryGrid2Demo2026!';
 
 export const GRID2_DEMO_PATH = '/demo/grid2';
 

@@ -21,19 +21,36 @@ export default function Grid2DemoPage() {
   const shareUrl =
     typeof window !== 'undefined' ? getGrid2DemoUrl(window.location.origin) : getGrid2DemoUrl();
 
+  const syncDemoAccount = async () => {
+    const res = await fetch('/api/grid2-demo-login', { method: 'POST' });
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    if (!res.ok) {
+      throw new Error(body.error || 'Demo could not be prepared');
+    }
+  };
+
   const startDemo = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/grid2-demo-login', { method: 'POST' });
-      const body = (await res.json().catch(() => ({}))) as { error?: string };
-      if (!res.ok) {
-        throw new Error(body.error || 'Demo could not be prepared');
+      await syncDemoAccount();
+      try {
+        await signInWithEmail(GRID2_DEMO_EMAIL, GRID2_DEMO_PASSWORD);
+      } catch {
+        // Password may have changed in Vercel — sync once more, then retry sign-in.
+        await syncDemoAccount();
+        await signInWithEmail(GRID2_DEMO_EMAIL, GRID2_DEMO_PASSWORD);
       }
-      await signInWithEmail(GRID2_DEMO_EMAIL, GRID2_DEMO_PASSWORD);
       router.push('/basic');
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Demo start failed');
+      const message = err instanceof Error ? err.message : 'Demo start failed';
+      if (/invalid login credentials/i.test(message)) {
+        setError(
+          'Demo sign-in failed. In Vercel, check NEXT_PUBLIC_GRID2_DEMO_EMAIL and NEXT_PUBLIC_GRID2_DEMO_PASSWORD match, then redeploy and try again.',
+        );
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }

@@ -8,6 +8,9 @@ import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
+import { GRID2_DEMO_EMAIL, GRID2_DEMO_PATH } from '@/lib/demoAuth';
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function LoginContent() {
   const searchParams = useSearchParams();
@@ -23,11 +26,31 @@ function LoginContent() {
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    const emailValue = email.trim();
+    if (!EMAIL_PATTERN.test(emailValue)) {
+      setError(
+        'Put the email in the Email field only (example: try-grid2@theoraclepic4.com). Put your password in the Password field below — not the other way around.',
+      );
+      return;
+    }
+    if (!password) {
+      setError('Enter your password in the Password field.');
+      return;
+    }
+
     setEmailLoading(true);
     try {
-      await signInWithEmail(email.trim(), password);
+      await signInWithEmail(emailValue, password);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Sign-in failed');
+      const message = err instanceof Error ? err.message : 'Sign-in failed';
+      if (/invalid login credentials/i.test(message)) {
+        setError(
+          'Wrong email or password. Testers: use the one-tap link at /demo/grid2 instead of typing here.',
+        );
+      } else {
+        setError(message);
+      }
     } finally {
       setEmailLoading(false);
     }
@@ -63,7 +86,7 @@ function LoginContent() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start px-6 py-6 relative overflow-hidden">
+    <div className="flex flex-col items-center justify-start px-6 py-6 relative">
       <PageHeader />
       <div className="mb-4 md:mb-8 w-full">
         <GridButtons />
@@ -96,29 +119,45 @@ function LoginContent() {
         )}
 
         <>
-            <form onSubmit={handleEmailSignIn} className="flex flex-col gap-4 mt-4 space-y-1">
+            <div className="mb-4 rounded-none border border-emerald-500/30 bg-emerald-950/20 px-4 py-3 text-left">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-300">
+                Fiverr / tester access
+              </p>
+              <p className="mt-1 text-[11px] leading-relaxed text-emerald-100/90">
+                Do not create an account. Open{' '}
+                <Link href={GRID2_DEMO_PATH} className="font-bold text-emerald-300 underline">
+                  the 4-grid demo page
+                </Link>{' '}
+                and tap <strong>Start 4-grid tester demo</strong> — one tap, no typing.
+              </p>
+            </div>
+
+            <form noValidate onSubmit={handleEmailSignIn} className="flex flex-col gap-4 mt-4 space-y-1">
               <motion.div>
-                <label className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">Email</label>
+                <label htmlFor="login-email" className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">Email</label>
                 <input
+                  id="login-email"
+                  name="email"
                   type="email"
-                  autoComplete="email"
+                  inputMode="email"
+                  autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
-                  placeholder="oracle@example.com"
-                  required
+                  placeholder={GRID2_DEMO_EMAIL}
                 />
               </motion.div>
               <motion.div>
-                <label className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">Password</label>
+                <label htmlFor="login-password" className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">Password</label>
                 <input
+                  id="login-password"
+                  name="password"
                   type="password"
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
-                  placeholder="********"
-                  required
+                  placeholder="Your password"
                 />
               </motion.div>
               <motion.div className="flex justify-end px-1">
