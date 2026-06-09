@@ -9,20 +9,27 @@ import SubscriptionGuard from '@/components/SubscriptionGuard';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
 import Grid2DemoBanner from '@/components/Grid2DemoBanner';
+import { useAuth } from '@/hooks/useAuth';
+import { isGrid2DemoEmail } from '@/lib/demoAuth';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { useAnchorClockTick, useSyncGridDateAtMidnight } from '@/hooks/useAnchorClockTick';
 import { WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 export default function BasicGridPage() {
+  const { user } = useAuth();
+  const isTesterDemo = isGrid2DemoEmail(user?.email);
   const [input, setInput] = useState('');
+  const [demoInputs, setDemoInputs] = useState(['', '']);
   const [currentTime, setCurrentTime] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [mounted, setMounted] = useState(false);
   const [selectedMarkColor, setSelectedMarkColor] = useState<string | null>(null);
   const [markedCells, setMarkedCells] = useState<{ [key: string]: { [index: number]: string } }>({
     grid1: {},
-    grid2: {}
+    grid2: {},
+    grid3: {},
+    grid4: {},
   });
 
   useEffect(() => {
@@ -78,23 +85,36 @@ export default function BasicGridPage() {
     setInput(val);
   };
 
+  const handleDemoInputChange = (index: number, val: string) => {
+    const sanitized = val.replace(/[^0-9]/g, '').slice(0, 4);
+    const next = [...demoInputs];
+    next[index] = sanitized;
+    setDemoInputs(next);
+  };
+
   const clearInput = () => {
     setInput('');
   };
 
+  const clearDemoInput = (index: number) => {
+    const next = [...demoInputs];
+    next[index] = '';
+    setDemoInputs(next);
+  };
+
   // LOCKED FORMULA FOR ODD GRIDS (1, 3, 5, 7, 9)
-  const getGrid1Values = () => {
+  const getGrid1Values = (source: string) => {
     const values = new Array(16).fill(null);
-    if (!input) return values;
+    if (!source) return values;
 
     // Fill as many of the first 4 as we have
-    for (let i = 0; i < input.length; i++) {
-      values[path[i]] = input[i];
+    for (let i = 0; i < source.length; i++) {
+      values[path[i]] = source[i];
     }
 
     // Remaining 12 are calculated starting from (last digit + 1)
-    if (input.length === 4) {
-      const lastDigit = parseInt(input[3]);
+    if (source.length === 4) {
+      const lastDigit = parseInt(source[3]);
       for (let i = 4; i < 16; i++) {
         values[path[i]] = ((lastDigit + (i - 3)) % 10).toString();
       }
@@ -104,11 +124,11 @@ export default function BasicGridPage() {
   };
 
   // LOCKED FORMULA FOR EVEN GRIDS (2, 4, 6, 8, 10)
-  const getGrid2Values = () => {
+  const getGrid2Values = (source: string) => {
     const values = new Array(16).fill(null);
-    if (!input) return values;
+    if (!source) return values;
 
-    const digits = input.split('').map(d => parseInt(d));
+    const digits = source.split('').map(d => parseInt(d));
 
     // Column 1: The input digits (Top-Downward)
     for (let i = 0; i < digits.length; i++) values[i * 4] = digits[i].toString();
@@ -130,8 +150,8 @@ export default function BasicGridPage() {
   // END OF LOCKED FORMULAS
   // ==========================================
 
-  const grid1Values = getGrid1Values();
-  const grid2Values = getGrid2Values();
+  const grid1Values = getGrid1Values(input);
+  const grid2Values = getGrid2Values(input);
 
   const handleCellClick = (gridId: string, index: number) => {
     if (!selectedMarkColor) return;
@@ -208,113 +228,233 @@ export default function BasicGridPage() {
 
             {/* AI Predictor Section */}
             <div className="w-full max-w-2xl lg:max-w-2xl py-4 mx-auto">
-              <AIPredictor 
-                gridData={{
-                  grid1: grid1Values,
-                  grid2: grid2Values
-                }}
+              <AIPredictor
+                gridData={
+                  isTesterDemo
+                    ? {
+                        grid1: getGrid1Values(demoInputs[0]),
+                        grid2: getGrid2Values(demoInputs[0]),
+                        grid3: getGrid1Values(demoInputs[1]),
+                        grid4: getGrid2Values(demoInputs[1]),
+                      }
+                    : {
+                        grid1: grid1Values,
+                        grid2: grid2Values,
+                      }
+                }
                 markedCells={markedCells}
                 anchors={{
                   red: [anchorRedTop, anchorRedBottom],
-                  blue: [anchorBlueTop, anchorBlueBottom]
+                  blue: [anchorBlueTop, anchorBlueBottom],
                 }}
                 selectedLocation=""
-                currentInput={input}
-                maxPredictions={2}
+                currentInput={isTesterDemo ? demoInputs[0] : input}
+                maxPredictions={isTesterDemo ? 4 : 2}
               />
             </div>
 
-            <AnchorSubtractionCircles
-              anchors={anchors}
-              mounted={mounted}
-              showLegend
-              className="mb-1"
-            />
+            {isTesterDemo ? (
+              <div className="flex w-full flex-col space-y-2">
+                {[0, 1].map((pairIndex) => {
+                  const gridAIndex = pairIndex * 2 + 1;
+                  const gridBIndex = pairIndex * 2 + 2;
+                  const inputVal = demoInputs[pairIndex];
+                  const gridAValues = getGrid1Values(inputVal);
+                  const gridBValues = getGrid2Values(inputVal);
 
-            {/* Combined Input & Marking Tool Box */}
-            <div className="flex flex-col items-center space-y-2 bg-[#94B6C7] p-2.5 md:p-4 rounded-none shadow-md border border-[#94B6C7] w-full max-w-[230px] sm:max-w-[300px]">
-              {/* Enter 4 Digits Section */}
-              <div className="flex flex-col items-center">
-                <p className="text-xs md:text-[15px] text-slate-800 font-bold tracking-normal mb-1 shadow-sm text-center">
-                  Enter 4 Digits
-                </p>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={input}
-                    onChange={handleInputChange}
-                    placeholder="----"
-                    className="w-[4.75rem] sm:w-24 text-center bg-slate-900 border border-slate-700 rounded-none py-1.5 sm:py-1.5 text-base sm:text-xl font-bold text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all shadow-inner tracking-normal"
-                  />
-                  <button
-                    onClick={clearInput}
-                    className="px-2.5 sm:px-3 py-1.5 sm:py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-none transition-all border border-slate-700 shadow-sm text-xs sm:text-sm font-bold tracking-normal"
-                  >
-                    Clear
-                  </button>
-                </div>
+                  return (
+                    <div
+                      key={pairIndex}
+                      className="flex w-full flex-col items-center space-y-1.5 border-b border-slate-100/10 pb-2 last:border-0"
+                    >
+                      <AnchorSubtractionCircles anchors={anchors} mounted={mounted} className="mb-4" />
+
+                      <div className="flex w-full max-w-[230px] flex-col items-center space-y-2 rounded-none border border-[#94B6C7] bg-[#94B6C7] p-2.5 shadow-md sm:max-w-[300px] md:p-4">
+                        <div className="flex flex-col items-center">
+                          <p className="mb-1 text-center text-xs font-bold tracking-normal text-slate-800 shadow-sm md:text-[15px]">
+                            Enter 4 Digits (pair {pairIndex + 1})
+                          </p>
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={inputVal}
+                              onChange={(e) => handleDemoInputChange(pairIndex, e.target.value)}
+                              placeholder="----"
+                              className="w-[4.75rem] rounded-none border border-slate-700 bg-slate-900 py-1.5 text-center text-base font-bold tracking-normal text-white shadow-inner transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 sm:w-24 sm:py-1.5 sm:text-xl"
+                            />
+                            <button
+                              onClick={() => clearDemoInput(pairIndex)}
+                              className="rounded-none border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-bold tracking-normal text-slate-300 shadow-sm transition-all hover:bg-slate-700 sm:px-3 sm:text-sm"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="my-1 h-px w-full bg-slate-400/50" />
+
+                        <div className="flex flex-col items-center space-y-1.5">
+                          <span className="text-[11px] font-bold uppercase tracking-wide text-slate-800 sm:text-xs">
+                            Marking Tool
+                          </span>
+                          <div className="flex items-center justify-center gap-1 sm:gap-2">
+                            {markColors.map((color) => (
+                              <button
+                                key={color.name}
+                                onClick={() =>
+                                  setSelectedMarkColor(
+                                    selectedMarkColor === color.class ? null : color.class,
+                                  )
+                                }
+                                className={`
+                                  h-6 w-6 transform rounded-full border-2 transition-all hover:scale-110 sm:h-7 sm:w-7
+                                  ${color.class}
+                                  ${selectedMarkColor === color.class ? 'scale-110 border-white ring-2 ring-blue-400 ring-offset-1' : 'border-slate-400/30'}
+                                `}
+                                title={`Mark with ${color.name}`}
+                              />
+                            ))}
+                            <button
+                              onClick={() => {
+                                setSelectedMarkColor(null);
+                                setMarkedCells({
+                                  grid1: {},
+                                  grid2: {},
+                                  grid3: {},
+                                  grid4: {},
+                                });
+                              }}
+                              className="ml-1 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-1.5 text-xs font-bold text-slate-600 shadow-sm transition-all hover:bg-red-100 hover:text-red-600 active:scale-95 sm:px-3 sm:text-sm"
+                              title="Reset All Marks"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="relative mx-auto flex w-full max-w-2xl flex-row items-start justify-center gap-2 px-1 py-4 md:px-4 sm:gap-6">
+                        <div className="absolute left-0 right-0 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+                        <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
+                          <Grid
+                            title={`Grid ${gridAIndex}`}
+                            gridValues={gridAValues}
+                            redNums={[anchorRedTop, anchorRedBottom]}
+                            blueNums={[anchorBlueTop, anchorBlueBottom]}
+                            markedCells={markedCells[`grid${gridAIndex}`] || {}}
+                            onCellClick={(idx) => handleCellClick(`grid${gridAIndex}`, idx)}
+                          />
+                        </div>
+                        <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
+                          <Grid
+                            title={`Grid ${gridBIndex}`}
+                            gridValues={gridBValues}
+                            redNums={[anchorRedTop, anchorRedBottom]}
+                            blueNums={[anchorBlueTop, anchorBlueBottom]}
+                            markedCells={markedCells[`grid${gridBIndex}`] || {}}
+                            onCellClick={(idx) => handleCellClick(`grid${gridBIndex}`, idx)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            ) : (
+              <>
+                <AnchorSubtractionCircles
+                  anchors={anchors}
+                  mounted={mounted}
+                  showLegend
+                  className="mb-1"
+                />
 
-              {/* Divider */}
-              <div className="w-full h-px bg-slate-400/50 my-1"></div>
+                <div className="flex w-full max-w-[230px] flex-col items-center space-y-2 rounded-none border border-[#94B6C7] bg-[#94B6C7] p-2.5 shadow-md sm:max-w-[300px] md:p-4">
+                  <div className="flex flex-col items-center">
+                    <p className="mb-1 text-center text-xs font-bold tracking-normal text-slate-800 shadow-sm md:text-[15px]">
+                      Enter 4 Digits
+                    </p>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={input}
+                        onChange={handleInputChange}
+                        placeholder="----"
+                        className="w-[4.75rem] rounded-none border border-slate-700 bg-slate-900 py-1.5 text-center text-base font-bold tracking-normal text-white shadow-inner transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 sm:w-24 sm:py-1.5 sm:text-xl"
+                      />
+                      <button
+                        onClick={clearInput}
+                        className="rounded-none border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-bold tracking-normal text-slate-300 shadow-sm transition-all hover:bg-slate-700 sm:px-3 sm:text-sm"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </div>
 
-              {/* Marking Tool Section */}
-              <div className="flex flex-col items-center space-y-1.5">
-                <span className="text-[11px] sm:text-xs font-bold text-slate-800 uppercase tracking-wide">Marking Tool</span>
-                <div className="flex items-center justify-center gap-1 sm:gap-2">
-                  {markColors.map((color) => (
-                    <button
-                      key={color.name}
-                      onClick={() => setSelectedMarkColor(selectedMarkColor === color.class ? null : color.class)}
-                      className={`
-                        w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 transition-all transform hover:scale-110
-                        ${color.class}
-                        ${selectedMarkColor === color.class ? 'ring-2 ring-blue-400 ring-offset-1 scale-110 border-white' : 'border-slate-400/30'}
-                      `}
-                      title={`Mark with ${color.name}`}
+                  <div className="my-1 h-px w-full bg-slate-400/50" />
+
+                  <div className="flex flex-col items-center space-y-1.5">
+                    <span className="text-[11px] font-bold uppercase tracking-wide text-slate-800 sm:text-xs">
+                      Marking Tool
+                    </span>
+                    <div className="flex items-center justify-center gap-1 sm:gap-2">
+                      {markColors.map((color) => (
+                        <button
+                          key={color.name}
+                          onClick={() =>
+                            setSelectedMarkColor(
+                              selectedMarkColor === color.class ? null : color.class,
+                            )
+                          }
+                          className={`
+                            h-6 w-6 transform rounded-full border-2 transition-all hover:scale-110 sm:h-7 sm:w-7
+                            ${color.class}
+                            ${selectedMarkColor === color.class ? 'scale-110 border-white ring-2 ring-blue-400 ring-offset-1' : 'border-slate-400/30'}
+                          `}
+                          title={`Mark with ${color.name}`}
+                        />
+                      ))}
+                      <button
+                        onClick={() => {
+                          setSelectedMarkColor(null);
+                          setMarkedCells({ grid1: {}, grid2: {}, grid3: {}, grid4: {} });
+                        }}
+                        className="ml-1 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-1.5 text-xs font-bold text-slate-600 shadow-sm transition-all hover:bg-red-100 hover:text-red-600 active:scale-95 sm:px-3 sm:text-sm"
+                        title="Reset Marks"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative mx-auto flex min-h-[200px] w-full max-w-2xl flex-row items-start justify-center gap-2 px-1 py-4 md:px-4 sm:gap-6">
+                  <div className="absolute left-0 right-0 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+                  <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
+                    <Grid
+                      title="Grid 1"
+                      gridValues={grid1Values}
+                      redNums={[anchorRedTop, anchorRedBottom]}
+                      blueNums={[anchorBlueTop, anchorBlueBottom]}
+                      markedCells={markedCells.grid1}
+                      onCellClick={(idx) => handleCellClick('grid1', idx)}
                     />
-                  ))}
-                  <button 
-                    onClick={() => {
-                      setSelectedMarkColor(null);
-                      setMarkedCells({ grid1: {}, grid2: {} });
-                    }}
-                    className="ml-1 px-2.5 sm:px-3 py-1.5 sm:py-1.5 bg-slate-100 hover:bg-red-100 text-slate-600 hover:text-red-600 rounded-full border border-slate-300 transition-all text-xs sm:text-sm font-bold shadow-sm active:scale-95"
-                    title="Reset Marks"
-                  >
-                    Clear
-                  </button>
+                  </div>
+                  <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
+                    <Grid
+                      title="Grid 2"
+                      gridValues={grid2Values}
+                      redNums={[anchorRedTop, anchorRedBottom]}
+                      blueNums={[anchorBlueTop, anchorBlueBottom]}
+                      markedCells={markedCells.grid2}
+                      onCellClick={(idx) => handleCellClick('grid2', idx)}
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Grids Side by Side */}
-            <div className="relative flex flex-row items-start justify-center gap-2 sm:gap-6 w-full max-w-2xl mx-auto min-h-[200px] py-4 px-1 md:px-4">
-              {/* Vertical Stripe Running Through the Grids */}
-              <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 via-white to-red-600 rounded-none opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)] -translate-y-1/2 z-0"></div>
-              
-              <div className="relative z-10 flex-1 max-w-[200px] sm:max-w-[240px]">
-                <Grid 
-                  title="Grid 1" 
-                  gridValues={grid1Values} 
-                  redNums={[anchorRedTop, anchorRedBottom]} 
-                  blueNums={[anchorBlueTop, anchorBlueBottom]} 
-                  markedCells={markedCells.grid1}
-                  onCellClick={(idx) => handleCellClick('grid1', idx)}
-                />
-              </div>
-              <div className="relative z-10 flex-1 max-w-[200px] sm:max-w-[240px]">
-                <Grid 
-                  title="Grid 2" 
-                  gridValues={grid2Values} 
-                  redNums={[anchorRedTop, anchorRedBottom]} 
-                  blueNums={[anchorBlueTop, anchorBlueBottom]} 
-                  markedCells={markedCells.grid2}
-                  onCellClick={(idx) => handleCellClick('grid2', idx)}
-                />
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
       </div>

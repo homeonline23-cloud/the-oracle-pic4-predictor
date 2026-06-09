@@ -8,7 +8,10 @@ export const DEMO_PASSWORD =
 export const DEMO_LOGIN_ENABLED =
   process.env.NEXT_PUBLIC_DEMO_LOGIN_ENABLED !== 'false';
 
-/** Public 2-grid demo — shareable ad link; no access to 10- or 20-grid tiers. */
+/** Public tester demo — 4 grids (2 pairs); shareable link; no 10- or 20-grid tiers. */
+export const TESTER_DEMO_GRID_COUNT = 4;
+
+/** Public tester demo — shareable ad/Fiverr link; no access to 10- or 20-grid tiers. */
 export const GRID2_DEMO_EMAIL =
   process.env.NEXT_PUBLIC_GRID2_DEMO_EMAIL?.trim() || 'try-grid2@theoraclepic4.com';
 

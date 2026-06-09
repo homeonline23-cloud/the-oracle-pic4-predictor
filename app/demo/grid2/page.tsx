@@ -43,7 +43,7 @@ export default function Grid2DemoPage() {
   if (!GRID2_DEMO_ENABLED) {
     return (
       <div className="flex min-h-screen items-center justify-center px-6 text-center text-white">
-        <p>The 2-grid demo is not available right now.</p>
+        <p>The tester demo is not available right now.</p>
       </div>
     );
   }
@@ -59,12 +59,12 @@ export default function Grid2DemoPage() {
           The Oracle Pic 4 Predictor
         </p>
         <h1 className="mt-3 text-2xl font-bold text-white md:text-3xl">
-          Try the <span className="text-blue-400">2-Grid</span> demo free
+          Try the <span className="text-blue-400">4-Grid</span> tester demo free
         </h1>
         <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-slate-300">
-          One tap opens the AI predictor with <strong className="text-white">Grid 1</strong> and{' '}
-          <strong className="text-white">Grid 2</strong> only. No email confirmation. 10- and
-          20-grid tiers stay locked until you subscribe.
+          One tap opens the AI predictor with <strong className="text-white">Grids 1–4</strong>{' '}
+          (two winning-number pairs). See the same patterns across more grids. No email
+          confirmation. 10- and 20-grid tiers stay locked until you subscribe.
         </p>
 
         {error && (
@@ -79,7 +79,7 @@ export default function Grid2DemoPage() {
           onClick={() => void startDemo()}
           className="mt-6 w-full rounded-none border border-blue-500/50 bg-blue-600 py-4 text-sm font-bold text-white transition-all hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50"
         >
-          {loading ? 'Opening demo…' : 'Start 2-grid demo'}
+          {loading ? 'Opening demo…' : 'Start 4-grid tester demo'}
         </button>
 
         <p className="mt-4 text-[10px] leading-relaxed text-slate-500">

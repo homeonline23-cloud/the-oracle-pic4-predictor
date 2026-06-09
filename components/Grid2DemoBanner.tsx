@@ -12,10 +12,10 @@ export default function Grid2DemoBanner() {
   return (
     <div className="mx-auto mb-4 w-full max-w-3xl rounded-none border border-amber-500/40 bg-amber-950/35 px-4 py-3 text-center">
       <p className="text-[11px] font-bold uppercase tracking-wide text-amber-300">
-        Free 2-grid demo
+        Free 4-grid tester demo
       </p>
       <p className="mt-1 text-xs leading-relaxed text-amber-100/90">
-        You are trying the 2-grid predictor only. Upgrade for 10- and 20-grid access.
+        You are trying Grids 1–4 only. Upgrade for 10- and 20-grid access.
       </p>
       <Link
         href="/pricing"

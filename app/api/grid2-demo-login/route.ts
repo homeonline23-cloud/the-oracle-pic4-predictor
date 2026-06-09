@@ -5,7 +5,7 @@ import {
   GRID2_DEMO_PASSWORD,
   GRID2_DEMO_ENABLED,
 } from '@/lib/demoAuth';
-import { TIER_LIMITS } from '@/lib/subscriptionTiers';
+import { TESTER_DEMO_GRID_COUNT } from '@/lib/demoAuth';
 
 /** Ensures the public 2-grid demo user exists with standard-tier access only. */
 export async function POST() {
@@ -20,8 +20,7 @@ export async function POST() {
   try {
     const admin = createAdminClient();
     const email = GRID2_DEMO_EMAIL.toLowerCase();
-    const limits = TIER_LIMITS.standard;
-    const expiresAt = new Date(Date.now() + limits.days * 24 * 60 * 60 * 1000).toISOString();
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     const { error: createError } = await admin.auth.admin.createUser({
       email,
@@ -78,9 +77,9 @@ export async function POST() {
             subscription_tier: 'standard',
             subscription_status: 'active',
             subscription_expires_at: expiresAt,
-            predictions_limit: limits.predictions_limit,
+            predictions_limit: TESTER_DEMO_GRID_COUNT,
             predictions_used: 0,
-            grids_limit: limits.grids_limit,
+            grids_limit: TESTER_DEMO_GRID_COUNT,
             grids_used: 0,
             updated_at: new Date().toISOString(),
           },
