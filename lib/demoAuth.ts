@@ -19,6 +19,16 @@ export const TESTER_DEMO_GRID_COUNT = 4;
 export const GRID2_DEMO_EMAIL =
   cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_EMAIL) || 'try-grid2@theoraclepic4.com';
 
+/** Server-only password (preferred). Falls back to NEXT_PUBLIC for older Vercel setups. */
+export function getGrid2DemoPasswordServer(): string {
+  return (
+    cleanEnv(process.env.GRID2_DEMO_PASSWORD) ||
+    cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_PASSWORD) ||
+    'TryGrid2Demo2026!'
+  );
+}
+
+/** @deprecated Client bundle may be stale after Vercel password changes — use /api/grid2-demo-login instead. */
 export const GRID2_DEMO_PASSWORD =
   cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_PASSWORD) || 'TryGrid2Demo2026!';
 

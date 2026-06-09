@@ -138,8 +138,11 @@ function LoginContent() {
                 <input
                   id="login-email"
                   name="email"
-                  type="email"
+                  type="text"
                   inputMode="email"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

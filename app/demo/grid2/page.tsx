@@ -1,56 +1,35 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import PageHeader from '@/components/PageHeader';
-import { useAuth } from '@/hooks/useAuth';
 import {
-  GRID2_DEMO_EMAIL,
-  GRID2_DEMO_PASSWORD,
   GRID2_DEMO_ENABLED,
   getGrid2DemoUrl,
 } from '@/lib/demoAuth';
 
 export default function Grid2DemoPage() {
-  const router = useRouter();
-  const { signInWithEmail } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const shareUrl =
     typeof window !== 'undefined' ? getGrid2DemoUrl(window.location.origin) : getGrid2DemoUrl();
 
-  const syncDemoAccount = async () => {
-    const res = await fetch('/api/grid2-demo-login', { method: 'POST' });
-    const body = (await res.json().catch(() => ({}))) as { error?: string };
-    if (!res.ok) {
-      throw new Error(body.error || 'Demo could not be prepared');
-    }
-  };
-
   const startDemo = async () => {
     setLoading(true);
     setError(null);
     try {
-      await syncDemoAccount();
-      try {
-        await signInWithEmail(GRID2_DEMO_EMAIL, GRID2_DEMO_PASSWORD);
-      } catch {
-        // Password may have changed in Vercel — sync once more, then retry sign-in.
-        await syncDemoAccount();
-        await signInWithEmail(GRID2_DEMO_EMAIL, GRID2_DEMO_PASSWORD);
+      const res = await fetch('/api/grid2-demo-login', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        throw new Error(body.error || 'Demo could not start');
       }
-      router.push('/basic');
+      window.location.href = '/basic';
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Demo start failed';
-      if (/invalid login credentials/i.test(message)) {
-        setError(
-          'Demo sign-in failed. In Vercel, check NEXT_PUBLIC_GRID2_DEMO_EMAIL and NEXT_PUBLIC_GRID2_DEMO_PASSWORD match, then redeploy and try again.',
-        );
-      } else {
-        setError(message);
-      }
+      setError(err instanceof Error ? err.message : 'Demo start failed');
     } finally {
       setLoading(false);
     }
@@ -79,8 +58,7 @@ export default function Grid2DemoPage() {
         </h1>
         <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-slate-300">
           One tap opens <strong className="text-white">Grids 1–4</strong> with two winning-number
-          pairs. Test patterns across all four grids. Free for testers — no payment, no signup
-          email.
+          pairs. Test patterns across all four grids. Free for testers — no payment, no typing.
         </p>
 
         {error && (
@@ -102,7 +80,6 @@ export default function Grid2DemoPage() {
           Share this link in ads and posts:
           <span className="mt-1 block break-all font-mono text-slate-400">{shareUrl}</span>
         </p>
-
       </motion.div>
     </div>
   );

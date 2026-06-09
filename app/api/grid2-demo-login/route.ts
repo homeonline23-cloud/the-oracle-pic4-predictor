@@ -1,19 +1,21 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 import {
   GRID2_DEMO_EMAIL,
-  GRID2_DEMO_PASSWORD,
   GRID2_DEMO_ENABLED,
+  getGrid2DemoPasswordServer,
+  TESTER_DEMO_GRID_COUNT,
 } from '@/lib/demoAuth';
-import { TESTER_DEMO_GRID_COUNT } from '@/lib/demoAuth';
 
-/** Ensures the public 2-grid demo user exists with standard-tier access only. */
+/** Ensures the public tester demo user exists, then signs in server-side (uses live Vercel password). */
 export async function POST() {
   if (!GRID2_DEMO_ENABLED) {
     return NextResponse.json({ error: 'Grid 2 demo is disabled' }, { status: 403 });
   }
 
-  if (!GRID2_DEMO_EMAIL || !GRID2_DEMO_PASSWORD) {
+  const password = getGrid2DemoPasswordServer();
+  if (!GRID2_DEMO_EMAIL || !password) {
     return NextResponse.json({ error: 'Grid 2 demo is not configured' }, { status: 503 });
   }
 
@@ -24,7 +26,7 @@ export async function POST() {
 
     const { error: createError } = await admin.auth.admin.createUser({
       email,
-      password: GRID2_DEMO_PASSWORD,
+      password,
       email_confirm: true,
       user_metadata: { full_name: 'Grid 2 Demo' },
     });
@@ -48,7 +50,7 @@ export async function POST() {
       userId = existing.id;
 
       const { error: updateError } = await admin.auth.admin.updateUserById(existing.id, {
-        password: GRID2_DEMO_PASSWORD,
+        password,
         email_confirm: true,
       });
       if (updateError) {
@@ -67,37 +69,47 @@ export async function POST() {
       userId = listData.users?.find((u) => u.email?.toLowerCase() === email)?.id;
     }
 
+    let profileReady = true;
     if (userId) {
-      const { error: profileError } = await admin
-        .from('profiles')
-        .upsert(
-          {
-            id: userId,
-            full_name: 'Grid 2 Demo',
-            subscription_tier: 'standard',
-            subscription_status: 'active',
-            subscription_expires_at: expiresAt,
-            predictions_limit: TESTER_DEMO_GRID_COUNT,
-            predictions_used: 0,
-            grids_limit: TESTER_DEMO_GRID_COUNT,
-            grids_used: 0,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'id' },
-        );
+      const { error: profileError } = await admin.from('profiles').upsert(
+        {
+          id: userId,
+          full_name: 'Grid 2 Demo',
+          subscription_tier: 'standard',
+          subscription_status: 'active',
+          subscription_expires_at: expiresAt,
+          predictions_limit: TESTER_DEMO_GRID_COUNT,
+          predictions_used: 0,
+          grids_limit: TESTER_DEMO_GRID_COUNT,
+          grids_used: 0,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'id' },
+      );
 
       if (profileError) {
+        profileReady = false;
         console.warn('grid2-demo-login: profiles upsert skipped:', profileError.message);
-        return NextResponse.json({
-          ok: true,
-          profileReady: false,
-          hint:
-            'Demo login works, but run supabase_migration.sql in Supabase if you need full billing/profile features.',
-        });
       }
     }
 
-    return NextResponse.json({ ok: true, profileReady: true });
+    const supabase = await createClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      return NextResponse.json({ error: signInError.message }, { status: 401 });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      profileReady,
+      hint: profileReady
+        ? undefined
+        : 'Demo login works, but run supabase_migration.sql in Supabase if you need full billing/profile features.',
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Grid 2 demo setup failed';
     return NextResponse.json({ error: message }, { status: 500 });
