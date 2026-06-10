@@ -24,6 +24,18 @@ export const WINDOW_OUTER_SHELL_RESPONSIVE =
 export const WINDOW_INNER_FRAME =
   'border border-blue-500/45 shadow-[0_0_24px_rgba(37,99,235,0.28),0_14px_48px_rgba(0,0,0,0.5)] ring-1 ring-blue-400/20';
 
+/** Solid panel shell — no backdrop-blur (keeps hero video and text sharp in the browser). */
+export const WINDOW_PANEL_OUTER =
+  'relative rounded-none bg-slate-950/95 p-1 md:p-2 min-h-0';
+
+/** Inner panel fill paired with {@link WINDOW_PANEL_OUTER}. */
+export const WINDOW_PANEL_INNER =
+  'relative flex min-h-0 w-full flex-col rounded-none bg-slate-900/95 p-2 md:p-4 h-auto';
+
+/** Soft edge glow behind panels — no CSS blur filter. */
+export const PANEL_EDGE_GLOW =
+  'pointer-events-none absolute -inset-4 md:-inset-10 rounded-none bg-gradient-to-r from-blue-600/12 via-white/5 to-red-600/12 opacity-60';
+
 /** Same border + outer glow as {@link WINDOW_OUTER_SHELL}, plus soft inset wash for top bars. */
 export const NAV_BAND_SHELL =
   'border-2 border-blue-600/[0.78] shadow-[0_0_0_1px_rgba(147,197,253,0.22),0_0_32px_rgba(37,99,235,0.42),0_0_52px_rgba(30,64,175,0.2),0_12px_40px_rgba(0,0,0,0.52),inset_0_0_36px_rgba(220,38,38,0.12),inset_0_0_36px_rgba(37,99,235,0.12),inset_0_1px_0_rgba(255,255,255,0.05)]';

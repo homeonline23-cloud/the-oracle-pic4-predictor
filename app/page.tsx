@@ -6,7 +6,7 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 import GridButtons from '@/components/GridButtons';
 import PageHeader from '@/components/PageHeader';
 import SiteDisclaimer from '@/components/SiteDisclaimer';
-import { VIDEO_SHELL, WINDOW_OUTER_SHELL, WINDOW_INNER_FRAME } from '@/lib/constants';
+import { VIDEO_SHELL, WINDOW_OUTER_SHELL, WINDOW_INNER_FRAME, WINDOW_PANEL_OUTER, WINDOW_PANEL_INNER, PANEL_EDGE_GLOW } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 export default function HomePage() {
@@ -27,14 +27,14 @@ export default function HomePage() {
         {/* Welcome Section — same width as hero video + GridButtons (VIDEO_SHELL / max-w-3xl). */}
         <div className={`${VIDEO_SHELL} mb-6`}>
           <div className="relative group">
-            <div className="pointer-events-none absolute -inset-4 md:-inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[60px] md:blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
+            <div className={PANEL_EDGE_GLOW}></div>
             <div
               className={cn(
-                'relative rounded-none bg-slate-900/20 p-1 backdrop-blur-sm md:p-2 min-h-0',
+                WINDOW_PANEL_OUTER,
                 WINDOW_OUTER_SHELL
               )}
             >
-              <div className="relative bg-slate-950/40 backdrop-blur-xl rounded-none p-4 md:p-12 h-auto flex flex-col">
+              <div className={cn(WINDOW_PANEL_INNER, 'p-4 md:p-12')}>
                 <div className="flex flex-col items-center text-center">
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}

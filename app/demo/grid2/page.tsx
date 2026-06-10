@@ -48,7 +48,7 @@ export default function Grid2DemoPage() {
       <PageHeader />
       <motion.div
         initial={{ opacity: 1, y: 0 }}
-        className="mt-6 w-full max-w-lg rounded-none border border-blue-500/30 bg-slate-900/60 p-6 text-center backdrop-blur-xl md:p-8"
+        className="mt-6 w-full max-w-lg rounded-none border border-blue-500/30 bg-slate-950/95 p-6 text-center md:p-8"
       >
         <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400">
           The Oracle Pic 4 Predictor

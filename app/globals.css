@@ -147,3 +147,15 @@ noscript .animate-hidden {
   color: #334155;
   background: rgba(203, 213, 225, 0.92);
 }
+
+/* Hero video — sharp in browser; no frosted overlay on the frame */
+.oracle-hero-frame {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.oracle-hero-video {
+  filter: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
