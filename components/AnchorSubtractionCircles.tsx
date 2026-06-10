@@ -45,28 +45,28 @@ export default function AnchorSubtractionCircles({
     <>
       <div
         dir="ltr"
-        className={`relative flex h-24 w-[11.5rem] scale-90 items-center justify-between sm:w-[13rem] sm:scale-100 ${className}`}
+        className={`relative flex h-[6.75rem] w-[12.75rem] items-center justify-between sm:h-24 sm:w-[13rem] ${className}`}
       >
         <AnchorConnectorLines />
 
         {/* RED circle — 0 over 5 */}
         <div
-          className="relative z-10 flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-full border-[6px] border-red-600 bg-transparent text-red-600 shadow-[0_0_15px_rgba(220,38,38,0.3)]"
+          className="relative z-10 flex h-[4.5rem] w-[4.5rem] shrink-0 flex-col items-center justify-center gap-0 rounded-full border-[5px] border-red-600 bg-transparent text-red-600 shadow-[0_0_15px_rgba(220,38,38,0.3)] sm:h-16 sm:w-16 sm:border-[6px]"
           title={`RED: ${redTop} (top) and ${redBottom} (bottom)`}
         >
-          <span className="text-lg font-bold leading-none">{redTop}</span>
-          <span className="text-lg font-bold leading-none">-</span>
-          <span className="text-lg font-bold leading-none">{redBottom}</span>
+          <span className="text-base font-bold leading-none sm:text-lg">{redTop}</span>
+          <span className="text-[9px] font-bold leading-none sm:text-sm">-</span>
+          <span className="text-base font-bold leading-none sm:text-lg">{redBottom}</span>
         </div>
 
         {/* BLUE circle — 1 over 6 */}
         <div
-          className="relative z-10 flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-full border-[6px] border-blue-600 bg-transparent text-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.35)]"
+          className="relative z-10 flex h-[4.5rem] w-[4.5rem] shrink-0 flex-col items-center justify-center gap-0 rounded-full border-[5px] border-blue-600 bg-transparent text-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.35)] sm:h-16 sm:w-16 sm:border-[6px]"
           title={`BLUE: ${blueTop} (top) and ${blueBottom} (bottom)`}
         >
-          <span className="text-lg font-bold leading-none">{blueTop}</span>
-          <span className="text-lg font-bold leading-none">-</span>
-          <span className="text-lg font-bold leading-none">{blueBottom}</span>
+          <span className="text-base font-bold leading-none sm:text-lg">{blueTop}</span>
+          <span className="text-[9px] font-bold leading-none sm:text-sm">-</span>
+          <span className="text-base font-bold leading-none sm:text-lg">{blueBottom}</span>
         </div>
       </div>
 
