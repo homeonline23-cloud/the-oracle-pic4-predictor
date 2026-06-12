@@ -9,7 +9,6 @@ import SubscriptionGuard from '@/components/SubscriptionGuard';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
 import Grid2DemoBanner from '@/components/Grid2DemoBanner';
-import GridPairStripe from '@/components/GridPairStripe';
 import { useAuth } from '@/hooks/useAuth';
 import { isGrid2DemoEmail } from '@/lib/demoAuth';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
@@ -336,7 +335,7 @@ export default function BasicGridPage() {
                       </div>
 
                       <div className="relative mx-auto flex w-full max-w-2xl flex-row items-start justify-center gap-2 px-1 py-4 md:px-4 sm:gap-6">
-                        <GridPairStripe pairNumber={pairIndex + 1} />
+                        <div className="absolute left-0 right-0 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
                         <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
                           <Grid
                             title={`Grid ${gridAIndex}`}
@@ -432,7 +431,7 @@ export default function BasicGridPage() {
                 </div>
 
                 <div className="relative mx-auto flex min-h-[200px] w-full max-w-2xl flex-row items-start justify-center gap-2 px-1 py-4 md:px-4 sm:gap-6">
-                  <GridPairStripe pairNumber={1} />
+                  <div className="absolute left-0 right-0 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
                   <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
                     <Grid
                       title="Grid 1"

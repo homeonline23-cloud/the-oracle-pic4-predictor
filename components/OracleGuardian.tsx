@@ -39,8 +39,8 @@ function buildMemberSignInWelcome(pathname: string): string {
     pathname.startsWith('/yearly');
 
   const gridHint = onGrid
-    ? 'In **Enter 4 Digits** above your first grid pair (line **1** on the red/blue stripe), you may type four digits from a **late past** or **midday** draw that already came in — if you wish to use that as a starting point.'
-    : 'Open your **Basic**, **Premium**, or **Yearly** grid page, then in **Enter 4 Digits** (pair line **1**) you may type four digits from a **late past** or **midday** draw that already happened — purely as a pattern starting point.';
+    ? 'In **Enter 4 Digits** above **Grid 1**, you may type four digits from a **late past** or **midday** draw that already came in — if you wish to use that as a starting point.'
+    : 'Open your **Basic**, **Premium**, or **Yearly** grid page, then in **Enter 4 Digits** above **Grid 1** you may type four digits from a **late past** or **midday** draw that already happened — purely as a pattern starting point.';
 
   return (
     'Welcome back, Visionary!\n\n' +
@@ -72,7 +72,7 @@ function buildGridConnectionBlock(pathname: string): string {
     return `\n\nPAGE / GRID CONTEXT: Current path is "${pathname}". User is not on Basic, Premium, or Yearly grid screens — explain Oracle Pic4 grids in general if asked. Universal anchors remain RED digits ${anchorRedTop}, ${anchorRedBottom} and BLUE digits ${anchorBlueTop}, ${anchorBlueBottom}.`;
   }
   const label = onBasic ? 'Basic (2 grids)' : onPremium ? 'Premium (10 grids)' : 'Yearly (20 grids)';
-  return `\n\nLIVE GRID CONNECTION (this chat is synced to the open page):\n- Path: ${pathname} — ${label}.\n- Pair lines on the red/blue stripe: ${onBasic ? '1 (Basic)' : onPremium ? '1–5 (one per grid pair)' : '1–10 (one per grid pair)'}.\n- RED ring: any cell showing digit ${anchorRedTop} or ${anchorRedBottom} (left circle, red border).\n- BLUE ring: any cell showing digit ${anchorBlueTop} or ${anchorBlueBottom} (right circle, blue border).\n- Same logic on every grid on this route. Marking-tool colors (yellow, turquoise, orange, purple) are manual marks on top of cells — use all of this when guiding or teaching patterns.`;
+  return `\n\nLIVE GRID CONNECTION (this chat is synced to the open page):\n- Path: ${pathname} — ${label}.\n- RED ring: any cell showing digit ${anchorRedTop} or ${anchorRedBottom} (left circle, red border).\n- BLUE ring: any cell showing digit ${anchorBlueTop} or ${anchorBlueBottom} (right circle, blue border).\n- Same logic on every grid on this route. Marking-tool colors (yellow, turquoise, orange, purple) are manual marks on top of cells — use all of this when guiding or teaching patterns.`;
 }
 
 export default function OracleGuardian() {
@@ -95,8 +95,8 @@ export default function OracleGuardian() {
     
     CORE PURPOSE:
     - You are both a **Guide** and a **Teacher** — the same way a wise mentor walks beside someone: you point the way, and you explain when they need it.
-    - **GUIDE**: Gently steer members toward the next right step (Enter 4 Digits, pair line numbers on the red/blue stripe, RED vs BLUE anchors, marking tool, Visual Evidence / Patterns). Do not rush them. Let them discover patterns for themselves, as the owner did — you open the door; they walk through.
-    - **TEACH**: When a member is new, stuck, or asks — explain clearly step by step: what the grids are, how anchor rings work, adjacent cells, odd vs even grid paths, pair lines 1–5 (Premium) or 1–10 (Yearly), and how midday/past draws can seed evening guess work. Use simple language. One step at a time when they are learning.
+    - **GUIDE**: Gently steer members toward the next right step (Enter 4 Digits, Grid 1 / Grid 2 pairs, RED vs BLUE anchors, marking tool, Visual Evidence / Patterns). Do not rush them. Let them discover patterns for themselves, as the owner did — you open the door; they walk through.
+    - **TEACH**: When a member is new, stuck, or asks — explain clearly step by step: what the grids are, how anchor rings work, adjacent cells, odd vs even grid paths, and how midday/past draws can seed evening guess work. Use simple language. One step at a time when they are learning.
     - **BOTH TOGETHER**: Default to a short guiding nudge first; offer deeper teaching when they ask "how?" or "why?" or seem lost. Be patient, never condescending. Aim to be the very best guide-teacher you can be.
     - While you are an expert in the Oracle Grids, your wisdom also extends to daily life — with the same humble guide-and-teach spirit.
     - You help people with their daily problems, offer solutions to life's challenges, and answer any question with kindness.
@@ -124,13 +124,12 @@ export default function OracleGuardian() {
     - You help members explore **patterns members sometimes guess from** adjacent cells near anchors — always as guess work, never as hidden guaranteed winners.
     - When a member first signs in, the app may already have told them they may enter a late past or midday draw (4 digits) before looking at the evening grid — reinforce that gently as optional guess work only; never guarantee a win.
     - You are aware of the Visual Evidence page as the "Patterns" gallery or grid archive of the system.
-    - Pair line numbers (1–5 on Premium, 1–10 on Yearly, 1 on Basic) sit on the red/blue horizontal stripe between grid pairs — use these when guiding or teaching ("look at pair line 3", etc.).
     
     GUIDE + TEACH STYLE (Grids):
-    - New member: welcome them, guide them to Enter 4 Digits on pair line 1, then teach what RED/BLUE rings mean if they ask.
-    - Curious member: teach the logic they ask for; guide them to the next pair or grid when they are ready.
+    - New member: welcome them, guide them to Enter 4 Digits above Grid 1, then teach what RED/BLUE rings mean if they ask.
+    - Curious member: teach the logic they ask for; guide them to the next grid pair when they are ready.
     - Advanced member: guide with light touch; teach only what they request — respect that discovery is personal.
-    - Always end heavy teaching with a gentle guide question ("What do you see on pair line 2, Friend?") so they stay active, not passive.
+    - Always end heavy teaching with a gentle guide question ("What do you see on Grid 2, Friend?") so they stay active, not passive.
     
     TRAINING MODE (Admin only):
     - If the user is teaching you new rules, listen carefully and acknowledge the new "Grid Wisdom".
@@ -349,13 +348,13 @@ export default function OracleGuardian() {
         isOpen
           ? cn(
               'bottom-[max(5.25rem,calc(4.5rem+env(safe-area-inset-bottom,0px)))]',
-              'left-[max(0.75rem,env(safe-area-inset-left,0px))]',
-              'right-[max(0.75rem,env(safe-area-inset-right,0px))]',
-              'min-[1300px]:bottom-6',
-              'min-[1300px]:left-[calc(50%+min(24rem,100vw)/2+0.75rem)]',
-              'min-[1300px]:right-[max(0.75rem,env(safe-area-inset-right,0px))]',
-              'min-[1300px]:w-auto min-[1300px]:max-w-80 min-[1300px]:min-w-[15rem]',
-              'min-[1300px]:flex min-[1300px]:flex-col min-[1300px]:gap-3',
+              'max-[1099px]:left-[max(0.75rem,env(safe-area-inset-left,0px))]',
+              'max-[1099px]:right-[max(0.75rem,env(safe-area-inset-right,0px))]',
+              'min-[1100px]:bottom-6',
+              'min-[1100px]:left-[calc((100vw+min(48rem,100vw))/2+1rem)]',
+              'min-[1100px]:right-auto',
+              'min-[1100px]:w-80',
+              'min-[1100px]:flex min-[1100px]:flex-col min-[1100px]:gap-3',
             )
           : cn(
               'bottom-[max(6rem,calc(5rem+env(safe-area-inset-bottom,0px)))]',
@@ -374,8 +373,8 @@ export default function OracleGuardian() {
               panelChrome,
               'absolute bottom-12 right-0 w-full',
               'h-[min(620px,calc(100dvh-10.5rem-env(safe-area-inset-bottom,0px)-env(safe-area-inset-top,0px)))]',
-              'min-[1300px]:relative min-[1300px]:bottom-auto min-[1300px]:right-auto',
-              'min-[1300px]:h-[min(34rem,calc(100dvh-6rem-env(safe-area-inset-bottom,0px)-env(safe-area-inset-top,0px)))]',
+              'min-[1100px]:relative min-[1100px]:bottom-auto min-[1100px]:right-auto min-[1100px]:w-full',
+              'min-[1100px]:h-[min(34rem,calc(100dvh-6rem-env(safe-area-inset-bottom,0px)-env(safe-area-inset-top,0px)))]',
             )}
           >
             {/* Header */}
@@ -414,7 +413,7 @@ export default function OracleGuardian() {
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
                   <Sparkles className="text-blue-500 w-12 h-12 animate-pulse" />
                   <p className="text-xs font-medium leading-relaxed text-slate-400 sm:text-sm">
-                    &quot;Hello, Friend! I guide and teach — step by step when you need it, gently when you are ready to discover. All grid talk is guess work for fun.&quot;
+                    &quot;Hello, Friend! I will guide and teach — step by step when you need it, gently when you are ready to discover secret of the Grids Boxes and how it works.&quot;
                   </p>
                   {isAdminUser && (
                     <button 
@@ -518,7 +517,7 @@ export default function OracleGuardian() {
         className={cn(
           'ml-auto flex items-center justify-center rounded-full shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all',
           'h-7 w-7 md:h-14 md:w-14',
-          isOpen ? 'bg-red-600 min-[1300px]:self-end' : 'bg-blue-600',
+          isOpen ? 'bg-red-600 min-[1100px]:self-end' : 'bg-blue-600',
         )}
       >
         <AnimatePresence mode="wait">
