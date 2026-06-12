@@ -3,6 +3,9 @@ import { GoogleGenAI } from '@google/genai';
 
 const apiKey = process.env.GEMINI_API_KEY;
 
+const PREDICT_MODEL = 'gemini-2.0-flash';
+const CHAT_MODEL = 'gemini-2.5-flash';
+
 /** Allow up to 60s on Vercel Pro; still helps Next.js set the limit where supported. */
 export const maxDuration = 60;
 export const runtime = 'nodejs';
@@ -26,16 +29,23 @@ export async function POST(req: Request) {
       tools?: unknown[];
       responseMimeType?: string;
     };
+
+    if (!contents) {
+      return NextResponse.json({ error: 'Missing contents.' }, { status: 400 });
+    }
+
     const ai = new GoogleGenAI({ apiKey });
 
-    // Build config object only with provided fields, otherwise the SDK rejects undefined values.
     const config: Record<string, unknown> = {};
     if (systemInstruction) config.systemInstruction = systemInstruction;
     if (Array.isArray(tools) && tools.length > 0) config.tools = tools;
     if (responseMimeType) config.responseMimeType = responseMimeType;
 
+    const usePredictModel = responseMimeType === 'application/json' && !tools?.length;
+    const model = usePredictModel ? PREDICT_MODEL : CHAT_MODEL;
+
     const result = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model,
       contents,
       ...(Object.keys(config).length ? { config } : {}),
     });

@@ -5,9 +5,9 @@ import { Sparkles, Loader2, AlertCircle, Trash2, CheckCircle2, Save } from 'luci
 import { motion, AnimatePresence } from 'motion/react';
 import { createClient } from '@/lib/supabase/client';
 import { WINDOW_OUTER_SHELL } from '@/lib/constants';
-import { formatMarkedCellsForAI, type GridDataMap } from '@/lib/gridMarkColors';
+import type { GridDataMap } from '@/lib/gridMarkColors';
 import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
-import { compactGridDataForPrompt } from '@/lib/gridPrompt';
+import { buildPredictPrompt } from '@/lib/buildPredictPrompt';
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { parseApiJsonResponse } from '@/lib/parseApiResponse';
 import { withTimeout } from '@/lib/withTimeout';
@@ -127,94 +127,62 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
 
     try {
       if (!isAdmin && !isTesterDemo) {
-        const { data: profile } = await withTimeout(
-          supabase.from('profiles').select('*').eq('id', user.id).single(),
-          12000,
-          'Profile check',
-        );
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('predictions_used, predictions_limit')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (profileError) console.warn('Profile check skipped:', profileError.message);
         if (profile && profile.predictions_used >= profile.predictions_limit) {
           setError('Monthly prediction limit reached. Please upgrade your plan.');
           return;
         }
       }
 
-      const [{ data: historyData }, memoryBank] = await Promise.all([
-        withTimeout(
+      let history: string[] = [];
+      let memoryBank = '';
+      try {
+        const [histRes, mem] = await Promise.all([
           supabase
             .from('winning_numbers')
             .select('number')
-            .eq('location', selectedLocation)
             .order('created_at', { ascending: false })
             .limit(20),
-          12000,
-          'History load',
-        ),
-        buildMarkMemoryBankBlock(supabase),
-      ]);
-
-      const history = historyData?.map((h) => h.number) || [];
+          buildMarkMemoryBankBlock(supabase),
+        ]);
+        history = histRes.data?.map((h) => h.number) || [];
+        memoryBank = mem;
+      } catch (prefetchErr) {
+        console.warn('Predict prefetch skipped:', prefetchErr);
+      }
       setHistoricalData(history);
 
-      const prompt = `
-        You are a pattern-exploration assistant for "The Oracle Pick 4" — entertainment and guess work only. Never guarantee wins.
-
-        LEGAL / SAFETY TONE (always):
-        - All outputs are humble guess work, not financial advice.
-        - Always use the word "Probaly" in reasons.
-        - Say "We are also not sure, we are also guessing" where appropriate.
-        - Never state odds, percentages, or "high probability" for lottery results.
-
-        USER'S CORE PATTERN RULES (for guess-work exploration):
-        1. Members look at numbers within the Grids provided.
-        2. Members often notice digits in cells IMMEDIATELY ADJACENT (horizontally, vertically, or diagonally) to the "RED" and "BLUE" anchor numbers.
-        3. The user may use a "Marking Tool" to color specific cells — these marks are manual notes, not proof of future results.
-        4. Some members guess that numbers SURROUNDING marked/colored cells are worth considering next — treat this as pattern play only. The mark colors (yellow, turquoise, orange, purple) are how members show the AI which winning numbers to read; each color can mean a draw or a step in their pattern story.
-        5. Some members watch for the SAME 4-digit combinations appearing across DIFFERENT grids — if seen, mention it as a curious pattern only, not as a likely winner.
-        6. Analyze all grids together for recurring digits or sequences — frame any finding as guess work.
-        
-        LOCATION CONTEXT:
-        The user is playing from: ${selectedLocation}. 
-        
-        HISTORICAL WINNING NUMBERS (Self-Learning Data):
-        The following numbers have recently won in ${selectedLocation}: ${history.join(', ') || 'None recorded yet'}.
-        Analyze these historical winners for recurring digits, sequences, or clusters that match the current grid patterns.
-        
-        CURRENT DATA:
-        - Red Anchor Numbers: ${anchors.red.join(', ')}
-        - Blue Anchor Numbers: ${anchors.blue.join(', ')}
-        
-        MARKED CELLS (User's Color Patterns — yellow, turquoise, orange, purple):
-        ${formatMarkedCellsForAI(markedCells, gridData as GridDataMap)}
-
-        ${memoryBank}
-        
-        GRID DATA (4x4 grids):
-        ${compactGridDataForPrompt(gridData as GridDataMap, {
-          maxGrids: maxPredictions > 5 ? 10 : 6,
-          markedCells,
-        })}
-        
-        TASK:
-        1. Identify the numbers in the cells that the user has marked.
-        2. Analyze the numbers in the cells IMMEDIATELY SURROUNDING these marked cells.
-        3. Combine this with the numbers near the Red and Blue anchors.
-        4. Cross-reference these clusters with the historical winners for ${selectedLocation}.
-        5. Generate EXACTLY ${maxPredictions} four-digit combinations for entertainment guess work.
-        
-        Return the response as a JSON array of objects with 'number' (string) and 'reason' (string). 
-        Ensure the 'reason' field incorporates the "Probaly" disclaimer and the humble tone requested.
-      `;
-
-      const response = await fetchWithTimeout('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        timeoutMs: 120000,
-        body: JSON.stringify({
-          systemInstruction: "You are a professional AI model. Respond with valid JSON only.",
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          responseMimeType: 'application/json',
-        }),
+      const prompt = buildPredictPrompt({
+        gridData: gridData as GridDataMap,
+        markedCells,
+        anchors,
+        maxPredictions,
+        history,
+        memoryBank,
       });
+
+      const callGenerate = () =>
+        fetchWithTimeout('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          timeoutMs: 90000,
+          body: JSON.stringify({
+            systemInstruction: 'Respond with valid JSON array only. No markdown.',
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            responseMimeType: 'application/json',
+          }),
+        });
+
+      let response = await callGenerate();
+      if (response.status === 504 || response.status === 502) {
+        await new Promise((r) => setTimeout(r, 1500));
+        response = await callGenerate();
+      }
       const data = await parseApiJsonResponse<{ text?: string; error?: string }>(response);
       if (!response.ok) {
         throw new Error(data.error || `Analysis failed (${response.status}). Please try again.`);
@@ -279,10 +247,12 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
         setError('Invalid API Key. Please check your Gemini API key configuration.');
       } else if (errorMessage.includes('model not found') || errorMessage.includes('404')) {
         setError('AI Model error. Please try again later.');
-      } else if (/timed out|timeout|504|FUNCTION_INVOCATION/i.test(errorMessage)) {
+      } else if (/timed out|timeout|504|502|FUNCTION_INVOCATION/i.test(errorMessage)) {
         setError(
-          'Analysis took too long. Make sure Enter 4 Digits is filled, then try again in a moment.',
+          'Analysis took too long (the AI server may be busy). Wait 30 seconds and try again — make sure Enter 4 Digits is filled first.',
         );
+      } else if (errorMessage.includes('Server error') || errorMessage.includes('error page')) {
+        setError(errorMessage);
       } else if (/rate|quota|429|busy/i.test(errorMessage)) {
         setError('AI is busy right now. Please wait a minute and try again.');
       } else if (errorMessage.includes('not valid JSON') || errorMessage.includes('no valid predictions')) {
