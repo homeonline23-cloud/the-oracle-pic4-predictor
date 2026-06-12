@@ -270,7 +270,7 @@ export default function OracleGuardian() {
             initial={{ opacity: 0, scale: 0.9, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 50 }}
-            className="absolute bottom-12 md:bottom-20 right-0 w-[350px] max-w-[90vw] h-[500px] bg-slate-900 border-2 border-blue-600/50 shadow-[0_0_40px_rgba(37,99,235,0.3)] flex flex-col overflow-hidden rounded-none"
+            className="absolute bottom-12 md:bottom-20 right-0 flex h-[min(580px,78vh)] w-[min(480px,94vw)] flex-col overflow-hidden rounded-none border-[3px] border-blue-600 bg-slate-900 shadow-[0_0_0_1px_rgba(220,38,38,0.75),0_0_48px_rgba(37,99,235,0.4),0_0_48px_rgba(220,38,38,0.25)] sm:w-[min(520px,94vw)] md:w-[min(560px,42vw)]"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-900 via-slate-900 to-red-900 p-4 border-b border-white/10 flex items-center justify-between">
@@ -282,9 +282,9 @@ export default function OracleGuardian() {
                   <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900 animate-pulse"></div>
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-[11px]">Oracle Predictor</h3>
+                  <h3 className="text-sm font-bold text-white">Oracle Predictor</h3>
                   <div className="flex items-center gap-1">
-                    <span className="text-[9px] text-blue-400 font-medium">Online & Watching</span>
+                    <span className="text-[10px] font-medium text-blue-400">Online & Watching</span>
                     {isTrainingMode && (
                       <span className="text-[8px] bg-amber-500 text-black px-1 font-bold rounded-none tracking-normal">TRAINING MODE</span>
                     )}
@@ -307,7 +307,7 @@ export default function OracleGuardian() {
               {messages.length === 0 && (
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
                   <Sparkles className="text-blue-500 w-12 h-12 animate-pulse" />
-                  <p className="text-slate-400 text-[11px] font-medium leading-relaxed">
+                  <p className="text-xs font-medium leading-relaxed text-slate-400 sm:text-sm">
                     &quot;Hello! I am your assistant — you can write in any language. How can I help you?&quot;
                   </p>
                   {isAdminUser && (
@@ -327,14 +327,14 @@ export default function OracleGuardian() {
                   key={i} 
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className={`max-w-[85%] p-3 rounded-none flex gap-3 ${
+                  <div className={`flex max-w-[90%] gap-3 rounded-none p-3 sm:p-3.5 ${
                     msg.role === 'user' 
                       ? 'bg-blue-600/20 border border-blue-500/30 text-white' 
                       : 'bg-slate-800/80 border border-white/10 text-slate-300'
                   }`}>
                     {msg.role === 'model' && <Bot size={14} className="shrink-0 text-blue-500 mt-1" />}
                     <div className="space-y-1">
-                      <p className="text-[11px] leading-relaxed select-text font-medium">
+                      <p className="select-text text-xs font-medium leading-relaxed sm:text-sm">
                         {msg.parts[0].text}
                       </p>
                       <span className="text-[8px] opacity-30 font-bold tracking-normal">
@@ -370,7 +370,7 @@ export default function OracleGuardian() {
                     }
                   }}
                   placeholder={isTrainingMode ? "Teach the AI new Grid Wisdom..." : "Ask your Friend about the Grids..."}
-                  className="min-w-0 flex-1 border-0 bg-transparent p-3 text-[10px] text-white placeholder:text-white/20 focus:outline-none focus:ring-0"
+                  className="min-w-0 flex-1 border-0 bg-transparent p-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:ring-0 sm:text-sm"
                 />
                 {speechSupported && (
                   <button
