@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, X, Send, User, Bot, Sparkles, GraduationCap, Loader2, Mic } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
+import { cn } from '@/lib/utils';
 
 /** Minimal Web Speech API surface (DOM lib typings vary by TS version). */
 type WebSpeechRecognitionInstance = {
@@ -262,15 +263,32 @@ export default function OracleGuardian() {
     }
   };
 
+  const panelChrome =
+    'flex flex-col overflow-hidden rounded-none border-[3px] border-blue-600 bg-slate-900 shadow-[0_0_0_1px_rgba(220,38,38,0.8),0_0_56px_rgba(37,99,235,0.45),0_0_56px_rgba(220,38,38,0.3)] md:border-4';
+
   return (
-    <div className="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-[200]">
+    <div
+      className={cn(
+        'fixed z-[200]',
+        'right-[max(0.75rem,env(safe-area-inset-right,0px))]',
+        isOpen
+          ? 'bottom-[max(5.25rem,calc(4.5rem+env(safe-area-inset-bottom,0px)))] left-[max(0.75rem,env(safe-area-inset-left,0px))] md:left-auto md:bottom-6'
+          : 'bottom-[max(6rem,calc(5rem+env(safe-area-inset-bottom,0px)))] md:bottom-6',
+      )}
+    >
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 50 }}
-            className="absolute bottom-12 md:bottom-20 right-0 flex h-[min(580px,78vh)] w-[min(480px,94vw)] flex-col overflow-hidden rounded-none border-[3px] border-blue-600 bg-slate-900 shadow-[0_0_0_1px_rgba(220,38,38,0.75),0_0_48px_rgba(37,99,235,0.4),0_0_48px_rgba(220,38,38,0.25)] sm:w-[min(520px,94vw)] md:w-[min(560px,42vw)]"
+            className={cn(
+              panelChrome,
+              'absolute bottom-12 right-0 w-full',
+              'h-[min(720px,calc(100dvh-10.5rem-env(safe-area-inset-bottom,0px)-env(safe-area-inset-top,0px)))]',
+              'md:bottom-20 md:h-[min(720px,86vh)] md:w-[min(680px,54vw)]',
+              'lg:w-[min(760px,50vw)] xl:w-[min(840px,46vw)]',
+            )}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-900 via-slate-900 to-red-900 p-4 border-b border-white/10 flex items-center justify-between">
@@ -409,7 +427,7 @@ export default function OracleGuardian() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(prev => !prev)}
-        className={`w-7 h-7 md:w-14 md:h-14 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all order-1 ${
+        className={`ml-auto flex h-7 w-7 items-center justify-center rounded-full shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all order-1 md:h-14 md:w-14 ${
           isOpen ? 'bg-red-600' : 'bg-blue-600'
         }`}
       >
