@@ -3,6 +3,9 @@ import { GoogleGenAI } from '@google/genai';
 
 const apiKey = process.env.GEMINI_API_KEY;
 
+/** Allow up to 60s on Vercel Pro; still helps Next.js set the limit where supported. */
+export const maxDuration = 60;
+
 export async function POST(req: Request) {
   if (!apiKey) {
     return NextResponse.json({ error: 'Gemini API key is not configured.' }, { status: 500 });
@@ -25,10 +28,17 @@ export async function POST(req: Request) {
     });
 
     const text = result.text ?? '';
+    if (!text.trim()) {
+      return NextResponse.json({ error: 'AI returned an empty response. Please try again.' }, { status: 502 });
+    }
     return NextResponse.json({ text });
   } catch (error) {
     console.error('Error in Gemini API route:', error);
     const message = error instanceof Error ? error.message : 'Failed to generate response.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    const status =
+      /timeout|deadline|timed out/i.test(message) ? 504
+      : /rate|quota|429/i.test(message) ? 429
+      : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

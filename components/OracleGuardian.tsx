@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { buildMarkedCellsConnectionBlock } from '@/lib/gridLiveSnapshot';
 import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { cn } from '@/lib/utils';
 
 /** Minimal Web Speech API surface (DOM lib typings vary by TS version). */
@@ -300,14 +301,15 @@ export default function OracleGuardian() {
 
       const systemInstruction = `${SYSTEM_INSTRUCTIONS}${gridConnection}${markingConnection}${memoryBank}${trainingAugment}`;
 
-      const response = await fetch('/api/generate', {
+      const response = await fetchWithTimeout('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        timeoutMs: 90000,
         body: JSON.stringify({
           contents: [...messages, userMessage],
           systemInstruction,
-          tools: [{ googleSearch: {} }]
-        })
+          tools: [{ googleSearch: {} }],
+        }),
       });
 
       const data = await response.json();

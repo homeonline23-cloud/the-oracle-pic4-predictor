@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/client';
 import { WINDOW_OUTER_SHELL } from '@/lib/constants';
 import { formatMarkedCellsForAI, type GridDataMap } from '@/lib/gridMarkColors';
 import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
+import { compactGridDataForPrompt } from '@/lib/gridPrompt';
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { cn } from '@/lib/utils';
 
 interface AIPredictorProps {
@@ -203,10 +205,7 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
         ${memoryBank}
         
         GRID DATA (4x4 grids):
-        ${Object.entries(gridData)
-          .filter(([, val]) => val !== undefined)
-          .map(([key, val]) => `${key}: ${JSON.stringify(val)}`)
-          .join('\n')}
+        ${compactGridDataForPrompt(gridData as GridDataMap)}
         
         TASK:
         1. Identify the numbers in the cells that the user has marked.
@@ -219,18 +218,20 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
         Ensure the 'reason' field incorporates the "Probaly" disclaimer and the humble tone requested.
       `;
 
-      const response = await fetch('/api/generate', {
+      const response = await fetchWithTimeout('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        timeoutMs: 90000,
         body: JSON.stringify({
           systemInstruction: "You are a professional AI model. Respond with valid JSON only.",
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          // Ask Gemini to return application/json so the response is reliably parseable.
           responseMimeType: 'application/json',
-        })
+        }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to generate');
+      if (!response.ok) {
+        throw new Error(data.error || `Analysis failed (${response.status}). Please try again.`);
+      }
 
       // Strip markdown code fences just in case the model still wraps JSON.
       const cleaned = String(data.text ?? '')
@@ -260,29 +261,47 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
           !!p && typeof (p as Prediction).number === 'string' && typeof (p as Prediction).reason === 'string'
       );
 
+      if (result.length === 0) {
+        throw new Error('AI returned no valid predictions. Please enter 4 digits and try again.');
+      }
+
       setPredictions(result);
 
-      // 3. Save Prediction History & Increment Usage
-      await supabase.from('predictions').insert({
-        user_id: user.id,
-        predictions: result,
-        location: selectedLocation || 'Global',
-        input_numbers: currentInput
-      });
+      // Save history in the background so the spinner stops as soon as results are ready.
+      void (async () => {
+        try {
+          await supabase.from('predictions').insert({
+            user_id: user.id,
+            predictions: result,
+            location: selectedLocation || 'Global',
+            input_numbers: currentInput,
+          });
 
-      if (!isAdmin) {
-        await supabase.rpc('increment_predictions_used');
-      }
+          if (!isAdmin && !isTesterDemo) {
+            await supabase.rpc('increment_predictions_used');
+          }
+        } catch (saveErr) {
+          console.error('Save prediction history error:', saveErr);
+        }
+      })();
 
     } catch (err) {
       console.error("AI Prediction Error:", err);
       const errorMessage = err instanceof Error ? err.message : String(err);
-      if (errorMessage.includes("API key not valid")) {
-        setError("Invalid API Key. Please check your Gemini API key configuration.");
-      } else if (errorMessage.includes("model not found") || errorMessage.includes("404")) {
-        setError("AI Model error. Please try again later.");
+      if (errorMessage.includes('API key not valid')) {
+        setError('Invalid API Key. Please check your Gemini API key configuration.');
+      } else if (errorMessage.includes('model not found') || errorMessage.includes('404')) {
+        setError('AI Model error. Please try again later.');
+      } else if (/timed out|timeout|504|FUNCTION_INVOCATION/i.test(errorMessage)) {
+        setError(
+          'Analysis took too long. Make sure Enter 4 Digits is filled, then try again in a moment.',
+        );
+      } else if (/rate|quota|429|busy/i.test(errorMessage)) {
+        setError('AI is busy right now. Please wait a minute and try again.');
+      } else if (errorMessage.includes('not valid JSON') || errorMessage.includes('no valid predictions')) {
+        setError(errorMessage);
       } else {
-        setError("Failed to generate predictions. Please ensure you have entered 4 digits.");
+        setError(errorMessage || 'Failed to generate predictions. Please ensure you have entered 4 digits.');
       }
     } finally {
       setLoading(false);
