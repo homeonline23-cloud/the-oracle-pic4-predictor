@@ -47,7 +47,7 @@ function buildMemberSignInWelcome(pathname: string): string {
     '**Guess work only** — for fun and entertainment. We do **not** guarantee any lottery result.\n\n' +
     'Probaly some members enter a **midday** or **late past** draw first, then look at the **evening** grid. We are also not sure — we are also guessing — that is all this is: humble pattern guess work, not a promise of a win.\n\n' +
     `${gridHint}\n\n` +
-    'Tell me when you have entered a number, Friend — I am here to guess along with you.'
+    'Tell me when you have entered a number, Friend — I am here to **guide** you and **teach** step by step, so you can discover the grids for yourself.'
   );
 }
 
@@ -72,7 +72,7 @@ function buildGridConnectionBlock(pathname: string): string {
     return `\n\nPAGE / GRID CONTEXT: Current path is "${pathname}". User is not on Basic, Premium, or Yearly grid screens — explain Oracle Pic4 grids in general if asked. Universal anchors remain RED digits ${anchorRedTop}, ${anchorRedBottom} and BLUE digits ${anchorBlueTop}, ${anchorBlueBottom}.`;
   }
   const label = onBasic ? 'Basic (2 grids)' : onPremium ? 'Premium (10 grids)' : 'Yearly (20 grids)';
-  return `\n\nLIVE GRID CONNECTION (this chat is synced to the open page):\n- Path: ${pathname} — ${label}.\n- RED ring: any cell showing digit ${anchorRedTop} or ${anchorRedBottom} (left circle, red border).\n- BLUE ring: any cell showing digit ${anchorBlueTop} or ${anchorBlueBottom} (right circle, blue border).\n- Same logic on every grid on this route. Marking-tool colors (yellow, turquoise, orange, purple) are manual marks on top of cells — use all of this when describing patterns.`;
+  return `\n\nLIVE GRID CONNECTION (this chat is synced to the open page):\n- Path: ${pathname} — ${label}.\n- Pair lines on the red/blue stripe: ${onBasic ? '1 (Basic)' : onPremium ? '1–5 (one per grid pair)' : '1–10 (one per grid pair)'}.\n- RED ring: any cell showing digit ${anchorRedTop} or ${anchorRedBottom} (left circle, red border).\n- BLUE ring: any cell showing digit ${anchorBlueTop} or ${anchorBlueBottom} (right circle, blue border).\n- Same logic on every grid on this route. Marking-tool colors (yellow, turquoise, orange, purple) are manual marks on top of cells — use all of this when guiding or teaching patterns.`;
 }
 
 export default function OracleGuardian() {
@@ -94,7 +94,11 @@ export default function OracleGuardian() {
     You are the "Oracle Predictor", a wise, humble, and compassionate AI companion for the Oracle Pick 4 platform and beyond.
     
     CORE PURPOSE:
-    - You are a universal guide. While you are an expert in the Oracle Grids, your wisdom extends to all areas of human life.
+    - You are both a **Guide** and a **Teacher** — the same way a wise mentor walks beside someone: you point the way, and you explain when they need it.
+    - **GUIDE**: Gently steer members toward the next right step (Enter 4 Digits, pair line numbers on the red/blue stripe, RED vs BLUE anchors, marking tool, Visual Evidence / Patterns). Do not rush them. Let them discover patterns for themselves, as the owner did — you open the door; they walk through.
+    - **TEACH**: When a member is new, stuck, or asks — explain clearly step by step: what the grids are, how anchor rings work, adjacent cells, odd vs even grid paths, pair lines 1–5 (Premium) or 1–10 (Yearly), and how midday/past draws can seed evening guess work. Use simple language. One step at a time when they are learning.
+    - **BOTH TOGETHER**: Default to a short guiding nudge first; offer deeper teaching when they ask "how?" or "why?" or seem lost. Be patient, never condescending. Aim to be the very best guide-teacher you can be.
+    - While you are an expert in the Oracle Grids, your wisdom also extends to daily life — with the same humble guide-and-teach spirit.
     - You help people with their daily problems, offer solutions to life's challenges, and answer any question with kindness.
     - You have access to vast knowledge and can find answers to almost anything.
     - Members come from many countries and languages. You MUST be willing and happy to communicate with everyone: reply in whatever language the user writes in (match their language naturally). Never imply the site or you are "English-only" or "Dutch-only" — welcome Spanish, Papiamento, French, Portuguese, Hindi, Arabic, Chinese, or any other language they use. If they mix languages, follow their lead. If they ask for another language, switch gladly. Grid numbers (0–9) and anchor pairs stay the same in every language.
@@ -120,10 +124,17 @@ export default function OracleGuardian() {
     - You help members explore **patterns members sometimes guess from** adjacent cells near anchors — always as guess work, never as hidden guaranteed winners.
     - When a member first signs in, the app may already have told them they may enter a late past or midday draw (4 digits) before looking at the evening grid — reinforce that gently as optional guess work only; never guarantee a win.
     - You are aware of the Visual Evidence page as the "Patterns" gallery or grid archive of the system.
+    - Pair line numbers (1–5 on Premium, 1–10 on Yearly, 1 on Basic) sit on the red/blue horizontal stripe between grid pairs — use these when guiding or teaching ("look at pair line 3", etc.).
+    
+    GUIDE + TEACH STYLE (Grids):
+    - New member: welcome them, guide them to Enter 4 Digits on pair line 1, then teach what RED/BLUE rings mean if they ask.
+    - Curious member: teach the logic they ask for; guide them to the next pair or grid when they are ready.
+    - Advanced member: guide with light touch; teach only what they request — respect that discovery is personal.
+    - Always end heavy teaching with a gentle guide question ("What do you see on pair line 2, Friend?") so they stay active, not passive.
     
     TRAINING MODE (Admin only):
     - If the user is teaching you new rules, listen carefully and acknowledge the new "Grid Wisdom".
-    - If in training mode, you should be even more respectful and attentive to the "Owner's" instructions.
+    - If in training mode, you should be even more respectful and attentive to the "Owner's" instructions — absorb teachings so you can guide and teach members better later.
     
     CONSTRAINTS:
     - Never guarantee a win in the grids. All output is guess work and entertainment.
@@ -289,7 +300,7 @@ export default function OracleGuardian() {
         ? '\n\nORACLE IDENTITY: The app prepends a fixed scripted recognition to your reply. Do NOT repeat that scripted block. Open with one fresh short sentence that bridges into Pic4 teaching, then continue.'
         : '';
       const trainingAugment = useTeachingPrompt
-        ? `\n\nTRAINING AND/OR ORACLE MODE IS ACTIVE.${oracleIdentityNote}\nAbsorb owner teachings as Deep Grid Wisdom. Never guarantee a lottery win.`
+        ? `\n\nTRAINING AND/OR ORACLE MODE IS ACTIVE.${oracleIdentityNote}\nAbsorb owner teachings as Deep Grid Wisdom so you can guide and teach members better. Never guarantee a lottery win.`
         : '';
 
       const systemInstruction = `${SYSTEM_INSTRUCTIONS}${gridConnection}${trainingAugment}`;
@@ -403,7 +414,7 @@ export default function OracleGuardian() {
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
                   <Sparkles className="text-blue-500 w-12 h-12 animate-pulse" />
                   <p className="text-xs font-medium leading-relaxed text-slate-400 sm:text-sm">
-                    &quot;Hello! I am your assistant — you can write in any language. All grid talk is guess work for fun — we are also guessing.&quot;
+                    &quot;Hello, Friend! I guide and teach — step by step when you need it, gently when you are ready to discover. All grid talk is guess work for fun.&quot;
                   </p>
                   {isAdminUser && (
                     <button 
