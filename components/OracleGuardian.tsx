@@ -32,23 +32,11 @@ interface Message {
 
 const SIGNIN_WELCOME_STORAGE_KEY = 'oracle-predictor-signin-welcome';
 
-function buildMemberSignInWelcome(pathname: string): string {
-  const onGrid =
-    pathname.startsWith('/basic') ||
-    pathname.startsWith('/premium') ||
-    pathname.startsWith('/yearly');
+const ORACLE_WELCOME_MESSAGE =
+  'Welcome! Start by entering a **midday** or **late past** winning draw from the day before. **Enter 4 Digit** — use this as your starting point. I am here to **guide** you and **teach** step by step, so you can discover the grids patterns for yourself.';
 
-  const gridHint = onGrid
-    ? 'In **Enter 4 Digits** above **Grid 1**, you may type four digits from a **late past** or **midday** draw that already came in — if you wish to use that as a starting point.'
-    : 'Open your **Basic**, **Premium**, or **Yearly** grid page, then in **Enter 4 Digits** above **Grid 1** you may type four digits from a **late past** or **midday** draw that already happened — purely as a pattern starting point.';
-
-  return (
-    'Welcome back, Visionary!\n\n' +
-    '**Guess work only** — for fun and entertainment. We do **not** guarantee any lottery result.\n\n' +
-    'Probaly some members enter a **midday** or **late past** draw first, then look at the **evening** grid. We are also not sure — we are also guessing — that is all this is: humble pattern guess work, not a promise of a win.\n\n' +
-    `${gridHint}\n\n` +
-    'Tell me when you have entered a number, Friend — I am here to **guide** you and **teach** step by step, so you can discover the grids for yourself.'
-  );
+function buildMemberSignInWelcome(): string {
+  return ORACLE_WELCOME_MESSAGE;
 }
 
 function buildOracleScriptedRecognition(): string {
@@ -185,7 +173,7 @@ export default function OracleGuardian() {
 
     sessionStorage.removeItem(SIGNIN_WELCOME_STORAGE_KEY);
     setIsOpen(true);
-    setMessages([{ role: 'model', parts: [{ text: buildMemberSignInWelcome(pathname) }] }]);
+    setMessages([{ role: 'model', parts: [{ text: buildMemberSignInWelcome() }] }]);
   }, [authLoading, user?.id]);
 
   useEffect(() => {
@@ -413,7 +401,7 @@ export default function OracleGuardian() {
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
                   <Sparkles className="text-blue-500 w-12 h-12 animate-pulse" />
                   <p className="text-xs font-medium leading-relaxed text-slate-400 sm:text-sm">
-                    &quot;Hello, Friend! I will guide and teach — step by step when you need it, gently when you are ready to discover secret of the Grids Boxes and how it works.&quot;
+                    &quot;{ORACLE_WELCOME_MESSAGE}&quot;
                   </p>
                   {isAdminUser && (
                     <button 
