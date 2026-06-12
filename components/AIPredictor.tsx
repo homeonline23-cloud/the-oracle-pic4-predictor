@@ -166,20 +166,21 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
       setHistoricalData(history);
 
       const prompt = `
-        You are an expert pattern recognition AI for "The Oracle Pick 4".
-        
-        USER'S CORE PATTERN RULES:
-        1. Winning numbers are always found within the Grids provided.
-        2. Winning numbers are most frequently found in the cells IMMEDIATELY ADJACENT (horizontally, vertically, or diagonally) to the "RED" and "BLUE" anchor numbers.
-        3. CRITICAL: The user uses a "Marking Tool" to color specific cells in the grids. These colored cells represent previous winning numbers or strong indicators.
-        4. CRITICAL PREDICTION LOGIC: The numbers SURROUNDING (adjacent to) the cells that have been marked/colored are the most likely candidates for the next winning numbers. The AI must pay special attention to the "color pattern" of the first numbers that were colored, as these are the primary anchors for the next prediction.
-        5. THE SECRET CORRELATION: Look for the SAME 4-digit combinations appearing across DIFFERENT grids. If the same 4 numbers appear in multiple grids (for example, Grid 4 and Grid 6), there is an 85% probability that these are the winning numbers.
-        6. COLLECTIVE ANALYSIS: Analyze all grids together. Recurring numbers or identical sequences that show up in more than one grid are extremely high-priority indicators.
-        
-        IMPORTANT DISCLAIMER:
-        When providing predictions, always use the word "Probaly". 
-        Be humble and clear that these are predictions, not guarantees. 
-        Use phrases like "We are also not sure, we are also guessing" or "These are 'Probaly' the most likely outcomes based on the current patterns."
+        You are a pattern-exploration assistant for "The Oracle Pick 4" — entertainment and guess work only. Never guarantee wins.
+
+        LEGAL / SAFETY TONE (always):
+        - All outputs are humble guess work, not financial advice.
+        - Always use the word "Probaly" in reasons.
+        - Say "We are also not sure, we are also guessing" where appropriate.
+        - Never state odds, percentages, or "high probability" for lottery results.
+
+        USER'S CORE PATTERN RULES (for guess-work exploration):
+        1. Members look at numbers within the Grids provided.
+        2. Members often notice digits in cells IMMEDIATELY ADJACENT (horizontally, vertically, or diagonally) to the "RED" and "BLUE" anchor numbers.
+        3. The user may use a "Marking Tool" to color specific cells — these marks are manual notes, not proof of future results.
+        4. Some members guess that numbers SURROUNDING marked/colored cells are worth considering next — treat this as pattern play only.
+        5. Some members watch for the SAME 4-digit combinations appearing across DIFFERENT grids — if seen, mention it as a curious pattern only, not as a likely winner.
+        6. Analyze all grids together for recurring digits or sequences — frame any finding as guess work.
         
         LOCATION CONTEXT:
         The user is playing from: ${selectedLocation}. 
@@ -208,7 +209,7 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
         2. Analyze the numbers in the cells IMMEDIATELY SURROUNDING these marked cells.
         3. Combine this with the numbers near the Red and Blue anchors.
         4. Cross-reference these clusters with the historical winners for ${selectedLocation}.
-        5. Generate EXACTLY ${maxPredictions} high-probability 4-digit combinations.
+        5. Generate EXACTLY ${maxPredictions} four-digit combinations for entertainment guess work.
         
         Return the response as a JSON array of objects with 'number' (string) and 'reason' (string). 
         Ensure the 'reason' field incorporates the "Probaly" disclaimer and the humble tone requested.

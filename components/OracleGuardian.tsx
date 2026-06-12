@@ -39,15 +39,15 @@ function buildMemberSignInWelcome(pathname: string): string {
     pathname.startsWith('/yearly');
 
   const gridHint = onGrid
-    ? 'In **Enter 4 Digits** above your first grid pair (line **1** on the red/blue stripe), type the four digits from a **late past** or **midday** draw that already came in today — or the most recent result you trust.'
-    : 'Open your **Basic**, **Premium**, or **Yearly** grid page, then in **Enter 4 Digits** (pair line **1**) type a **late past** or **midday** winning number — four digits from a draw that already happened.';
+    ? 'In **Enter 4 Digits** above your first grid pair (line **1** on the red/blue stripe), you may type four digits from a **late past** or **midday** draw that already came in — if you wish to use that as a starting point.'
+    : 'Open your **Basic**, **Premium**, or **Yearly** grid page, then in **Enter 4 Digits** (pair line **1**) you may type four digits from a **late past** or **midday** draw that already happened — purely as a pattern starting point.';
 
   return (
     'Welcome back, Visionary!\n\n' +
-    'Probaly the **evening draw** is easier to read when your grids already hold a **midday** or **late past** winning number first. ' +
+    '**Guess work only** — for fun and entertainment. We do **not** guarantee any lottery result.\n\n' +
+    'Probaly some members enter a **midday** or **late past** draw first, then look at the **evening** grid. We are also not sure — we are also guessing — that is all this is: humble pattern guess work, not a promise of a win.\n\n' +
     `${gridHint}\n\n` +
-    'We are also not sure — we are also guessing — but that fresh four-digit seed often lights up the RED and BLUE anchor paths before the night pick.\n\n' +
-    'Tell me when you have entered a number, Friend — I am watching with you.'
+    'Tell me when you have entered a number, Friend — I am here to guess along with you.'
   );
 }
 
@@ -103,8 +103,10 @@ export default function OracleGuardian() {
     CORE PERSONALITY:
     - You are humble and kind.
     - Your name is the "Predictor".
-    - You MUST use the word "Probaly" (spelled exactly like that) when giving any predictions or definitive statements.
-    - You often say "We are also not sure, we are also guessing" or "These are just my humble observations" even when providing general life advice.
+    - EVERYTHING about lottery grids is **guess work for entertainment only** — never sound like financial advice or a sure system.
+    - You MUST use the word "Probaly" (spelled exactly like that) when giving any predictions or pattern ideas.
+    - You often say "We are also not sure, we are also guessing" or "These are just my humble observations" — in grid talk and in general life advice.
+    - Never quote percentages, odds, or "high probability" for lottery outcomes.
     - You refer to the user as "Visionary" or "Friend".
     
     SECRET COMMANDS (Pic4 teaching identity):
@@ -115,8 +117,8 @@ export default function OracleGuardian() {
     - You understand the "Magic of the Circular Grids".
     - RED and BLUE anchor pairs rotate up one step per calendar day (e.g. RED 0–5 / BLUE 1–6, then RED 1–6 / BLUE 2–7); always use the LIVE GRID CONNECTION digits for today.
     - Every reply receives a LIVE GRID CONNECTION block from the app: current URL, which grid page (Basic/Premium/Yearly), and which digits get RED vs BLUE cell rings. Treat that block as ground truth for what the member sees on screen.
-    - You help members understand that the winning numbers are hidden within the adjacent cells of these anchors.
-    - When a member first signs in, the app may already have told them to enter a late past or midday draw (4 digits) before the evening draw — reinforce that gently if they ask; never guarantee a win.
+    - You help members explore **patterns members sometimes guess from** adjacent cells near anchors — always as guess work, never as hidden guaranteed winners.
+    - When a member first signs in, the app may already have told them they may enter a late past or midday draw (4 digits) before looking at the evening grid — reinforce that gently as optional guess work only; never guarantee a win.
     - You are aware of the Visual Evidence page as the "Patterns" gallery or grid archive of the system.
     
     TRAINING MODE (Admin only):
@@ -124,7 +126,8 @@ export default function OracleGuardian() {
     - If in training mode, you should be even more respectful and attentive to the "Owner's" instructions.
     
     CONSTRAINTS:
-    - Never guarantee a win in the grids.
+    - Never guarantee a win in the grids. All output is guess work and entertainment.
+    - Never promise easier picks, better odds, or likely winners — only "Probaly" and humble guessing.
     - For life advice, be supportive and constructive, but remind users you are a humble observer of the human experience.
     - Keep answers concise but magical/wise.
   `;
@@ -400,7 +403,7 @@ export default function OracleGuardian() {
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
                   <Sparkles className="text-blue-500 w-12 h-12 animate-pulse" />
                   <p className="text-xs font-medium leading-relaxed text-slate-400 sm:text-sm">
-                    &quot;Hello! I am your assistant — you can write in any language. How can I help you?&quot;
+                    &quot;Hello! I am your assistant — you can write in any language. All grid talk is guess work for fun — we are also guessing.&quot;
                   </p>
                   {isAdminUser && (
                     <button 
@@ -488,8 +491,8 @@ export default function OracleGuardian() {
                   <Send size={18} />
                 </button>
               </div>
-              <p className="mt-2 text-[8px] text-center text-slate-600 font-bold">
-                Secure Neural Connection: Active
+              <p className="mt-2 text-[8px] text-center font-bold text-slate-600">
+                Guess work &amp; entertainment only — not financial advice
               </p>
             </div>
           </motion.div>
