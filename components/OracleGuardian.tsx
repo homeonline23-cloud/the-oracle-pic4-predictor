@@ -264,16 +264,28 @@ export default function OracleGuardian() {
   };
 
   const panelChrome =
-    'flex flex-col overflow-hidden rounded-none border-[3px] border-blue-600 bg-slate-900 shadow-[0_0_0_1px_rgba(220,38,38,0.8),0_0_56px_rgba(37,99,235,0.45),0_0_56px_rgba(220,38,38,0.3)] md:border-4';
+    'flex flex-col overflow-hidden rounded-none border-[3px] border-blue-600 bg-slate-900 shadow-[0_0_0_1px_rgba(220,38,38,0.8),0_0_48px_rgba(37,99,235,0.4),0_0_48px_rgba(220,38,38,0.28)] md:border-[3px]';
 
   return (
     <div
       className={cn(
         'fixed z-[200]',
-        'right-[max(0.75rem,env(safe-area-inset-right,0px))]',
         isOpen
-          ? 'bottom-[max(5.25rem,calc(4.5rem+env(safe-area-inset-bottom,0px)))] left-[max(0.75rem,env(safe-area-inset-left,0px))] md:left-auto md:bottom-6'
-          : 'bottom-[max(6rem,calc(5rem+env(safe-area-inset-bottom,0px)))] md:bottom-6',
+          ? cn(
+              'bottom-[max(5.25rem,calc(4.5rem+env(safe-area-inset-bottom,0px)))]',
+              'left-[max(0.75rem,env(safe-area-inset-left,0px))]',
+              'right-[max(0.75rem,env(safe-area-inset-right,0px))]',
+              'min-[1300px]:bottom-6',
+              'min-[1300px]:left-[calc(50%+min(24rem,100vw)/2+0.75rem)]',
+              'min-[1300px]:right-[max(0.75rem,env(safe-area-inset-right,0px))]',
+              'min-[1300px]:w-auto min-[1300px]:max-w-80 min-[1300px]:min-w-[15rem]',
+              'min-[1300px]:flex min-[1300px]:flex-col min-[1300px]:gap-3',
+            )
+          : cn(
+              'bottom-[max(6rem,calc(5rem+env(safe-area-inset-bottom,0px)))]',
+              'right-[max(0.75rem,env(safe-area-inset-right,0px))]',
+              'md:bottom-6',
+            ),
       )}
     >
       <AnimatePresence>
@@ -285,9 +297,9 @@ export default function OracleGuardian() {
             className={cn(
               panelChrome,
               'absolute bottom-12 right-0 w-full',
-              'h-[min(720px,calc(100dvh-10.5rem-env(safe-area-inset-bottom,0px)-env(safe-area-inset-top,0px)))]',
-              'md:bottom-20 md:h-[min(720px,86vh)] md:w-[min(680px,54vw)]',
-              'lg:w-[min(760px,50vw)] xl:w-[min(840px,46vw)]',
+              'h-[min(620px,calc(100dvh-10.5rem-env(safe-area-inset-bottom,0px)-env(safe-area-inset-top,0px)))]',
+              'min-[1300px]:relative min-[1300px]:bottom-auto min-[1300px]:right-auto',
+              'min-[1300px]:h-[min(34rem,calc(100dvh-6rem-env(safe-area-inset-bottom,0px)-env(safe-area-inset-top,0px)))]',
             )}
           >
             {/* Header */}
@@ -427,9 +439,11 @@ export default function OracleGuardian() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(prev => !prev)}
-        className={`ml-auto flex h-7 w-7 items-center justify-center rounded-full shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all order-1 md:h-14 md:w-14 ${
-          isOpen ? 'bg-red-600' : 'bg-blue-600'
-        }`}
+        className={cn(
+          'ml-auto flex items-center justify-center rounded-full shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all',
+          'h-7 w-7 md:h-14 md:w-14',
+          isOpen ? 'bg-red-600 min-[1300px]:self-end' : 'bg-blue-600',
+        )}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
