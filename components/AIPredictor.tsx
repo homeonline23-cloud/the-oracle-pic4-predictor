@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { createClient } from '@/lib/supabase/client';
 import { WINDOW_OUTER_SHELL } from '@/lib/constants';
 import { formatMarkedCellsForAI, type GridDataMap } from '@/lib/gridMarkColors';
+import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
 import { cn } from '@/lib/utils';
 
 interface AIPredictorProps {
@@ -166,6 +167,8 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
       const history = historyData?.map(h => h.number) || [];
       setHistoricalData(history);
 
+      const memoryBank = await buildMarkMemoryBankBlock(supabase);
+
       const prompt = `
         You are a pattern-exploration assistant for "The Oracle Pick 4" — entertainment and guess work only. Never guarantee wins.
 
@@ -196,6 +199,8 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
         
         MARKED CELLS (User's Color Patterns — yellow, turquoise, orange, purple):
         ${formatMarkedCellsForAI(markedCells, gridData as GridDataMap)}
+
+        ${memoryBank}
         
         GRID DATA (4x4 grids):
         ${Object.entries(gridData)

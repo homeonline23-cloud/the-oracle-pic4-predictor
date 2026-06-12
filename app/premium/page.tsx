@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { useAnchorClockTick, useSyncGridDateAtMidnight } from '@/hooks/useAnchorClockTick';
 import { useGridLiveSync } from '@/hooks/useGridLiveSync';
+import { usePersistGridMarks } from '@/hooks/usePersistGridMarks';
 
 export default function PremiumTenGridPage() {
   const { user, userRole } = useAuth();
@@ -152,6 +153,26 @@ export default function PremiumTenGridPage() {
     grid8: getGrid2Values(inputs[3]),
     grid9: getGrid1Values(inputs[4]),
     grid10: getGrid2Values(inputs[4]),
+  });
+
+  usePersistGridMarks({
+    pageTier: 'premium',
+    markedCells,
+    setMarkedCells,
+    gridData: {
+      grid1: getGrid1Values(inputs[0]),
+      grid2: getGrid2Values(inputs[0]),
+      grid3: getGrid1Values(inputs[1]),
+      grid4: getGrid2Values(inputs[1]),
+      grid5: getGrid1Values(inputs[2]),
+      grid6: getGrid2Values(inputs[2]),
+      grid7: getGrid1Values(inputs[3]),
+      grid8: getGrid2Values(inputs[3]),
+      grid9: getGrid1Values(inputs[4]),
+      grid10: getGrid2Values(inputs[4]),
+    },
+    inputs,
+    userId: user?.id,
   });
 
   return (

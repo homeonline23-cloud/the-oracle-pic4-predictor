@@ -94,6 +94,46 @@ drop policy if exists "Only admins can record winning numbers" on public.winning
 create policy "Only admins can record winning numbers" on public.winning_numbers
   for insert with check (public.is_admin());
 
+-- Grid marking: latest snapshot per user + page (restore marks on return)
+create table if not exists public.grid_mark_snapshots (
+  user_id uuid references auth.users(id) on delete cascade not null,
+  page_tier text not null check (page_tier in ('basic', 'premium', 'yearly')),
+  marked_cells jsonb not null default '{}'::jsonb,
+  inputs jsonb default '[]'::jsonb,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  primary key (user_id, page_tier)
+);
+
+alter table public.grid_mark_snapshots enable row level security;
+
+drop policy if exists "Users manage own grid mark snapshots" on public.grid_mark_snapshots;
+create policy "Users manage own grid mark snapshots" on public.grid_mark_snapshots
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- Grid marking memory bank (each marked cell saved for AI pattern learning)
+create table if not exists public.grid_mark_memory (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  page_tier text not null check (page_tier in ('basic', 'premium', 'yearly')),
+  grid_id text not null,
+  cell_index int not null,
+  color_name text not null,
+  digit text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+create index if not exists grid_mark_memory_created_at_idx on public.grid_mark_memory (created_at desc);
+
+alter table public.grid_mark_memory enable row level security;
+
+drop policy if exists "Grid mark memory viewable by authenticated users" on public.grid_mark_memory;
+create policy "Grid mark memory viewable by authenticated users" on public.grid_mark_memory
+  for select using (auth.role() = 'authenticated');
+
+drop policy if exists "Users insert own grid mark memory" on public.grid_mark_memory;
+create policy "Users insert own grid mark memory" on public.grid_mark_memory
+  for insert with check (auth.uid() = user_id);
+
 -- Predictions table (to store user prediction history)
 create table if not exists public.predictions (
   id uuid default gen_random_uuid() primary key,

@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { createClient } from '@/lib/supabase/client';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { buildMarkedCellsConnectionBlock } from '@/lib/gridLiveSnapshot';
+import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
 import { cn } from '@/lib/utils';
 
 /** Minimal Web Speech API surface (DOM lib typings vary by TS version). */
@@ -285,6 +286,8 @@ export default function OracleGuardian() {
     const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
     const gridConnection = buildGridConnectionBlock(pathname);
     const markingConnection = buildMarkedCellsConnectionBlock();
+    const supabase = createClient();
+    const memoryBank = await buildMarkMemoryBankBlock(supabase);
 
     try {
       const useTeachingPrompt = isTrainingMode || oracleIdentity;
@@ -295,7 +298,7 @@ export default function OracleGuardian() {
         ? `\n\nTRAINING AND/OR ORACLE MODE IS ACTIVE.${oracleIdentityNote}\nAbsorb owner teachings as Deep Grid Wisdom so you can guide and teach members better. Never guarantee a lottery win.`
         : '';
 
-      const systemInstruction = `${SYSTEM_INSTRUCTIONS}${gridConnection}${markingConnection}${trainingAugment}`;
+      const systemInstruction = `${SYSTEM_INSTRUCTIONS}${gridConnection}${markingConnection}${memoryBank}${trainingAugment}`;
 
       const response = await fetch('/api/generate', {
         method: 'POST',

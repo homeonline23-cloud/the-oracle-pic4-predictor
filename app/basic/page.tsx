@@ -14,6 +14,7 @@ import { isGrid2DemoEmail } from '@/lib/demoAuth';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { useAnchorClockTick, useSyncGridDateAtMidnight } from '@/hooks/useAnchorClockTick';
 import { useGridLiveSync } from '@/hooks/useGridLiveSync';
+import { usePersistGridMarks } from '@/hooks/usePersistGridMarks';
 import { WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
@@ -165,6 +166,22 @@ export default function BasicGridPage() {
         }
       : { grid1: grid1Values, grid2: grid2Values },
   );
+
+  usePersistGridMarks({
+    pageTier: 'basic',
+    markedCells,
+    setMarkedCells,
+    gridData: isTesterDemo
+      ? {
+          grid1: getGrid1Values(demoInputs[0]),
+          grid2: getGrid2Values(demoInputs[0]),
+          grid3: getGrid1Values(demoInputs[1]),
+          grid4: getGrid2Values(demoInputs[1]),
+        }
+      : { grid1: grid1Values, grid2: grid2Values },
+    inputs: isTesterDemo ? demoInputs : [input],
+    userId: user?.id,
+  });
 
   const handleCellClick = (gridId: string, index: number) => {
     if (!selectedMarkColor) return;
