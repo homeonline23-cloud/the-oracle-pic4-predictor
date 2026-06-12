@@ -179,7 +179,7 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
         1. Members look at numbers within the Grids provided.
         2. Members often notice digits in cells IMMEDIATELY ADJACENT (horizontally, vertically, or diagonally) to the "RED" and "BLUE" anchor numbers.
         3. The user may use a "Marking Tool" to color specific cells — these marks are manual notes, not proof of future results.
-        4. Some members guess that numbers SURROUNDING marked/colored cells are worth considering next — treat this as pattern play only.
+        4. Some members guess that numbers SURROUNDING marked/colored cells are worth considering next — treat this as pattern play only. The mark colors (yellow, turquoise, orange, purple) are how members show the AI which winning numbers to read; each color can mean a draw or a step in their pattern story.
         5. Some members watch for the SAME 4-digit combinations appearing across DIFFERENT grids — if seen, mention it as a curious pattern only, not as a likely winner.
         6. Analyze all grids together for recurring digits or sequences — frame any finding as guess work.
         
