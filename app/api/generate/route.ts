@@ -5,14 +5,27 @@ const apiKey = process.env.GEMINI_API_KEY;
 
 /** Allow up to 60s on Vercel Pro; still helps Next.js set the limit where supported. */
 export const maxDuration = 60;
+export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
   if (!apiKey) {
     return NextResponse.json({ error: 'Gemini API key is not configured.' }, { status: 500 });
   }
 
+  let body: unknown;
   try {
-    const { contents, systemInstruction, tools, responseMimeType } = await req.json();
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
+  }
+
+  try {
+    const { contents, systemInstruction, tools, responseMimeType } = body as {
+      contents?: unknown;
+      systemInstruction?: string;
+      tools?: unknown[];
+      responseMimeType?: string;
+    };
     const ai = new GoogleGenAI({ apiKey });
 
     // Build config object only with provided fields, otherwise the SDK rejects undefined values.

@@ -9,6 +9,7 @@ import { formatMarkedCellsForAI, type GridDataMap } from '@/lib/gridMarkColors';
 import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
 import { compactGridDataForPrompt } from '@/lib/gridPrompt';
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
+import { parseApiJsonResponse } from '@/lib/parseApiResponse';
 import { withTimeout } from '@/lib/withTimeout';
 import { cn } from '@/lib/utils';
 
@@ -188,7 +189,10 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
         ${memoryBank}
         
         GRID DATA (4x4 grids):
-        ${compactGridDataForPrompt(gridData as GridDataMap)}
+        ${compactGridDataForPrompt(gridData as GridDataMap, {
+          maxGrids: maxPredictions > 5 ? 10 : 6,
+          markedCells,
+        })}
         
         TASK:
         1. Identify the numbers in the cells that the user has marked.
@@ -211,7 +215,7 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
           responseMimeType: 'application/json',
         }),
       });
-      const data = await response.json();
+      const data = await parseApiJsonResponse<{ text?: string; error?: string }>(response);
       if (!response.ok) {
         throw new Error(data.error || `Analysis failed (${response.status}). Please try again.`);
       }

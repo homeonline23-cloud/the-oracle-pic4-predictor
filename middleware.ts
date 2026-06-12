@@ -8,9 +8,8 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Skip all Next internals (dev + prod), static images, favicon — avoids
-     * middleware touching chunk/CSS requests (unstyled page in dev).
+     * Skip API routes, Next internals, static assets — avoids HTML redirects/timeouts on /api/*.
      */
-    "/((?!_next/|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm|mov)$).*)",
+    "/((?!_next/|api/|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm|mov)$).*)",
   ],
 };

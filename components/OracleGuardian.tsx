@@ -9,6 +9,7 @@ import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { buildMarkedCellsConnectionBlock } from '@/lib/gridLiveSnapshot';
 import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
+import { parseApiJsonResponse } from '@/lib/parseApiResponse';
 import { cn } from '@/lib/utils';
 
 /** Minimal Web Speech API surface (DOM lib typings vary by TS version). */
@@ -312,7 +313,7 @@ export default function OracleGuardian() {
         }),
       });
 
-      const data = await response.json();
+      const data = await parseApiJsonResponse<{ text?: string; error?: string }>(response);
       if (!response.ok) throw new Error(data.error || 'Failed to generate');
 
       let modelText = (data.text || '').trim();
