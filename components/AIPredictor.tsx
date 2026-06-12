@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles, Loader2, AlertCircle, Trash2, CheckCircle2, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { createClient } from '@/lib/supabase/client';
@@ -9,6 +9,7 @@ import { formatMarkedCellsForAI, type GridDataMap } from '@/lib/gridMarkColors';
 import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
 import { compactGridDataForPrompt } from '@/lib/gridPrompt';
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
+import { withTimeout } from '@/lib/withTimeout';
 import { cn } from '@/lib/utils';
 
 interface AIPredictorProps {
@@ -59,49 +60,20 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [historicalData, setHistoricalData] = useState<string[]>([]);
-  const lastAutoRecordedRef = useRef<string | null>(null);
+  const [loadingSeconds, setLoadingSeconds] = useState(0);
   const supabase = createClient();
   const { user, userRole } = useAuth();
   const isAdmin = userRole === 'admin';
   const isTesterDemo = isGrid2DemoEmail(user?.email);
 
-  // Reset recorded state when input changes and handle automatic recording
   useEffect(() => {
-    const inputKey = `${selectedLocation}-${currentInput}`;
-    
-    if (currentInput?.length !== 4) {
-      setRecorded(false);
+    if (!loading) {
+      setLoadingSeconds(0);
+      return;
     }
-    
-    const autoRecord = async () => {
-      if (
-        currentInput && 
-        currentInput.length === 4 && 
-        user && 
-        !recorded && 
-        !recording && 
-        lastAutoRecordedRef.current !== inputKey
-      ) {
-        lastAutoRecordedRef.current = inputKey;
-        setRecording(true);
-        try {
-          const { error } = await supabase.from('winning_numbers').insert({
-            number: currentInput,
-            location: selectedLocation || 'Global',
-            recorded_by: user.id
-          });
-          if (error) throw error;
-          setRecorded(true);
-        } catch (err: unknown) {
-          lastAutoRecordedRef.current = null;
-          console.error("Auto-recording error:", err);
-        } finally {
-          setRecording(false);
-        }
-      }
-    };
-    autoRecord();
-  }, [currentInput, selectedLocation, recorded, recording, supabase, user]);
+    const tick = setInterval(() => setLoadingSeconds((s) => s + 1), 1000);
+    return () => clearInterval(tick);
+  }, [loading]);
 
   const recordWinningNumber = async () => {
     if (!currentInput || currentInput.length !== 4) {
@@ -117,17 +89,21 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
     setError(null);
 
     try {
-      lastAutoRecordedRef.current = `${selectedLocation}-${currentInput}`;
-      const { error } = await supabase.from('winning_numbers').insert({
-        number: currentInput,
-        location: selectedLocation || 'Global',
-        recorded_by: user.id
-      });
+      const { error } = await withTimeout(
+        supabase.from('winning_numbers').insert({
+          number: currentInput,
+          location: selectedLocation || 'Global',
+          recorded_by: user.id,
+        }),
+        12000,
+        'Save winning number',
+      );
       if (error) throw error;
       setRecorded(true);
     } catch (err: unknown) {
-      console.error("Error recording winning number:", err);
-      setError("Failed to record winning number. Please try again.");
+      console.error('Error recording winning number:', err);
+      const msg = err instanceof Error ? err.message : 'Save failed';
+      setError(msg.includes('timed out') ? msg : 'Failed to record winning number. Please try again.');
     } finally {
       setRecording(false);
     }
@@ -146,30 +122,37 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
 
     setLoading(true);
     setError(null);
+    setLoadingSeconds(0);
 
     try {
-      // 1. Check Usage Limits (admin + tester demo are exempt)
       if (!isAdmin && !isTesterDemo) {
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        const { data: profile } = await withTimeout(
+          supabase.from('profiles').select('*').eq('id', user.id).single(),
+          12000,
+          'Profile check',
+        );
         if (profile && profile.predictions_used >= profile.predictions_limit) {
-          setError("Monthly prediction limit reached. Please upgrade your plan.");
-          setLoading(false);
+          setError('Monthly prediction limit reached. Please upgrade your plan.');
           return;
         }
       }
 
-      // 2. Fetch History
-      const { data: historyData } = await supabase
-        .from('winning_numbers')
-        .select('number')
-        .eq('location', selectedLocation)
-        .order('created_at', { ascending: false })
-        .limit(20);
+      const [{ data: historyData }, memoryBank] = await Promise.all([
+        withTimeout(
+          supabase
+            .from('winning_numbers')
+            .select('number')
+            .eq('location', selectedLocation)
+            .order('created_at', { ascending: false })
+            .limit(20),
+          12000,
+          'History load',
+        ),
+        buildMarkMemoryBankBlock(supabase),
+      ]);
 
-      const history = historyData?.map(h => h.number) || [];
+      const history = historyData?.map((h) => h.number) || [];
       setHistoricalData(history);
-
-      const memoryBank = await buildMarkMemoryBankBlock(supabase);
 
       const prompt = `
         You are a pattern-exploration assistant for "The Oracle Pick 4" — entertainment and guess work only. Never guarantee wins.
@@ -221,7 +204,7 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
       const response = await fetchWithTimeout('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        timeoutMs: 90000,
+        timeoutMs: 120000,
         body: JSON.stringify({
           systemInstruction: "You are a professional AI model. Respond with valid JSON only.",
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
@@ -339,16 +322,19 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
           className="w-full py-2 bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 hover:from-blue-500 hover:via-purple-500 hover:to-red-500 text-white rounded-none font-bold tracking-normal text-[11px] shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 group"
         >
           {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Analyzing Patterns…{loadingSeconds > 0 ? ` (${loadingSeconds}s)` : ''}
+            </>
           ) : (
-            <Sparkles className="w-4 h-4 group-hover:animate-pulse" />
-          )}
-          {loading ? 'Analyzing Patterns...' : (
-            <span className="font-bold flex items-center justify-center gap-1.5">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">AI</span>
-              <span className="text-red-600 font-bold">Pic 4</span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-400 to-white">Predictor</span>
-            </span>
+            <>
+              <Sparkles className="w-4 h-4 group-hover:animate-pulse" />
+              <span className="font-bold flex items-center justify-center gap-1.5">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">AI</span>
+                <span className="text-red-600 font-bold">Pic 4</span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-400 to-white">Predictor</span>
+              </span>
+            </>
           )}
         </button>
       </div>

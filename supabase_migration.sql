@@ -94,6 +94,10 @@ drop policy if exists "Only admins can record winning numbers" on public.winning
 create policy "Only admins can record winning numbers" on public.winning_numbers
   for insert with check (public.is_admin());
 
+drop policy if exists "Members can record winning numbers" on public.winning_numbers;
+create policy "Members can record winning numbers" on public.winning_numbers
+  for insert with check (auth.uid() = recorded_by);
+
 -- Grid marking: latest snapshot per user + page (restore marks on return)
 create table if not exists public.grid_mark_snapshots (
   user_id uuid references auth.users(id) on delete cascade not null,
