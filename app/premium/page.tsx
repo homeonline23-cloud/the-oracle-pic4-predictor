@@ -11,6 +11,7 @@ import AIPredictor from '@/components/AIPredictor';
 import SubscriptionGuard from '@/components/SubscriptionGuard';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
+import GridPairStripe from '@/components/GridPairStripe';
 import { ADMIN_EMAIL, WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
@@ -297,8 +298,7 @@ export default function PremiumTenGridPage() {
 
                       {/* The Pair of Grids */}
                       <div className="relative flex flex-row items-start justify-center gap-2 sm:gap-6 w-full max-w-2xl mx-auto py-4 px-1 md:px-4">
-                        {/* Stripe Running Through the Grid Pair */}
-                        <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 via-white to-red-600 rounded-none opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)] -translate-y-1/2 z-0"></div>
+                        <GridPairStripe pairNumber={pairIndex + 1} />
                         
                         <div className="relative z-10 flex-1 max-w-[200px] sm:max-w-[240px]">
                           <Grid 
