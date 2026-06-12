@@ -245,8 +245,8 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
       const errorMessage = err instanceof Error ? err.message : String(err);
       if (errorMessage.includes('API key not valid')) {
         setError('Invalid API Key. Please check your Gemini API key configuration.');
-      } else if (errorMessage.includes('model not found') || errorMessage.includes('404')) {
-        setError('AI Model error. Please try again later.');
+      } else if (/model not found|no longer available|404|NOT_FOUND/i.test(errorMessage)) {
+        setError('AI model is updating on the server. Please wait one minute, refresh the page, and try again.');
       } else if (/timed out|timeout|504|502|FUNCTION_INVOCATION/i.test(errorMessage)) {
         setError(
           'Analysis took too long (the AI server may be busy). Wait 30 seconds and try again — make sure Enter 4 Digits is filled first.',

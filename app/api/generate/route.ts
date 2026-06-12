@@ -3,8 +3,8 @@ import { GoogleGenAI } from '@google/genai';
 
 const apiKey = process.env.GEMINI_API_KEY;
 
-const PREDICT_MODEL = 'gemini-2.0-flash';
-const CHAT_MODEL = 'gemini-2.5-flash';
+/** Same model for chat + predict — gemini-2.0-flash was retired by Google (404). */
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 /** Allow up to 60s on Vercel Pro; still helps Next.js set the limit where supported. */
 export const maxDuration = 60;
@@ -41,8 +41,7 @@ export async function POST(req: Request) {
     if (Array.isArray(tools) && tools.length > 0) config.tools = tools;
     if (responseMimeType) config.responseMimeType = responseMimeType;
 
-    const usePredictModel = responseMimeType === 'application/json' && !tools?.length;
-    const model = usePredictModel ? PREDICT_MODEL : CHAT_MODEL;
+    const model = GEMINI_MODEL;
 
     const result = await ai.models.generateContent({
       model,
