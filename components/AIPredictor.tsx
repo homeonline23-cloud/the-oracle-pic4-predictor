@@ -5,6 +5,7 @@ import { Sparkles, Loader2, AlertCircle, Trash2, CheckCircle2, Save } from 'luci
 import { motion, AnimatePresence } from 'motion/react';
 import { createClient } from '@/lib/supabase/client';
 import { WINDOW_OUTER_SHELL } from '@/lib/constants';
+import { formatMarkedCellsForAI, type GridDataMap } from '@/lib/gridMarkColors';
 import { cn } from '@/lib/utils';
 
 interface AIPredictorProps {
@@ -193,10 +194,8 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
         - Red Anchor Numbers: ${anchors.red.join(', ')}
         - Blue Anchor Numbers: ${anchors.blue.join(', ')}
         
-        MARKED CELLS (User's Color Patterns):
-        The user has marked the following cells in the grids:
-        ${JSON.stringify(markedCells)}
-        (Format: { "gridId": { "cellIndex": "colorClass" } })
+        MARKED CELLS (User's Color Patterns — yellow, turquoise, orange, purple):
+        ${formatMarkedCellsForAI(markedCells, gridData as GridDataMap)}
         
         GRID DATA (4x4 grids):
         ${Object.entries(gridData)

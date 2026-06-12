@@ -15,6 +15,7 @@ import { ADMIN_EMAIL, WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { useAnchorClockTick, useSyncGridDateAtMidnight } from '@/hooks/useAnchorClockTick';
+import { useGridLiveSync } from '@/hooks/useGridLiveSync';
 
 export default function YearlyTwentyGridPage() {
   const { user, userRole } = useAuth();
@@ -141,6 +142,29 @@ export default function YearlyTwentyGridPage() {
   useSyncGridDateAtMidnight(setSelectedDate, setCurrentTime, anchorTick);
   const anchors = getSubtractCircleAnchors(selectedDate);
   const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } = anchors;
+
+  useGridLiveSync(markedCells, {
+    grid1: getGrid1Values(inputs[0]),
+    grid2: getGrid2Values(inputs[0]),
+    grid3: getGrid1Values(inputs[1]),
+    grid4: getGrid2Values(inputs[1]),
+    grid5: getGrid1Values(inputs[2]),
+    grid6: getGrid2Values(inputs[2]),
+    grid7: getGrid1Values(inputs[3]),
+    grid8: getGrid2Values(inputs[3]),
+    grid9: getGrid1Values(inputs[4]),
+    grid10: getGrid2Values(inputs[4]),
+    grid11: getGrid1Values(inputs[5]),
+    grid12: getGrid2Values(inputs[5]),
+    grid13: getGrid1Values(inputs[6]),
+    grid14: getGrid2Values(inputs[6]),
+    grid15: getGrid1Values(inputs[7]),
+    grid16: getGrid2Values(inputs[7]),
+    grid17: getGrid1Values(inputs[8]),
+    grid18: getGrid2Values(inputs[8]),
+    grid19: getGrid1Values(inputs[9]),
+    grid20: getGrid2Values(inputs[9]),
+  });
 
   return (
     <SubscriptionGuard requiredTier="yearly" allowGuestView>

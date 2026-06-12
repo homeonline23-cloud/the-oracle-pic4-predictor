@@ -6,6 +6,7 @@ import { MessageSquare, X, Send, User, Bot, Sparkles, GraduationCap, Loader2, Mi
 import { useAuth } from '@/hooks/useAuth';
 import { createClient } from '@/lib/supabase/client';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
+import { buildMarkedCellsConnectionBlock } from '@/lib/gridLiveSnapshot';
 import { cn } from '@/lib/utils';
 
 /** Minimal Web Speech API surface (DOM lib typings vary by TS version). */
@@ -109,6 +110,7 @@ export default function OracleGuardian() {
     - You understand the "Magic of the Circular Grids".
     - RED and BLUE anchor pairs rotate up one step per calendar day (e.g. RED 0–5 / BLUE 1–6, then RED 1–6 / BLUE 2–7); always use the LIVE GRID CONNECTION digits for today.
     - Every reply receives a LIVE GRID CONNECTION block from the app: current URL, which grid page (Basic/Premium/Yearly), and which digits get RED vs BLUE cell rings. Treat that block as ground truth for what the member sees on screen.
+    - Every reply on a grid page also receives a LIVE MARKING TOOL block: which cells are marked yellow, turquoise, orange, or purple, and the digit in each marked cell. Use this when they ask about their marks or winning numbers they colored in.
     - You help members explore **patterns members sometimes guess from** adjacent cells near anchors — always as guess work, never as hidden guaranteed winners.
     - When a member first signs in, the app may already have told them they may enter a late past or midday draw (4 digits) before looking at the evening grid — reinforce that gently as optional guess work only; never guarantee a win.
     - You are aware of the Visual Evidence page as the "Patterns" gallery or grid archive of the system.
@@ -280,6 +282,7 @@ export default function OracleGuardian() {
 
     const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
     const gridConnection = buildGridConnectionBlock(pathname);
+    const markingConnection = buildMarkedCellsConnectionBlock();
 
     try {
       const useTeachingPrompt = isTrainingMode || oracleIdentity;
@@ -290,7 +293,7 @@ export default function OracleGuardian() {
         ? `\n\nTRAINING AND/OR ORACLE MODE IS ACTIVE.${oracleIdentityNote}\nAbsorb owner teachings as Deep Grid Wisdom so you can guide and teach members better. Never guarantee a lottery win.`
         : '';
 
-      const systemInstruction = `${SYSTEM_INSTRUCTIONS}${gridConnection}${trainingAugment}`;
+      const systemInstruction = `${SYSTEM_INSTRUCTIONS}${gridConnection}${markingConnection}${trainingAugment}`;
 
       const response = await fetch('/api/generate', {
         method: 'POST',
