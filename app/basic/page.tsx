@@ -279,6 +279,7 @@ export default function BasicGridPage() {
                 }}
                 selectedLocation=""
                 currentInput={isTesterDemo ? demoInputs[0] : input}
+                watchInputs={isTesterDemo ? demoInputs : undefined}
                 maxPredictions={isTesterDemo ? 4 : 2}
               />
             </div>

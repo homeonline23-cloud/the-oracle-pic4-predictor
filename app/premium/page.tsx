@@ -247,6 +247,7 @@ export default function PremiumTenGridPage() {
                   }}
                   selectedLocation=""
                   currentInput={inputs[0]}
+                  watchInputs={inputs}
                   maxPredictions={5}
                 />
               </div>

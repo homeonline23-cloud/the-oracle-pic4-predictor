@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Sparkles, Loader2, AlertCircle, Trash2, CheckCircle2, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { createClient } from '@/lib/supabase/client';
@@ -10,7 +10,7 @@ import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
 import { buildPredictPrompt } from '@/lib/buildPredictPrompt';
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { parseApiJsonResponse } from '@/lib/parseApiResponse';
-import { withTimeout } from '@/lib/withTimeout';
+import { recordWinningNumberClient } from '@/lib/recordWinningNumber';
 import { cn } from '@/lib/utils';
 
 interface AIPredictorProps {
@@ -44,6 +44,8 @@ interface AIPredictorProps {
   selectedLocation: string;
   currentInput: string;
   maxPredictions: number;
+  /** All Enter 4 Digits values on the page — each is auto-saved when 4 digits are entered. */
+  watchInputs?: string[];
 }
 
 interface Prediction {
@@ -54,14 +56,16 @@ interface Prediction {
 import { useAuth } from '@/hooks/useAuth';
 import { isGrid2DemoEmail } from '@/lib/demoAuth';
 
-export default function AIPredictor({ gridData, markedCells, anchors, selectedLocation, currentInput, maxPredictions }: AIPredictorProps) {
+export default function AIPredictor({ gridData, markedCells, anchors, selectedLocation, currentInput, maxPredictions, watchInputs }: AIPredictorProps) {
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState(false);
   const [recorded, setRecorded] = useState(false);
+  const [autoSaving, setAutoSaving] = useState(false);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [historicalData, setHistoricalData] = useState<string[]>([]);
   const [loadingSeconds, setLoadingSeconds] = useState(0);
+  const autoRecordedKeysRef = useRef<Set<string>>(new Set());
   const supabase = createClient();
   const { user, userRole } = useAuth();
   const isAdmin = userRole === 'admin';
@@ -76,6 +80,54 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
     return () => clearInterval(tick);
   }, [loading]);
 
+  const inputsToWatch = useMemo(
+    () => (watchInputs && watchInputs.length > 0 ? watchInputs : [currentInput]),
+    [watchInputs, currentInput],
+  );
+  const inputsWatchKey = inputsToWatch.map((v) => v?.trim() ?? '').join('|');
+
+  // Auto-save each 4-digit entry to the memory bank (silent — no error spam).
+  useEffect(() => {
+    if (!user) return;
+
+    let cancelled = false;
+
+    void (async () => {
+      for (let i = 0; i < inputsToWatch.length; i++) {
+        const num = inputsToWatch[i]?.trim() ?? '';
+        if (!/^\d{4}$/.test(num)) continue;
+
+        const key = `${selectedLocation || 'Global'}-pair${i + 1}-${num}`;
+        if (autoRecordedKeysRef.current.has(key)) continue;
+
+        autoRecordedKeysRef.current.add(key);
+        setAutoSaving(true);
+
+        const result = await recordWinningNumberClient(
+          num,
+          selectedLocation || `Grid pair ${i + 1}`,
+        );
+
+        if (cancelled) return;
+
+        if (result.ok) {
+          if (num === currentInput.trim()) setRecorded(true);
+        } else {
+          console.warn('Auto-record skipped:', result.error);
+        }
+      }
+      setAutoSaving(false);
+    })();
+
+    if (currentInput?.length !== 4) {
+      setRecorded(false);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [inputsWatchKey, inputsToWatch, currentInput, selectedLocation, user]);
+
   const recordWinningNumber = async () => {
     if (!currentInput || currentInput.length !== 4) {
       setError("Please enter a valid 4-digit winning number.");
@@ -89,25 +141,20 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
     setRecording(true);
     setError(null);
 
-    try {
-      const { error } = await withTimeout(
-        supabase.from('winning_numbers').insert({
-          number: currentInput,
-          location: selectedLocation || 'Global',
-          recorded_by: user.id,
-        }),
-        12000,
-        'Save winning number',
-      );
-      if (error) throw error;
+    const result = await recordWinningNumberClient(
+      currentInput.trim(),
+      selectedLocation || 'Global',
+    );
+
+    if (result.ok) {
       setRecorded(true);
-    } catch (err: unknown) {
-      console.error('Error recording winning number:', err);
-      const msg = err instanceof Error ? err.message : 'Save failed';
-      setError(msg.includes('timed out') ? msg : 'Failed to record winning number. Please try again.');
-    } finally {
-      setRecording(false);
+      autoRecordedKeysRef.current.add(
+        `${selectedLocation || 'Global'}-pair1-${currentInput.trim()}`,
+      );
+    } else {
+      setError(result.error || 'Failed to record winning number. Please try again.');
     }
+    setRecording(false);
   };
 
   const predictWinningNumbers = async () => {
@@ -286,7 +333,7 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
           ) : (
             <Save className="w-3 h-3" />
           )}
-          {recording ? 'Recording...' : recorded ? 'Winning Number Recorded' : 'Record as Winning Number'}
+          {recording ? 'Recording...' : recorded ? 'Winning Number Recorded' : autoSaving ? 'Auto-saving to memory...' : 'Record as Winning Number'}
         </button>
 
         {/* Predict Button */}

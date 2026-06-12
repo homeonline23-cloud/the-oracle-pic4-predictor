@@ -279,6 +279,7 @@ export default function YearlyTwentyGridPage() {
                   }}
                   selectedLocation=""
                   currentInput={inputs[0]}
+                  watchInputs={inputs}
                   maxPredictions={10}
                 />
               </div>
