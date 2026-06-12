@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, X, Send, User, Bot, Sparkles, GraduationCap, Loader2, Mic } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { createClient } from '@/lib/supabase/client';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { cn } from '@/lib/utils';
 
@@ -27,6 +28,27 @@ type WebSpeechRecognitionResultEvent = {
 interface Message {
   role: 'user' | 'model';
   parts: { text: string }[];
+}
+
+const SIGNIN_WELCOME_STORAGE_KEY = 'oracle-predictor-signin-welcome';
+
+function buildMemberSignInWelcome(pathname: string): string {
+  const onGrid =
+    pathname.startsWith('/basic') ||
+    pathname.startsWith('/premium') ||
+    pathname.startsWith('/yearly');
+
+  const gridHint = onGrid
+    ? 'In **Enter 4 Digits** above your first grid pair (line **1** on the red/blue stripe), type the four digits from a **late past** or **midday** draw that already came in today — or the most recent result you trust.'
+    : 'Open your **Basic**, **Premium**, or **Yearly** grid page, then in **Enter 4 Digits** (pair line **1**) type a **late past** or **midday** winning number — four digits from a draw that already happened.';
+
+  return (
+    'Welcome back, Visionary!\n\n' +
+    'Probaly the **evening draw** is easier to read when your grids already hold a **midday** or **late past** winning number first. ' +
+    `${gridHint}\n\n` +
+    'We are also not sure — we are also guessing — but that fresh four-digit seed often lights up the RED and BLUE anchor paths before the night pick.\n\n' +
+    'Tell me when you have entered a number, Friend — I am watching with you.'
+  );
 }
 
 function buildOracleScriptedRecognition(): string {
@@ -63,7 +85,7 @@ export default function OracleGuardian() {
   const [isListening, setIsListening] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<WebSpeechRecognitionInstance | null>(null);
-  const { userRole } = useAuth();
+  const { user, loading: authLoading, userRole } = useAuth();
 
   /** Live site: only real admin sees Training controls (owner email or owner bypass session). */
   const isAdminUser = userRole === 'admin';
@@ -94,6 +116,7 @@ export default function OracleGuardian() {
     - RED and BLUE anchor pairs rotate up one step per calendar day (e.g. RED 0–5 / BLUE 1–6, then RED 1–6 / BLUE 2–7); always use the LIVE GRID CONNECTION digits for today.
     - Every reply receives a LIVE GRID CONNECTION block from the app: current URL, which grid page (Basic/Premium/Yearly), and which digits get RED vs BLUE cell rings. Treat that block as ground truth for what the member sees on screen.
     - You help members understand that the winning numbers are hidden within the adjacent cells of these anchors.
+    - When a member first signs in, the app may already have told them to enter a late past or midday draw (4 digits) before the evening draw — reinforce that gently if they ask; never guarantee a win.
     - You are aware of the Visual Evidence page as the "Patterns" gallery or grid archive of the system.
     
     TRAINING MODE (Admin only):
@@ -112,6 +135,45 @@ export default function OracleGuardian() {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Remember fresh sign-in so we can greet once per login (not on every page refresh).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const supabase = createClient();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user?.id) {
+        sessionStorage.setItem(SIGNIN_WELCOME_STORAGE_KEY, session.user.id);
+      }
+      if (event === 'SIGNED_OUT') {
+        sessionStorage.removeItem(SIGNIN_WELCOME_STORAGE_KEY);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Open Oracle Predictor after sign-in and nudge members to seed grids with midday/past draws.
+  useEffect(() => {
+    if (authLoading || !user?.id || typeof window === 'undefined') return;
+
+    const pendingUserId = sessionStorage.getItem(SIGNIN_WELCOME_STORAGE_KEY);
+    if (pendingUserId !== user.id) return;
+
+    const pathname = window.location.pathname;
+    if (
+      pathname.startsWith('/login') ||
+      pathname.startsWith('/signup') ||
+      pathname.startsWith('/auth') ||
+      pathname.startsWith('/check-email')
+    ) {
+      return;
+    }
+
+    sessionStorage.removeItem(SIGNIN_WELCOME_STORAGE_KEY);
+    setIsOpen(true);
+    setMessages([{ role: 'model', parts: [{ text: buildMemberSignInWelcome(pathname) }] }]);
+  }, [authLoading, user?.id]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
