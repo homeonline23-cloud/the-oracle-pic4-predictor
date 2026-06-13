@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
 import { GRID2_DEMO_EMAIL, GRID2_DEMO_PATH } from '@/lib/demoAuth';
+import { ADMIN_EMAIL } from '@/lib/constants';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -17,7 +18,7 @@ function LoginContent() {
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -65,7 +66,9 @@ function LoginContent() {
       const message = err instanceof Error ? err.message : 'Sign-in failed';
       if (/invalid login credentials/i.test(message)) {
         setError(
-          'Wrong email or password. Testers: use the one-tap link at /demo/grid2 instead of typing here.',
+          emailValue.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+            ? 'Wrong password for the site owner account. Use Forgot password below, or set your password once in Supabase → Authentication → Users.'
+            : 'Wrong email or password. Testers: use the one-tap link at /demo/grid2 instead of typing here.',
         );
       } else {
         setError(message);
@@ -107,7 +110,7 @@ function LoginContent() {
             <span className="px-3 py-1 bg-slate-600 rounded-none border border-white/10 text-blue-500 w-fit">In</span>
           </h1>
           <p className="text-slate-400 text-[10px] md:text-xs font-bold tracking-normal mt-6 underline decoration-blue-500/30 px-2 text-center">
-            Welcome back to the Oracle — sign in with Google or email
+            Site owner: email sign-in below (Chrome can save it — one click next time)
           </p>
         </motion.div>
 
@@ -123,47 +126,21 @@ function LoginContent() {
           </motion.div>
         )}
 
-        <button
-          type="button"
-          onClick={() => void handleGoogleSignIn()}
-          disabled={googleLoading || emailLoading}
-          className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 border border-white/20 text-slate-900 rounded-none py-4 px-2 font-bold transition-all active:scale-[0.98] disabled:opacity-50"
-        >
-          <Image
-            src="https://www.google.com/favicon.ico"
-            width={20}
-            height={20}
-            className="w-5 h-5 shrink-0"
-            alt="Google"
-          />
-          <span className="text-[11px] sm:text-sm font-bold tracking-normal text-center">
-            {googleLoading ? 'Connecting to Google…' : 'Sign in with Google'}
-          </span>
-        </button>
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/10" />
-          </div>
-          <div className="relative flex justify-center text-[10px] font-bold tracking-normal leading-none">
-            <span className="bg-slate-900 px-4 text-slate-500">or email & password</span>
-          </div>
-        </div>
-
-        <div className="mb-4 rounded-none border border-emerald-500/30 bg-emerald-950/20 px-4 py-3 text-left">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-300">
-            Fiverr / tester access
+        <div className="mb-5 rounded-none border border-blue-500/40 bg-blue-950/30 px-4 py-3 text-left">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-blue-300">
+            Site owner — no Google verification
           </p>
-          <p className="mt-1 text-[11px] leading-relaxed text-emerald-100/90">
-            Do not create an account. Open{' '}
-            <Link href={GRID2_DEMO_PATH} className="font-bold text-emerald-300 underline">
-              the 4-grid demo page
+          <p className="mt-1 text-[11px] leading-relaxed text-blue-100/90">
+            Your email is filled in below. Enter your site password once — Chrome can save it for automatic
+            sign-in. First time?{' '}
+            <Link href="/forgot-password" className="font-bold text-blue-300 underline">
+              Set password here
             </Link>{' '}
-            and tap <strong>Start 4-grid tester demo</strong> — one tap, no typing.
+            or create the user in Supabase → Authentication → Users.
           </p>
         </div>
 
-        <form noValidate onSubmit={handleEmailSignIn} className="flex flex-col gap-4 space-y-1">
+        <form noValidate onSubmit={handleEmailSignIn} className="flex flex-col gap-4 space-y-1 mb-6">
           <motion.div>
             <label htmlFor="login-email" className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">
               Email
@@ -180,7 +157,7 @@ function LoginContent() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
-              placeholder={GRID2_DEMO_EMAIL}
+              placeholder={ADMIN_EMAIL}
             />
           </motion.div>
           <motion.div>
@@ -195,12 +172,12 @@ function LoginContent() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
-              placeholder="Your password"
+              placeholder="Your site password"
             />
           </motion.div>
           <motion.div className="flex justify-end px-1">
             <Link href="/forgot-password" className="text-[10px] font-bold text-blue-400 hover:text-blue-300">
-              Forgot password?
+              Forgot password / set new password
             </Link>
           </motion.div>
           <button
@@ -208,11 +185,60 @@ function LoginContent() {
             disabled={emailLoading || googleLoading}
             className="w-full bg-blue-600 hover:bg-blue-700 border border-white/10 text-white rounded-none py-4 px-2 font-bold tracking-normal text-sm transition-all active:scale-95 disabled:opacity-50"
           >
-            {emailLoading ? 'Signing in...' : 'Sign in with email'}
+            {emailLoading ? 'Signing in...' : 'Sign in (site owner & members)'}
           </button>
         </form>
 
-        <p className="mt-10 text-center text-[10px] font-bold text-slate-400 tracking-normal opacity-50">
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/10" />
+          </div>
+          <div className="relative flex justify-center text-[10px] font-bold tracking-normal leading-none">
+            <span className="bg-slate-900 px-4 text-slate-500">optional — Google</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => void handleGoogleSignIn()}
+          disabled={googleLoading || emailLoading}
+          className="w-full flex items-center justify-center gap-3 bg-slate-700 hover:bg-slate-600 border border-white/10 text-white rounded-none py-3 px-2 font-bold transition-all active:scale-[0.98] disabled:opacity-50"
+        >
+          <Image
+            src="https://www.google.com/favicon.ico"
+            width={20}
+            height={20}
+            className="w-5 h-5 shrink-0"
+            alt="Google"
+          />
+          <span className="text-[11px] sm:text-sm font-bold tracking-normal text-center">
+            {googleLoading ? 'Connecting to Google…' : 'Sign in with Google (optional)'}
+          </span>
+        </button>
+
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/10" />
+          </div>
+          <div className="relative flex justify-center text-[10px] font-bold tracking-normal leading-none">
+            <span className="bg-slate-900 px-4 text-slate-500">testers</span>
+          </div>
+        </div>
+
+        <div className="mb-4 rounded-none border border-emerald-500/30 bg-emerald-950/20 px-4 py-3 text-left">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-300">
+            Fiverr / tester access
+          </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-emerald-100/90">
+            Do not create an account. Open{' '}
+            <Link href={GRID2_DEMO_PATH} className="font-bold text-emerald-300 underline">
+              the 4-grid demo page
+            </Link>{' '}
+            and tap <strong>Start 4-grid tester demo</strong> — one tap, no typing.
+          </p>
+        </div>
+
+        <p className="mt-6 text-center text-[10px] font-bold text-slate-400 tracking-normal opacity-50">
           New member?{' '}
           <Link href="/signup" className="text-red-400/90 hover:text-red-300 underline decoration-red-400/40">
             Create account (Join)
