@@ -42,12 +42,29 @@ export async function POST(req: Request) {
     if (responseMimeType) config.responseMimeType = responseMimeType;
 
     const model = GEMINI_MODEL;
-
-    const result = await ai.models.generateContent({
+    const request = {
       model,
       contents,
       ...(Object.keys(config).length ? { config } : {}),
-    });
+    };
+
+    let result;
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        result = await ai.models.generateContent(request);
+        lastError = null;
+        break;
+      } catch (error) {
+        lastError = error;
+        const message = error instanceof Error ? error.message : String(error);
+        const retryable = /503|429|UNAVAILABLE|high demand|rate|quota|timeout/i.test(message);
+        if (!retryable || attempt === 2) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 900 * (attempt + 1)));
+      }
+    }
+
+    if (!result) throw lastError ?? new Error('Failed to generate response.');
 
     const text = result.text ?? '';
     if (!text.trim()) {

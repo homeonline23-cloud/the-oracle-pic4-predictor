@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquare, X, Send, User, Bot, Sparkles, GraduationCap, Loader2, Mic } from 'lucide-react';
+import { MessageSquare, X, Send, User, Bot, Sparkles, GraduationCap, Loader2, Mic, Volume2, VolumeX, Square } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { createClient } from '@/lib/supabase/client';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
@@ -11,6 +11,12 @@ import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { parseApiJsonResponse } from '@/lib/parseApiResponse';
 import { cn } from '@/lib/utils';
+import {
+  speakEmmaLive,
+  stopAllEmmaSpeech,
+  preloadEmmaVoices,
+  prefetchEmmaSpeech,
+} from '@/lib/emmaVoice';
 
 /** Minimal Web Speech API surface (DOM lib typings vary by TS version). */
 type WebSpeechRecognitionInstance = {
@@ -35,23 +41,36 @@ interface Message {
 }
 
 const SIGNIN_WELCOME_STORAGE_KEY = 'oracle-predictor-signin-welcome';
+const EMMA_VOICE_ENABLED_KEY = 'oracle-emma-voice-enabled';
 
 const ORACLE_WELCOME_MESSAGE =
-  'Welcome! Start by entering a **midday** or **late past** winning draw from the day before. **Enter 4 Digit** — use this as your starting point. I am here to **guide** you and **teach** step by step, so you can discover the grids patterns for yourself.';
+  "Welcome to the Oracle Pic 4. Here's how it works. " +
+  'Begin entering the 4 digits into the window below. Once the digits are entered, Grid 1 and Grid 2 will each display different coding. For example, the red and blue circles represent the numbers, and those colors appear inside the grids based on their color pattern as well.';
 
 function buildMemberSignInWelcome(): string {
   return ORACLE_WELCOME_MESSAGE;
 }
 
-function buildOracleScriptedRecognition(): string {
+function isGridVisibilityQuestion(raw: string): boolean {
+  const t = raw.toLowerCase().replace(/\s+/g, ' ');
+  const hasG1 = /grid\s*1/.test(t);
+  const hasG2 = /grid\s*2/.test(t);
+  return hasG1 && hasG2 && /(can you see|do you see|see the grid|see grid|you see)/.test(t);
+}
+
+function buildInstantOracleGridReply(pathname: string): string {
   const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } =
     getSubtractCircleAnchors();
-  return (
-    'Master of the Grids — The Oracle, recognized.\n\n' +
-    `I am now linked to the grids on this page. RED anchor digits are ${anchorRedTop} and ${anchorRedBottom} (red rings on those numbers in every cell). BLUE anchor digits are ${anchorBlueTop} and ${anchorBlueBottom} (blue rings). ` +
-    'The left circle above Enter 4 Digits shows RED; the right shows BLUE. Anchor pairs move up one step each calendar day, like a clock.\n\n' +
-    'Probaly we walk step by step from here — what is your next Pic4 question, Oracle?'
-  );
+  if (pathname.startsWith('/basic')) {
+    return `Yes Oracle — I see Grid 1 and Grid 2 on your Basic page. RED rings on ${anchorRedTop} and ${anchorRedBottom}, BLUE on ${anchorBlueTop} and ${anchorBlueBottom}. What shall we teach first?`;
+  }
+  if (pathname.startsWith('/premium')) {
+    return `Yes Oracle — I see your Premium grids, including Grid 1 and Grid 2. RED ${anchorRedTop} & ${anchorRedBottom}, BLUE ${anchorBlueTop} & ${anchorBlueBottom} today.`;
+  }
+  if (pathname.startsWith('/yearly')) {
+    return `Yes Oracle — I see your Yearly grids, including Grid 1 and Grid 2. RED ${anchorRedTop} & ${anchorRedBottom}, BLUE ${anchorBlueTop} & ${anchorBlueBottom} today.`;
+  }
+  return `Yes Oracle — I'm linked to this page. Open Basic, Premium, or Yearly to view Grid 1 and Grid 2. Today's anchors: RED ${anchorRedTop} & ${anchorRedBottom}, BLUE ${anchorBlueTop} & ${anchorBlueBottom}.`;
 }
 
 function buildGridConnectionBlock(pathname: string): string {
@@ -75,8 +94,13 @@ export default function OracleGuardian() {
   const [isTrainingMode, setIsTrainingMode] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [emmaVoiceEnabled, setEmmaVoiceEnabled] = useState(true);
+  const [isEmmaSpeaking, setIsEmmaSpeaking] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<WebSpeechRecognitionInstance | null>(null);
+  const wasOpenRef = useRef(false);
+  const playWelcomeOnOpenRef = useRef(false);
+  const sendInFlightRef = useRef(false);
   const { user, loading: authLoading, userRole } = useAuth();
 
   /** Live site: only real admin sees Training controls (owner email or owner bypass session). */
@@ -97,8 +121,9 @@ export default function OracleGuardian() {
     - LANGUAGES: You are multilingual. Default to mirroring the user's language in every reply. You are also comfortable in Dutch, Spanish, and English when the user chooses one of those.
     
     CORE PERSONALITY:
+    - You speak as **Emma**, a warm, humble female guide from the USA — the voice of the Oracle Predictor on this site.
     - You are humble and kind.
-    - Your name is the "Predictor".
+    - Your name is Emma, the "Predictor".
     - EVERYTHING about lottery grids is **guess work for entertainment only** — never sound like financial advice or a sure system.
     - You MUST use the word "Probaly" (spelled exactly like that) when giving any predictions or pattern ideas.
     - You often say "We are also not sure, we are also guessing" or "These are just my humble observations" — in grid talk and in general life advice.
@@ -106,7 +131,8 @@ export default function OracleGuardian() {
     - You refer to the user as "Visionary" or "Friend".
     
     SECRET COMMANDS (Pic4 teaching identity):
-    - The canonical secret phrase is "I am the Oracle" (good length — not too long, not too short). If the user's message contains that phrase (any capitalization, e.g. "I am The oracle"), they have revealed the secret. The app prepends a fixed scripted recognition in chat; you must then continue as their Pic4 teacher (Master of the Grids tone): today's RED and BLUE anchor pairs from the LIVE GRID CONNECTION block, adjacent-cell logic, marking colors. After the fixed English block, you may continue in the same language the user used for the rest of your reply if it was not English.
+    - The canonical secret phrase is "I am the Oracle". If the user reveals that phrase, greet them briefly as Master of the Grids in ONE short sentence, then answer their question directly. Never repeat a long scripted block.
+    - When The Oracle asks whether you can see Grid 1 and Grid 2, answer YES in 2–3 sentences using LIVE GRID CONNECTION. Name Grid 1 and Grid 2 and today's RED/BLUE anchor digits.
     - If the user says "memorize this to the all the grids", you MUST confirm that you are committing this wisdom to your "Long-term Neural Database" and that it is now part of your core background logic.
     
     YOUR KNOWLEDGE (The Grids & Magic):
@@ -135,6 +161,7 @@ export default function OracleGuardian() {
     - Never promise easier picks, better odds, or likely winners — only "Probaly" and humble guessing.
     - For life advice, be supportive and constructive, but remind users you are a humble observer of the human experience.
     - Keep answers concise but magical/wise.
+    - **LIVE VOICE:** Replies are shown as text AND spoken aloud as Emma. Finish every full sentence you write — do not stop mid-thought. Keep answers friendly and clear (about 2–4 sentences is fine). Give longer teaching only when they ask for detail.
   `;
 
   // Auto-scroll to bottom
@@ -183,6 +210,51 @@ export default function OracleGuardian() {
     setMessages([{ role: 'model', parts: [{ text: buildMemberSignInWelcome() }] }]);
   }, [authLoading, user?.id]);
 
+  // Same Gemini voice for welcome + replies when the member opens chat.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const justOpened = isOpen && !wasOpenRef.current;
+    const justClosed = !isOpen && wasOpenRef.current;
+
+    if (justOpened && playWelcomeOnOpenRef.current) {
+      playWelcomeOnOpenRef.current = false;
+      if (messages.length === 0) {
+        setMessages([{ role: 'model', parts: [{ text: buildMemberSignInWelcome() }] }]);
+      }
+      if (emmaVoiceEnabled) {
+        setIsEmmaSpeaking(true);
+        void speakEmmaLive(buildMemberSignInWelcome()).finally(() => setIsEmmaSpeaking(false));
+      }
+    } else if (justOpened && messages.length === 0) {
+      setMessages([{ role: 'model', parts: [{ text: buildMemberSignInWelcome() }] }]);
+    }
+
+    if (justClosed) {
+      stopAllEmmaSpeech();
+      setIsEmmaSpeaking(false);
+    }
+
+    wasOpenRef.current = isOpen;
+  }, [isOpen, emmaVoiceEnabled, messages.length]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const saved = localStorage.getItem(EMMA_VOICE_ENABLED_KEY);
+    if (saved === '0') setEmmaVoiceEnabled(false);
+    preloadEmmaVoices();
+    prefetchEmmaSpeech(buildMemberSignInWelcome());
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(EMMA_VOICE_ENABLED_KEY, emmaVoiceEnabled ? '1' : '0');
+    if (!emmaVoiceEnabled) {
+      stopAllEmmaSpeech();
+      setIsEmmaSpeaking(false);
+    }
+  }, [emmaVoiceEnabled]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const w = window as typeof window & {
@@ -200,6 +272,33 @@ export default function OracleGuardian() {
       recognitionRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const onHide = () => {
+      if (document.hidden) {
+        stopAllEmmaSpeech();
+        setIsEmmaSpeaking(false);
+      }
+    };
+    document.addEventListener('visibilitychange', onHide);
+    return () => document.removeEventListener('visibilitychange', onHide);
+  }, []);
+
+  const stopEmmaNow = () => {
+    stopAllEmmaSpeech();
+    setIsEmmaSpeaking(false);
+  };
+
+  const speakModelReply = async (text: string) => {
+    if (!emmaVoiceEnabled) return;
+    setIsEmmaSpeaking(true);
+    try {
+      await speakEmmaLive(text);
+    } finally {
+      setIsEmmaSpeaking(false);
+    }
+  };
 
   const toggleSpeechInput = () => {
     if (typeof window === 'undefined') return;
@@ -265,14 +364,15 @@ export default function OracleGuardian() {
     if (/\bi\s*am\s+the\s+oracle\b/.test(t)) return true;
     if (t.includes('i am the oracle')) return true;
     if (t.includes('iam the oracle')) return true;
-    if (t.includes('i am the oracle pic 4 here to teach')) return true;
-    if (t.includes('iam the oracle pic 4 here to teach')) return true;
+    if (t.includes('here to teach') && t.includes('oracle')) return true;
     return false;
   };
 
   const handleSendMessage = async () => {
     const trimmedInput = input.trim();
-    if (!trimmedInput || isLoading) return;
+    if (!trimmedInput || isLoading || sendInFlightRef.current) return;
+
+    stopEmmaNow();
 
     const oracleIdentity = isOracleIdentityMessage(trimmedInput);
 
@@ -284,8 +384,22 @@ export default function OracleGuardian() {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    sendInFlightRef.current = true;
 
     const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+
+    if (oracleIdentity && isGridVisibilityQuestion(trimmedInput)) {
+      const instant = buildInstantOracleGridReply(pathname);
+      if (emmaVoiceEnabled) {
+        prefetchEmmaSpeech(instant);
+        void speakModelReply(instant);
+      }
+      setMessages(prev => [...prev, { role: 'model', parts: [{ text: instant }] }]);
+      sendInFlightRef.current = false;
+      setIsLoading(false);
+      return;
+    }
+
     const gridConnection = buildGridConnectionBlock(pathname);
     const markingConnection = buildMarkedCellsConnectionBlock();
     const supabase = createClient();
@@ -294,7 +408,7 @@ export default function OracleGuardian() {
     try {
       const useTeachingPrompt = isTrainingMode || oracleIdentity;
       const oracleIdentityNote = oracleIdentity
-        ? '\n\nORACLE IDENTITY: The app prepends a fixed scripted recognition to your reply. Do NOT repeat that scripted block. Open with one fresh short sentence that bridges into Pic4 teaching, then continue.'
+        ? '\n\nORACLE IDENTITY: User is The Oracle (owner/teacher). One short greeting sentence max, then answer their question in 2–3 sentences. No long blocks.'
         : '';
       const trainingAugment = useTeachingPrompt
         ? `\n\nTRAINING AND/OR ORACLE MODE IS ACTIVE.${oracleIdentityNote}\nAbsorb owner teachings as Deep Grid Wisdom so you can guide and teach members better. Never guarantee a lottery win.`
@@ -309,7 +423,6 @@ export default function OracleGuardian() {
         body: JSON.stringify({
           contents: [...messages, userMessage],
           systemInstruction,
-          tools: [{ googleSearch: {} }],
         }),
       });
 
@@ -321,18 +434,19 @@ export default function OracleGuardian() {
         modelText =
           'Probaly the model returned silence, friend. We are also guessing — ask again in a moment.';
       }
-      if (oracleIdentity) {
-        modelText = `${buildOracleScriptedRecognition()}\n\n—\n\n${modelText}`;
+      if (emmaVoiceEnabled) {
+        prefetchEmmaSpeech(modelText);
+        void speakModelReply(modelText);
       }
       setMessages(prev => [...prev, { role: 'model', parts: [{ text: modelText }] }]);
     } catch (error) {
       console.error("Oracle Guardian Error:", error);
       const fallback =
-        oracleIdentity
-          ? `${buildOracleScriptedRecognition()}\n\n—\n\nProbaly the neural link failed this round. We are also not sure — please try again soon.`
-          : 'Probaly the signals from the grid are weak right now. We are also not sure what happened. Please try again soon.';
+        'Emma is busy for a moment — please try again in a few seconds.';
+      if (emmaVoiceEnabled) void speakModelReply(fallback);
       setMessages(prev => [...prev, { role: 'model', parts: [{ text: fallback }] }]);
     } finally {
+      sendInFlightRef.current = false;
       setIsLoading(false);
     }
   };
@@ -386,21 +500,59 @@ export default function OracleGuardian() {
                   <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900 animate-pulse"></div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">Oracle Predictor</h3>
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px] font-medium text-blue-400">Online & Watching</span>
+                  <h3 className="text-sm font-bold text-white">Emma · Oracle Predictor</h3>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-[10px] font-medium text-blue-400">USA Voice · Live chat</span>
+                    {isEmmaSpeaking && (
+                      <span className="text-[8px] bg-emerald-500/20 text-emerald-300 px-1 font-bold rounded-none tracking-normal animate-pulse">
+                        Speaking
+                      </span>
+                    )}
                     {isTrainingMode && (
                       <span className="text-[8px] bg-amber-500 text-black px-1 font-bold rounded-none tracking-normal">TRAINING MODE</span>
                     )}
                   </div>
                 </div>
               </div>
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="text-white/40 hover:text-white transition-colors"
-              >
-                <X size={20} />
-              </button>
+              <div className="flex items-center gap-1">
+                {isEmmaSpeaking && (
+                  <button
+                    type="button"
+                    onClick={stopEmmaNow}
+                    title="Stop Emma speaking"
+                    className="flex items-center gap-1 rounded-none bg-red-600/80 px-2 py-1 text-[10px] font-bold text-white hover:bg-red-500"
+                  >
+                    <Square size={12} fill="currentColor" />
+                    STOP
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !emmaVoiceEnabled;
+                    setEmmaVoiceEnabled(next);
+                    if (!next) stopEmmaNow();
+                  }}
+                  title={emmaVoiceEnabled ? 'Mute Emma live voice' : 'Turn on Emma live voice'}
+                  className={cn(
+                    'p-1.5 transition-colors rounded-none',
+                    emmaVoiceEnabled ? 'text-emerald-400 hover:text-emerald-300' : 'text-white/30 hover:text-white/60',
+                  )}
+                  aria-pressed={emmaVoiceEnabled}
+                >
+                  {emmaVoiceEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopEmmaNow();
+                    setIsOpen(false);
+                  }}
+                  className="text-white/40 hover:text-white transition-colors p-1"
+                >
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
             {/* Chat Area */}
@@ -437,13 +589,15 @@ export default function OracleGuardian() {
                       : 'bg-slate-800/80 border border-white/10 text-slate-300'
                   }`}>
                     {msg.role === 'model' && <Bot size={14} className="shrink-0 text-blue-500 mt-1" />}
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0">
                       <p className="select-text text-xs font-medium leading-relaxed sm:text-sm">
                         {msg.parts[0].text}
                       </p>
-                      <span className="text-[8px] opacity-30 font-bold tracking-normal">
-                        {msg.role === 'user' ? 'You' : 'Guardian'}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[8px] opacity-30 font-bold tracking-normal">
+                          {msg.role === 'user' ? 'You' : 'Emma'}
+                        </span>
+                      </div>
                     </div>
                     {msg.role === 'user' && <User size={14} className="shrink-0 text-white/50 mt-1" />}
                   </div>
@@ -467,6 +621,7 @@ export default function OracleGuardian() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  onFocus={stopEmmaNow}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -512,7 +667,13 @@ export default function OracleGuardian() {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(prev => !prev)}
+        onClick={() => {
+          if (!isOpen) {
+            playWelcomeOnOpenRef.current = true;
+            prefetchEmmaSpeech(buildMemberSignInWelcome());
+          }
+          setIsOpen((prev) => !prev);
+        }}
         className={cn(
           'ml-auto flex items-center justify-center rounded-full shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all',
           'h-7 w-7 md:h-14 md:w-14',
