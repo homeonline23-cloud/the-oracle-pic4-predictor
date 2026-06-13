@@ -5,26 +5,14 @@ import {
   hasPaidGridAccess,
   isAdminEmail,
 } from '@/lib/gridAccess';
-
-function getSupabaseConfig() {
-  let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    'sb_publishable_wOamvyvM37FkG0Jernvl3A_wL1gl2D9';
-
-  if (!supabaseUrl || !supabaseUrl.startsWith('http')) {
-    supabaseUrl = 'https://tvsplftucbntmcuadfsf.supabase.co';
-  }
-
-  return { supabaseUrl, supabaseAnonKey };
-}
+import { getSupabaseAnonKey, getSupabaseUrl } from '@/lib/supabase/config';
 
 export const updateSession = async (request: NextRequest) => {
   let response = NextResponse.next({ request });
-  const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
+  const anonKey = getSupabaseAnonKey();
+  if (!anonKey) return response;
 
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+  const supabase = createServerClient(getSupabaseUrl(), anonKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();

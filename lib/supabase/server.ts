@@ -1,19 +1,14 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { getSupabaseAnonKey, getSupabaseUrl } from '@/lib/supabase/config';
 
 export const createClient = async () => {
   const cookieStore = await cookies();
-  let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_wOamvyvM37FkG0Jernvl3A_wL1gl2D9';
-
-  // Hardcode fallback if user has missing or swapped URL in settings
-  if (!supabaseUrl || !supabaseUrl.startsWith('http')) {
-    supabaseUrl = 'https://tvsplftucbntmcuadfsf.supabase.co';
-  }
+  const anonKey = getSupabaseAnonKey();
 
   return createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
+    getSupabaseUrl(),
+    anonKey,
     {
       cookies: {
         get(name: string) {
