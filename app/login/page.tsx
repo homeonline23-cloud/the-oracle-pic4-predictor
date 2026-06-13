@@ -21,7 +21,7 @@ function LoginContent() {
   const [password, setPassword] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const { user, signInWithEmail, signInWithGoogle, loading: authLoading } = useAuth();
+  const { user, signInWithGoogle, loading: authLoading } = useAuth();
 
   const nextPath =
     searchParams?.get('next') &&
@@ -58,7 +58,18 @@ function LoginContent() {
 
     setEmailLoading(true);
     try {
-      await signInWithEmail(emailValue, password);
+      const res = await fetch('/api/auth/sign-in', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: emailValue, password }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        throw new Error(body.error || 'Sign-in failed');
+      }
+      window.location.href = nextPath;
+      return;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Sign-in failed';
       if (/invalid login credentials/i.test(message)) {
@@ -161,7 +172,7 @@ function LoginContent() {
           </div>
         </div>
 
-        <form noValidate autoComplete="off" onSubmit={handleEmailSignIn} className="flex flex-col gap-4 space-y-1">
+        <form noValidate onSubmit={handleEmailSignIn} className="flex flex-col gap-4 space-y-1">
           <motion.div>
             <label htmlFor="login-email" className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">
               Email
@@ -174,9 +185,7 @@ function LoginContent() {
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
-              autoComplete="off"
-              readOnly
-              onFocus={(e) => e.currentTarget.removeAttribute('readonly')}
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
@@ -191,9 +200,7 @@ function LoginContent() {
               id="login-password"
               name="oracle-login-password"
               type="password"
-              autoComplete="new-password"
-              readOnly
-              onFocus={(e) => e.currentTarget.removeAttribute('readonly')}
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"

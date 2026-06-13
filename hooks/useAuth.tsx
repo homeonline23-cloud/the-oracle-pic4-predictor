@@ -4,7 +4,8 @@ import { useState, useEffect, createContext, useContext, useCallback } from 'rea
 import { User, Session } from '@supabase/supabase-js';
 import { createClient, resetBrowserClient } from '@/lib/supabase/client';
 import { authCallbackUrl, getAppOrigin } from '@/lib/appOrigin';
-import { ADMIN_EMAIL, LEGACY_ADMIN_BYPASS_KEY, MOCK_OWNER_SESSION_KEY } from '@/lib/constants';
+import { LEGACY_ADMIN_BYPASS_KEY, MOCK_OWNER_SESSION_KEY } from '@/lib/constants';
+import { isAdminEmail } from '@/lib/gridAccess';
 
 export interface Profile {
   id: string;
@@ -202,7 +203,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const userRole =
-    user?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+    isAdminEmail(user?.email)
       ? 'admin'
       : (profile?.subscription_tier || 'free');
 

@@ -11,8 +11,15 @@ export const GRID_ROUTE_TIERS: Record<string, GridTier> = {
 
 const TIER_ORDER = ['free', 'standard', 'premium', 'yearly'] as const;
 
+function adminEmailFromEnv(): string {
+  const server = process.env.ADMIN_EMAIL?.trim();
+  if (server) return server;
+  return ADMIN_EMAIL.trim();
+}
+
 export function isAdminEmail(email: string | null | undefined): boolean {
-  return !!email && email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  const admin = adminEmailFromEnv();
+  return !!email && !!admin && email.toLowerCase() === admin.toLowerCase();
 }
 
 export function hasPaidGridAccess(
