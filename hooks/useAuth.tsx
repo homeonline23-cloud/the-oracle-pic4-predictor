@@ -2,7 +2,8 @@
 
 import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, resetBrowserClient } from '@/lib/supabase/client';
+import { authCallbackUrl, getAppOrigin } from '@/lib/appOrigin';
 import { ADMIN_EMAIL, LEGACY_ADMIN_BYPASS_KEY, MOCK_OWNER_SESSION_KEY } from '@/lib/constants';
 
 export interface Profile {
@@ -130,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: authCallbackUrl(),
       },
     });
     if (error) throw error;
@@ -142,10 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ? new URLSearchParams(window.location.search).get('next')
         : null;
     const next = nextPath ?? fromUrl;
-    let redirectTo = `${window.location.origin}/auth/callback`;
-    if (next && next.startsWith('/') && !next.startsWith('//')) {
-      redirectTo += `?next=${encodeURIComponent(next)}`;
-    }
+    const redirectTo = authCallbackUrl(next);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo },
@@ -175,7 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: authCallbackUrl(),
       },
     });
     if (error) throw error;
@@ -191,7 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const sendPasswordResetEmail = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
+      redirectTo: `${getAppOrigin(typeof window !== 'undefined' ? window.location.origin : undefined)}/auth/reset-password`,
     });
     if (error) throw error;
   };
@@ -199,6 +197,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     clearLegacyBypassStorage();
     await supabase.auth.signOut();
+    resetBrowserClient();
     window.location.href = '/';
   };
 

@@ -18,3 +18,8 @@ export const createClient = () => {
   browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
   return browserClient;
 };
+
+/** After sign-out, next Google login needs a fresh PKCE cookie chain. */
+export function resetBrowserClient(): void {
+  browserClient = undefined;
+}

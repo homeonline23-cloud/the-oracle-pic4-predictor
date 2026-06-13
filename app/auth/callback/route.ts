@@ -1,5 +1,9 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { getAppOrigin } from '@/lib/appOrigin';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 function getSupabaseConfig() {
   let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -15,48 +19,55 @@ function getSupabaseConfig() {
   return { supabaseUrl, supabaseAnonKey };
 }
 
-/** Server-side OAuth callback — reads PKCE verifier from cookies (fixes Google sign-in on live). */
+function loginRedirect(origin: string, message: string) {
+  const loginUrl = new URL('/login', origin);
+  loginUrl.searchParams.set('message', message);
+  return NextResponse.redirect(loginUrl);
+}
+
+/** Server-side OAuth callback — exchanges Google code using PKCE cookies. */
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get('code');
-  const rawNext = searchParams.get('next');
-  const next =
-    rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/';
+  try {
+    const requestUrl = new URL(request.url);
+    const origin = getAppOrigin(requestUrl.origin);
+    const code = requestUrl.searchParams.get('code');
+    const rawNext = requestUrl.searchParams.get('next');
+    const next =
+      rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/';
 
-  if (!code) {
-    const loginUrl = new URL('/login', origin);
-    loginUrl.searchParams.set(
-      'message',
-      'Sign-in link expired. Please try Sign in with Google again.',
-    );
-    return NextResponse.redirect(loginUrl);
-  }
+    if (!code) {
+      return loginRedirect(origin, 'Sign-in link expired. Please try Sign in with Google again.');
+    }
 
-  const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
-  let response = NextResponse.redirect(new URL(next, origin));
+    const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
+    let response = NextResponse.redirect(new URL(next, origin));
 
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options as CookieOptions);
+          });
+        },
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.redirect(new URL(next, origin));
-        cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options as CookieOptions);
-        });
-      },
-    },
-  });
+    });
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-  if (error) {
-    const loginUrl = new URL('/login', origin);
-    loginUrl.searchParams.set('message', error.message);
-    return NextResponse.redirect(loginUrl);
+    if (error) {
+      console.error('auth/callback exchangeCodeForSession:', error.message);
+      return loginRedirect(origin, error.message);
+    }
+
+    return response;
+  } catch (error) {
+    console.error('auth/callback:', error);
+    const origin = getAppOrigin(new URL(request.url).origin);
+    const message =
+      error instanceof Error ? error.message : 'Sign-in failed. Please try again.';
+    return loginRedirect(origin, message);
   }
-
-  return response;
 }
