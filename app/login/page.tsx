@@ -163,6 +163,11 @@ function LoginContent() {
           </span>
         </button>
 
+        <p className="mt-3 rounded-none border border-amber-500/30 bg-amber-950/25 px-3 py-2 text-[10px] leading-relaxed text-amber-100/90">
+          One-click Google works in <strong>normal Chrome</strong> when you are already signed into Google there.
+          Cursor&apos;s preview always asks for a security code (g.co/sc) — use Chrome, or <strong>Sign in with email</strong> below.
+        </p>
+
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-white/10" />
