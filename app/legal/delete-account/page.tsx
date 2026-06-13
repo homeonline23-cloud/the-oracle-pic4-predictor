@@ -18,8 +18,8 @@ export default function DeleteAccountPage() {
             <ol className="list-decimal list-inside space-y-2 text-slate-300">
               <li>
                 Email{' '}
-                <a href="mailto:homeonline23@gmail.com" className="text-blue-400 hover:underline">
-                  homeonline23@gmail.com
+                <a href="mailto:karelcarty@gmail.com" className="text-blue-400 hover:underline">
+                  karelcarty@gmail.com
                 </a>{' '}
                 from the same address as your account.
               </li>

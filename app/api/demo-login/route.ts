@@ -1,24 +1,31 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { DEMO_EMAIL, DEMO_PASSWORD, DEMO_LOGIN_ENABLED } from '@/lib/demoAuth';
+import { createClient } from '@/lib/supabase/server';
+import {
+  DEMO_LOGIN_ENABLED,
+  getDemoEmailServer,
+  getDemoPasswordServer,
+} from '@/lib/demoAuth';
 
-/** Ensures the demo user exists with a confirmed email (no inbox needed). */
+/** Ensures the demo user exists, then signs in server-side (credentials never sent to browser). */
 export async function POST() {
   if (!DEMO_LOGIN_ENABLED) {
     return NextResponse.json({ error: 'Demo login is disabled' }, { status: 403 });
   }
 
-  if (!DEMO_EMAIL || !DEMO_PASSWORD) {
+  const email = getDemoEmailServer().toLowerCase();
+  const password = getDemoPasswordServer();
+
+  if (!email || !password) {
     return NextResponse.json({ error: 'Demo login is not configured' }, { status: 503 });
   }
 
   try {
     const admin = createAdminClient();
-    const email = DEMO_EMAIL.toLowerCase();
 
     const { error: createError } = await admin.auth.admin.createUser({
       email,
-      password: DEMO_PASSWORD,
+      password,
       email_confirm: true,
       user_metadata: { full_name: 'Demo User' },
     });
@@ -38,12 +45,22 @@ export async function POST() {
       }
 
       const { error: updateError } = await admin.auth.admin.updateUserById(existing.id, {
-        password: DEMO_PASSWORD,
+        password,
         email_confirm: true,
       });
       if (updateError) {
         return NextResponse.json({ error: updateError.message }, { status: 500 });
       }
+    }
+
+    const supabase = await createClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      return NextResponse.json({ error: signInError.message }, { status: 401 });
     }
 
     return NextResponse.json({ ok: true });

@@ -2,43 +2,46 @@ function cleanEnv(value: string | undefined): string {
   return (value?.trim() || '').replace(/^["']|["']$/g, '');
 }
 
-/** Owner/admin demo — full grid access. */
-export const DEMO_EMAIL =
-  cleanEnv(process.env.NEXT_PUBLIC_DEMO_EMAIL) || 'homeonline23@gmail.com';
-
-export const DEMO_PASSWORD =
-  cleanEnv(process.env.NEXT_PUBLIC_DEMO_PASSWORD) || 'OracleDemo2026!';
-
 export const DEMO_LOGIN_ENABLED =
   process.env.NEXT_PUBLIC_DEMO_LOGIN_ENABLED !== 'false';
 
-/** Public tester demo — 4 grids (2 pairs); shareable link; no 10- or 20-grid tiers. */
-export const TESTER_DEMO_GRID_COUNT = 4;
+/** Server-only — never expose owner demo credentials in the client bundle. */
+export function getDemoEmailServer(): string {
+  return cleanEnv(process.env.DEMO_EMAIL) || cleanEnv(process.env.NEXT_PUBLIC_DEMO_EMAIL);
+}
 
-/** Public tester demo — shareable ad/Fiverr link; no access to 10- or 20-grid tiers. */
-export const GRID2_DEMO_EMAIL =
-  cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_EMAIL) || 'try-grid2@theoraclepic4.com';
-
-/** Server-only password (preferred). Falls back to NEXT_PUBLIC for older Vercel setups. */
-export function getGrid2DemoPasswordServer(): string {
+export function getDemoPasswordServer(): string {
   return (
-    cleanEnv(process.env.GRID2_DEMO_PASSWORD) ||
-    cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_PASSWORD) ||
-    'TryGrid2Demo2026!'
+    cleanEnv(process.env.DEMO_PASSWORD) || cleanEnv(process.env.NEXT_PUBLIC_DEMO_PASSWORD)
   );
 }
 
-/** @deprecated Client bundle may be stale after Vercel password changes — use /api/grid2-demo-login instead. */
-export const GRID2_DEMO_PASSWORD =
-  cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_PASSWORD) || 'TryGrid2Demo2026!';
+/** Public tester demo — 4 grids (2 pairs); shareable link; no 10- or 20-grid tiers. */
+export const TESTER_DEMO_GRID_COUNT = 4;
 
 export const GRID2_DEMO_PATH = '/demo/grid2';
 
 export const GRID2_DEMO_ENABLED =
   process.env.NEXT_PUBLIC_GRID2_DEMO_ENABLED !== 'false';
 
+/** Server-only tester demo email (for login API). */
+export function getGrid2DemoEmailServer(): string {
+  return cleanEnv(process.env.GRID2_DEMO_EMAIL) ||
+    cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_EMAIL);
+}
+
+/** Server-only password — never ship demo passwords to the browser. */
+export function getGrid2DemoPasswordServer(): string {
+  return (
+    cleanEnv(process.env.GRID2_DEMO_PASSWORD) ||
+    cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_PASSWORD)
+  );
+}
+
+/** Client-side tester banner — compares against env only (no hardcoded email). */
 export function isGrid2DemoEmail(email: string | null | undefined): boolean {
-  return !!email && email.toLowerCase() === GRID2_DEMO_EMAIL.toLowerCase();
+  const demoEmail = cleanEnv(process.env.NEXT_PUBLIC_GRID2_DEMO_EMAIL);
+  return !!email && !!demoEmail && email.toLowerCase() === demoEmail.toLowerCase();
 }
 
 /** Full public URL for ads and Play Console testing links. */

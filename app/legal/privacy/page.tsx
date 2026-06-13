@@ -40,8 +40,8 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-bold text-white mb-2">4. Your rights (GDPR)</h2>
             <p>
               You may request access, correction, deletion, or portability of your data. Contact:{' '}
-              <a href="mailto:homeonline23@gmail.com" className="text-blue-400 hover:underline">
-                homeonline23@gmail.com
+              <a href="mailto:karelcarty@gmail.com" className="text-blue-400 hover:underline">
+                karelcarty@gmail.com
               </a>
             </p>
           </section>

@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import {
-  GRID2_DEMO_EMAIL,
   GRID2_DEMO_ENABLED,
+  getGrid2DemoEmailServer,
   getGrid2DemoPasswordServer,
   TESTER_DEMO_GRID_COUNT,
 } from '@/lib/demoAuth';
@@ -14,14 +14,15 @@ export async function POST() {
     return NextResponse.json({ error: 'Grid 2 demo is disabled' }, { status: 403 });
   }
 
+  const email = getGrid2DemoEmailServer().toLowerCase();
   const password = getGrid2DemoPasswordServer();
-  if (!GRID2_DEMO_EMAIL || !password) {
+
+  if (!email || !password) {
     return NextResponse.json({ error: 'Grid 2 demo is not configured' }, { status: 503 });
   }
 
   try {
     const admin = createAdminClient();
-    const email = GRID2_DEMO_EMAIL.toLowerCase();
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     const { error: createError } = await admin.auth.admin.createUser({

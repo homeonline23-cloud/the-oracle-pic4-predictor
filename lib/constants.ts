@@ -1,5 +1,4 @@
-export const ADMIN_EMAIL =
-  process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'homeonline23@gmail.com';
+export const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
 
 /**
  * Broader sections only (e.g. wide copy blocks). Nav + hero + framed windows use {@link VIDEO_SHELL}.

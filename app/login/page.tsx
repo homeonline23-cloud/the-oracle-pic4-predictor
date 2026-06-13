@@ -8,7 +8,7 @@ import { motion } from 'motion/react';
 import { useAuth } from '@/hooks/useAuth';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
-import { GRID2_DEMO_EMAIL, GRID2_DEMO_PATH } from '@/lib/demoAuth';
+import { GRID2_DEMO_PATH } from '@/lib/demoAuth';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -48,9 +48,7 @@ function LoginContent() {
 
     const emailValue = email.trim();
     if (!EMAIL_PATTERN.test(emailValue)) {
-      setError(
-        'Put the email in the Email field only (example: try-grid2@theoraclepic4.com). Put your password in the Password field below — not the other way around.',
-      );
+      setError('Enter a valid email address in the Email field and your password below.');
       return;
     }
     if (!password) {
@@ -163,24 +161,26 @@ function LoginContent() {
           </div>
         </div>
 
-        <form noValidate onSubmit={handleEmailSignIn} className="flex flex-col gap-4 space-y-1">
+        <form noValidate autoComplete="off" onSubmit={handleEmailSignIn} className="flex flex-col gap-4 space-y-1">
           <motion.div>
             <label htmlFor="login-email" className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">
               Email
             </label>
             <input
               id="login-email"
-              name="email"
+              name="oracle-login-email"
               type="text"
               inputMode="email"
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
-              autoComplete="username"
+              autoComplete="off"
+              readOnly
+              onFocus={(e) => e.currentTarget.removeAttribute('readonly')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
-              placeholder={GRID2_DEMO_EMAIL}
+              placeholder="you@example.com"
             />
           </motion.div>
           <motion.div>
@@ -189,13 +189,15 @@ function LoginContent() {
             </label>
             <input
               id="login-password"
-              name="password"
+              name="oracle-login-password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
+              readOnly
+              onFocus={(e) => e.currentTarget.removeAttribute('readonly')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
-              placeholder="Your password"
+              placeholder="••••••••"
             />
           </motion.div>
           <motion.div className="flex justify-end px-1">
