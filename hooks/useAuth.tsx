@@ -25,7 +25,7 @@ export interface AuthContextType {
   loading: boolean;
   userRole: string | null;
   signOut: () => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: (nextPath?: string) => Promise<void>;
   signInWithMagicLink: (email: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
@@ -136,8 +136,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
-  const signInWithGoogle = async () => {
-    const redirectTo = `${window.location.origin}/auth/callback`;
+  const signInWithGoogle = async (nextPath?: string) => {
+    const fromUrl =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search).get('next')
+        : null;
+    const next = nextPath ?? fromUrl;
+    let redirectTo = `${window.location.origin}/auth/callback`;
+    if (next && next.startsWith('/') && !next.startsWith('//')) {
+      redirectTo += `?next=${encodeURIComponent(next)}`;
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo },

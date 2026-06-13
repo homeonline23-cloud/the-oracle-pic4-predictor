@@ -145,7 +145,7 @@ export default function Navbar() {
               {!user && (
                 <>
                   <Link href="/login" onClick={scrollToTop} className={getNavLinkClass('/login')}>
-                    Log in
+                    Sign in
                   </Link>
                   <Link href="/signup" onClick={scrollToTop} className={getNavLinkClass('/signup')}>
                     Join
@@ -216,7 +216,7 @@ export default function Navbar() {
                     }}
                     className={getMobileLinkClass('/login')}
                   >
-                    Log in
+                    Sign in
                   </Link>
                   <Link
                     href="/signup"

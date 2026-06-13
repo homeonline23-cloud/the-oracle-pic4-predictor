@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'motion/react';
 import { useAuth } from '@/hooks/useAuth';
 import PageHeader from '@/components/PageHeader';
@@ -19,7 +20,27 @@ function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
-  const { user, signInWithEmail, loading: authLoading } = useAuth();
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { user, signInWithEmail, signInWithGoogle, loading: authLoading } = useAuth();
+
+  const nextPath =
+    searchParams?.get('next') &&
+    searchParams.get('next')!.startsWith('/') &&
+    !searchParams.get('next')!.startsWith('//')
+      ? searchParams.get('next')!
+      : '/';
+
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setGoogleLoading(true);
+    try {
+      await signInWithGoogle(nextPath);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Google sign-in failed';
+      setError(message);
+      setGoogleLoading(false);
+    }
+  };
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,12 +77,9 @@ function LoginContent() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      const raw = searchParams?.get('next');
-      const next =
-        raw && raw.startsWith('/') && !raw.startsWith('//') ? raw : '/';
-      window.location.href = next;
+      window.location.href = nextPath;
     }
-  }, [user, authLoading, searchParams]);
+  }, [user, authLoading, nextPath]);
 
   useEffect(() => {
     if (searchParams) {
@@ -78,18 +96,18 @@ function LoginContent() {
       <div className="mb-4 md:mb-8 w-full">
         <GridButtons />
       </div>
-      <motion.div 
+      <motion.div
         initial={{ opacity: 1, y: 0 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md bg-slate-900/60 backdrop-blur-xl p-6 md:p-8 rounded-none border border-white/10 shadow-2xl"
       >
         <motion.div className="text-center mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight flex flex-col md:flex-row gap-2 justify-center items-center">
-            <span className="px-3 py-1 bg-slate-600 rounded-none border border-white/10 w-fit">Sign</span> 
+            <span className="px-3 py-1 bg-slate-600 rounded-none border border-white/10 w-fit">Sign</span>
             <span className="px-3 py-1 bg-slate-600 rounded-none border border-white/10 text-blue-500 w-fit">In</span>
           </h1>
           <p className="text-slate-400 text-[10px] md:text-xs font-bold tracking-normal mt-6 underline decoration-blue-500/30 px-2 text-center">
-            Welcome back to the Oracle
+            Welcome back to the Oracle — sign in with Google or email
           </p>
         </motion.div>
 
@@ -105,74 +123,99 @@ function LoginContent() {
           </motion.div>
         )}
 
-        <>
-            <div className="mb-4 rounded-none border border-emerald-500/30 bg-emerald-950/20 px-4 py-3 text-left">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-300">
-                Fiverr / tester access
-              </p>
-              <p className="mt-1 text-[11px] leading-relaxed text-emerald-100/90">
-                Do not create an account. Open{' '}
-                <Link href={GRID2_DEMO_PATH} className="font-bold text-emerald-300 underline">
-                  the 4-grid demo page
-                </Link>{' '}
-                and tap <strong>Start 4-grid tester demo</strong> — one tap, no typing.
-              </p>
-            </div>
+        <button
+          type="button"
+          onClick={() => void handleGoogleSignIn()}
+          disabled={googleLoading || emailLoading}
+          className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 border border-white/20 text-slate-900 rounded-none py-4 px-2 font-bold transition-all active:scale-[0.98] disabled:opacity-50"
+        >
+          <Image
+            src="https://www.google.com/favicon.ico"
+            width={20}
+            height={20}
+            className="w-5 h-5 shrink-0"
+            alt="Google"
+          />
+          <span className="text-[11px] sm:text-sm font-bold tracking-normal text-center">
+            {googleLoading ? 'Connecting to Google…' : 'Sign in with Google'}
+          </span>
+        </button>
 
-            <form noValidate onSubmit={handleEmailSignIn} className="flex flex-col gap-4 mt-4 space-y-1">
-              <motion.div>
-                <label htmlFor="login-email" className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">Email</label>
-                <input
-                  id="login-email"
-                  name="email"
-                  type="text"
-                  inputMode="email"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  autoComplete="username"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
-                  placeholder={GRID2_DEMO_EMAIL}
-                />
-              </motion.div>
-              <motion.div>
-                <label htmlFor="login-password" className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">Password</label>
-                <input
-                  id="login-password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
-                  placeholder="Your password"
-                />
-              </motion.div>
-              <motion.div className="flex justify-end px-1">
-                <Link
-                  href="/forgot-password"
-                  className="text-[10px] font-bold text-blue-400 hover:text-blue-300"
-                >
-                  Forgot password?
-                </Link>
-              </motion.div>
-              <button
-                type="submit"
-                disabled={emailLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 border border-white/10 text-white rounded-none py-4 px-2 font-bold tracking-normal text-sm transition-all active:scale-95 disabled:opacity-50"
-              >
-                {emailLoading ? 'Signing in...' : 'Sign in with email'}
-              </button>
-            </form>
-        </>
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/10" />
+          </div>
+          <div className="relative flex justify-center text-[10px] font-bold tracking-normal leading-none">
+            <span className="bg-slate-900 px-4 text-slate-500">or email & password</span>
+          </div>
+        </div>
+
+        <div className="mb-4 rounded-none border border-emerald-500/30 bg-emerald-950/20 px-4 py-3 text-left">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-300">
+            Fiverr / tester access
+          </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-emerald-100/90">
+            Do not create an account. Open{' '}
+            <Link href={GRID2_DEMO_PATH} className="font-bold text-emerald-300 underline">
+              the 4-grid demo page
+            </Link>{' '}
+            and tap <strong>Start 4-grid tester demo</strong> — one tap, no typing.
+          </p>
+        </div>
+
+        <form noValidate onSubmit={handleEmailSignIn} className="flex flex-col gap-4 space-y-1">
+          <motion.div>
+            <label htmlFor="login-email" className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">
+              Email
+            </label>
+            <input
+              id="login-email"
+              name="email"
+              type="text"
+              inputMode="email"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
+              placeholder={GRID2_DEMO_EMAIL}
+            />
+          </motion.div>
+          <motion.div>
+            <label htmlFor="login-password" className="block text-[10px] font-bold text-white tracking-normal mb-1 ml-4">
+              Password
+            </label>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-slate-950/50 border border-white/10 rounded-none px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 font-mono"
+              placeholder="Your password"
+            />
+          </motion.div>
+          <motion.div className="flex justify-end px-1">
+            <Link href="/forgot-password" className="text-[10px] font-bold text-blue-400 hover:text-blue-300">
+              Forgot password?
+            </Link>
+          </motion.div>
+          <button
+            type="submit"
+            disabled={emailLoading || googleLoading}
+            className="w-full bg-blue-600 hover:bg-blue-700 border border-white/10 text-white rounded-none py-4 px-2 font-bold tracking-normal text-sm transition-all active:scale-95 disabled:opacity-50"
+          >
+            {emailLoading ? 'Signing in...' : 'Sign in with email'}
+          </button>
+        </form>
 
         <p className="mt-10 text-center text-[10px] font-bold text-slate-400 tracking-normal opacity-50">
-          Members sign in with email and password.
-          {' '}
+          New member?{' '}
           <Link href="/signup" className="text-red-400/90 hover:text-red-300 underline decoration-red-400/40">
-            Create account
+            Create account (Join)
           </Link>
         </p>
       </motion.div>
@@ -182,11 +225,13 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <motion.div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-none animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-950">
+          <motion.div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-none animate-spin" />
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   );
