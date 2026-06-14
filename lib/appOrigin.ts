@@ -31,7 +31,7 @@ export function getAppOrigin(runtimeOrigin?: string): string {
 
 export function authCallbackUrl(nextPath?: string | null): string {
   const origin = getAppOrigin(typeof window !== 'undefined' ? window.location.origin : undefined);
-  const base = `${origin}/auth/callback`;
+  const base = `${origin}/api/auth/callback`;
   if (nextPath && nextPath.startsWith('/') && !nextPath.startsWith('//')) {
     return `${base}?next=${encodeURIComponent(nextPath)}`;
   }

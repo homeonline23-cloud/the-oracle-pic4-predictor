@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   const code = url.searchParams.get("code");
   // Supabase sometimes returns to Site URL root (?code=...) — forward to auth callback.
   if (code && (url.pathname === "/" || url.pathname === "/login" || url.pathname === "/signup")) {
-    url.pathname = "/auth/callback";
+    url.pathname = "/api/auth/callback";
     return NextResponse.redirect(url);
   }
 
