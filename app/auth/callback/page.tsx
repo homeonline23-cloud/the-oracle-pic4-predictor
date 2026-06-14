@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, resetBrowserClient } from '@/lib/supabase/client';
 
 export default function AuthCallback() {
   const handled = useRef(false);
@@ -10,7 +10,6 @@ export default function AuthCallback() {
     if (handled.current) return;
     handled.current = true;
 
-    const supabase = createClient();
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
     const rawNext = url.searchParams.get('next');
@@ -22,6 +21,7 @@ export default function AuthCallback() {
     };
 
     const finish = () => {
+      resetBrowserClient();
       if (window.opener && !window.opener.closed) {
         window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, window.location.origin);
         window.close();
@@ -31,18 +31,25 @@ export default function AuthCallback() {
     };
 
     void (async () => {
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-        if (error) {
-          console.error('OAuth code exchange failed:', error);
-          const friendly = /pkce|code verifier/i.test(error.message)
-            ? 'Google sign-in timed out. Tap Sign in with Google once more.'
-            : error.message;
-          goLogin(friendly);
-          return;
-        }
+      if (!code) {
+        goLogin('Sign-in link expired. Tap Sign in with Google again.');
+        return;
       }
 
+      const res = await fetch('/api/auth/exchange', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+
+      if (!res.ok) {
+        goLogin(body.error || 'Sign-in failed. Please try again.');
+        return;
+      }
+
+      const supabase = createClient();
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -51,21 +58,13 @@ export default function AuthCallback() {
         return;
       }
 
-      const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN' && session) {
-          sub.subscription.unsubscribe();
-          finish();
-        }
-      });
-
       window.setTimeout(async () => {
-        sub.subscription.unsubscribe();
         const {
           data: { session: retrySession },
         } = await supabase.auth.getSession();
         if (retrySession) finish();
         else goLogin('Sign-in could not finish. Please try Sign in with Google again.');
-      }, 5000);
+      }, 1500);
     })();
   }, []);
 

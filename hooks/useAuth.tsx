@@ -143,19 +143,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search).get('next')
         : null;
-    const next = nextPath ?? fromUrl;
-    const redirectTo = authCallbackUrl(next);
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo, skipBrowserRedirect: true },
-    });
-    if (error) {
-      console.error('Google Sign-In Error:', error);
-      throw error;
-    }
-    if (data?.url) {
-      window.location.assign(data.url);
-    }
+    const next = nextPath ?? fromUrl ?? '/';
+    const query = new URLSearchParams({ next });
+    window.location.assign(`/api/auth/google?${query.toString()}`);
   };
 
   useEffect(() => {
