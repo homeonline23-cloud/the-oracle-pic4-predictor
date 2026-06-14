@@ -163,11 +163,6 @@ function LoginContent() {
           </span>
         </button>
 
-        <p className="mt-3 rounded-none border border-amber-500/30 bg-amber-950/25 px-3 py-2 text-[10px] leading-relaxed text-amber-100/90">
-          Google may send fingerprint approval to your iPhone — that is normal. Use <strong>normal Chrome</strong> on
-          PC (not Cursor preview). Or <strong>Sign in with email</strong> below.
-        </p>
-
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-white/10" />
