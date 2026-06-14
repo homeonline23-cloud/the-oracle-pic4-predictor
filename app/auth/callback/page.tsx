@@ -10,6 +10,7 @@ export default function AuthCallback() {
     if (handled.current) return;
     handled.current = true;
 
+    const supabase = createClient();
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
     const rawNext = url.searchParams.get('next');
@@ -36,20 +37,16 @@ export default function AuthCallback() {
         return;
       }
 
-      const res = await fetch('/api/auth/exchange', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      });
-      const body = (await res.json().catch(() => ({}))) as { error?: string };
-
-      if (!res.ok) {
-        goLogin(body.error || 'Sign-in failed. Please try again.');
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) {
+        console.error('OAuth code exchange failed:', error);
+        const friendly = /pkce|code verifier/i.test(error.message)
+          ? 'Google sign-in timed out. Tap Sign in with Google once more.'
+          : error.message;
+        goLogin(friendly);
         return;
       }
 
-      const supabase = createClient();
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -64,7 +61,7 @@ export default function AuthCallback() {
         } = await supabase.auth.getSession();
         if (retrySession) finish();
         else goLogin('Sign-in could not finish. Please try Sign in with Google again.');
-      }, 1500);
+      }, 2000);
     })();
   }, []);
 

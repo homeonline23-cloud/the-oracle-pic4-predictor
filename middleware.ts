@@ -2,6 +2,14 @@ import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
+  const hostname = request.nextUrl.hostname;
+  // Always use www — must match Supabase Site URL and redirect allow-list.
+  if (hostname === 'theoraclepic4.com') {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.hostname = 'www.theoraclepic4.com';
+    return NextResponse.redirect(redirectUrl, 308);
+  }
+
   const url = request.nextUrl.clone();
   const code = url.searchParams.get("code");
   // Supabase sometimes returns to Site URL root (?code=...) — forward to auth callback.
