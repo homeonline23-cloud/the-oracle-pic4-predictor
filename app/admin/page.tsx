@@ -65,37 +65,40 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function fetchDashboardData() {
       if (userRole !== 'admin') return;
-      
+
       setIsDataLoading(true);
       try {
-        // Fetch profiles count
-        const { count: userCount } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true });
+        const fetchWithTimeout = async <T,>(promise: Promise<T>, ms = 10000): Promise<T> => {
+          let timer: ReturnType<typeof setTimeout> | undefined;
+          const timeout = new Promise<never>((_, reject) => {
+            timer = setTimeout(() => reject(new Error('Request timed out')), ms);
+          });
+          try {
+            return await Promise.race([promise, timeout]);
+          } finally {
+            if (timer) clearTimeout(timer);
+          }
+        };
 
-        // Fetch recent payments
-        const { data: payments } = await supabase
-          .from('payments')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(5);
+        const { count: userCount } = await fetchWithTimeout(
+          supabase.from('profiles').select('*', { count: 'exact', head: true })
+        );
 
-        // Calculate total revenue
-        const { data: allPayments } = await supabase.from('payments').select('amount');
+        const { data: payments } = await fetchWithTimeout(
+          supabase.from('payments').select('*').order('created_at', { ascending: false }).limit(5)
+        );
+
+        const { data: allPayments } = await fetchWithTimeout(
+          supabase.from('payments').select('amount')
+        );
         const revenue = allPayments?.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0) || 0;
 
-        // Fetch recent users
-        const { data: recentUsers } = await supabase
-          .from('profiles')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(5);
-
-        // Real hits — starts at 0 until a proper analytics system is connected
-        const simulatedHits = 0;
+        const { data: recentUsers } = await fetchWithTimeout(
+          supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(5)
+        );
 
         setStats({
-          totalHits: simulatedHits,
+          totalHits: 0,
           totalUsers: userCount || 0,
           totalRevenue: revenue,
           recentPayments: (payments || []) as DashboardStats['recentPayments'],
@@ -109,13 +112,17 @@ export default function AdminDashboard() {
     }
 
     if (userRole === 'admin') {
-      fetchDashboardData();
-      const interval = setInterval(fetchDashboardData, 30000); // Refresh every 30s
+      void fetchDashboardData();
+      const interval = setInterval(() => void fetchDashboardData(), 30000);
       return () => clearInterval(interval);
     }
+
+    setIsDataLoading(false);
   }, [userRole, supabase]);
 
-  if (loading || !user || userRole !== 'admin' || (isDataLoading && stats.totalHits === 0)) {
+  const authPending = loading || !user || userRole !== 'admin';
+
+  if (authPending) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -148,7 +155,9 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></div>
-                  <span className="text-[10px] text-white/70 font-medium tracking-wide lowercase">system is live</span>
+                  <span className="text-[10px] text-white/70 font-medium tracking-wide lowercase">
+                    {isDataLoading ? 'refreshing stats…' : 'system is live'}
+                  </span>
                 </div>
                 <span className="text-[9px] text-slate-600 font-mono italic lowercase">{new Date().toLocaleDateString()} - {new Date().toLocaleTimeString()}</span>
               </div>
