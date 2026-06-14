@@ -5,12 +5,6 @@
     },
     "app/api/emma-speak/route.ts": {
       "maxDuration": 60
-    },
-    "app/api/auth/callback/route.ts": {
-      "maxDuration": 30
-    },
-    "app/api/auth/google/route.ts": {
-      "maxDuration": 30
     }
   }
 }
