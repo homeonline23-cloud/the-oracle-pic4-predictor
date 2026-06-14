@@ -3,7 +3,7 @@
 import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { createClient, resetBrowserClient } from '@/lib/supabase/client';
-import { authCallbackUrl, getAppOrigin } from '@/lib/appOrigin';
+import { authCallbackUrl, getAppOrigin, redirectToWwwIfNeeded } from '@/lib/appOrigin';
 import { LEGACY_ADMIN_BYPASS_KEY, MOCK_OWNER_SESSION_KEY } from '@/lib/constants';
 import { isAdminEmail } from '@/lib/gridAccess';
 
@@ -139,23 +139,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async (nextPath?: string) => {
+    if (redirectToWwwIfNeeded()) return;
+
     const fromUrl =
       typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search).get('next')
         : null;
-    const next = nextPath ?? fromUrl;
-    const redirectTo = authCallbackUrl(next);
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo, skipBrowserRedirect: true },
-    });
-    if (error) {
-      console.error('Google Sign-In Error:', error);
-      throw error;
-    }
-    if (data?.url) {
-      window.location.assign(data.url);
-    }
+    const next = nextPath ?? fromUrl ?? '/';
+    const query = new URLSearchParams({ next });
+    window.location.assign(`/api/auth/google?${query.toString()}`);
   };
 
   useEffect(() => {

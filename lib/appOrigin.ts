@@ -15,6 +15,19 @@ export function isLocalDevOrigin(origin: string): boolean {
   }
 }
 
+/** Live site always uses www so OAuth cookies match Supabase Site URL. */
+export function normalizeProductionOrigin(origin: string): string {
+  try {
+    const url = new URL(origin);
+    if (url.hostname === 'theoraclepic4.com') {
+      url.hostname = 'www.theoraclepic4.com';
+    }
+    return url.origin;
+  } catch {
+    return origin.replace(/\/$/, '');
+  }
+}
+
 /**
  * Origin for OAuth redirects. Uses the page you are actually on (localhost vs live)
  * so local testing never jumps to theoraclepic4.com.
@@ -22,10 +35,13 @@ export function isLocalDevOrigin(origin: string): boolean {
  */
 export function getAppOrigin(runtimeOrigin?: string): string {
   const normalizedRuntime = runtimeOrigin?.trim().replace(/\/$/, '');
-  if (normalizedRuntime) return normalizedRuntime;
+  if (normalizedRuntime) {
+    if (isLocalDevOrigin(normalizedRuntime)) return normalizedRuntime;
+    return normalizeProductionOrigin(normalizedRuntime);
+  }
 
   const configured = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, '');
-  if (configured) return configured;
+  if (configured) return normalizeProductionOrigin(configured);
   return 'https://www.theoraclepic4.com';
 }
 
@@ -36,4 +52,13 @@ export function authCallbackUrl(nextPath?: string | null): string {
     return `${base}?next=${encodeURIComponent(nextPath)}`;
   }
   return base;
+}
+
+/** Client redirect to www before OAuth (when middleware does not run). */
+export function redirectToWwwIfNeeded(): boolean {
+  if (typeof window === 'undefined') return false;
+  if (window.location.hostname !== 'theoraclepic4.com') return false;
+  const target = `https://www.theoraclepic4.com${window.location.pathname}${window.location.search}${window.location.hash}`;
+  window.location.replace(target);
+  return true;
 }

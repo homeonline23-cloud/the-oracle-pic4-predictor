@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
 import { GRID2_DEMO_PATH } from '@/lib/demoAuth';
+import { redirectToWwwIfNeeded } from '@/lib/appOrigin';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -83,6 +84,10 @@ function LoginContent() {
       setEmailLoading(false);
     }
   };
+
+  useEffect(() => {
+    redirectToWwwIfNeeded();
+  }, []);
 
   useEffect(() => {
     if (!authLoading && user) {

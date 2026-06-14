@@ -1,12 +1,15 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { redirectToWwwIfNeeded } from '@/lib/appOrigin';
 import { createClient, resetBrowserClient } from '@/lib/supabase/client';
 
 export default function AuthCallback() {
   const handled = useRef(false);
 
   useEffect(() => {
+    if (redirectToWwwIfNeeded()) return;
+
     if (handled.current) return;
     handled.current = true;
 
@@ -37,14 +40,30 @@ export default function AuthCallback() {
         return;
       }
 
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
-      if (error) {
-        console.error('OAuth code exchange failed:', error);
-        const friendly = /pkce|code verifier/i.test(error.message)
-          ? 'Google sign-in timed out. Tap Sign in with Google once more.'
-          : error.message;
-        goLogin(friendly);
-        return;
+      // Server exchange first (PKCE from /api/auth/google cookies), then browser fallback.
+      let exchanged = false;
+      try {
+        const res = await fetch('/api/auth/exchange', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        });
+        if (res.ok) exchanged = true;
+      } catch {
+        /* gateway may block — try browser exchange below */
+      }
+
+      if (!exchanged) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          console.error('OAuth code exchange failed:', error);
+          const friendly = /pkce|code verifier/i.test(error.message)
+            ? 'Google sign-in timed out. Tap Sign in with Google once more.'
+            : error.message;
+          goLogin(friendly);
+          return;
+        }
       }
 
       const {

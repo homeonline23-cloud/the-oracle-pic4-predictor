@@ -3,19 +3,27 @@ import { updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   const hostname = request.nextUrl.hostname;
-  // Always use www — must match Supabase Site URL and redirect allow-list.
+
+  // www redirect for ALL paths (including /auth/callback — was excluded before and broke PKCE).
   if (hostname === 'theoraclepic4.com') {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.hostname = 'www.theoraclepic4.com';
     return NextResponse.redirect(redirectUrl, 308);
   }
 
+  const pathname = request.nextUrl.pathname;
+
+  // OAuth return with ?code= on home/login/signup
   const url = request.nextUrl.clone();
   const code = url.searchParams.get("code");
-  // Supabase sometimes returns to Site URL root (?code=...) — forward to auth callback.
-  if (code && (url.pathname === "/" || url.pathname === "/login" || url.pathname === "/signup")) {
+  if (code && (pathname === "/" || pathname === "/login" || pathname === "/signup")) {
     url.pathname = "/auth/callback";
     return NextResponse.redirect(url);
+  }
+
+  // Skip session refresh on auth callback and API routes
+  if (pathname.startsWith('/auth/callback') || pathname.startsWith('/api/')) {
+    return NextResponse.next();
   }
 
   return await updateSession(request);
@@ -23,10 +31,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Skip API routes, auth callback, Next internals, static assets.
-     * Auth callback runs in the browser (original flow) — middleware must not block it.
-     */
-    "/((?!_next/|api/|auth/callback|auth/reset-password|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm|mov)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm|mov)$).*)",
   ],
 };
