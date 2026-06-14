@@ -6,8 +6,16 @@ import { MessageSquare, X, Send, User, Bot, Sparkles, GraduationCap, Loader2, Mi
 import { useAuth } from '@/hooks/useAuth';
 import { createClient } from '@/lib/supabase/client';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
-import { buildMarkedCellsConnectionBlock } from '@/lib/gridLiveSnapshot';
+import { buildFullLiveGridContextBlock } from '@/lib/gridLiveSnapshot';
 import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
+import {
+  buildMemoryActionNote,
+  buildUrlContextBlock,
+  getFilledInputsFromSnapshot,
+  parseWinningNumbersToStore,
+  shouldStoreAllGridInputs,
+  storeWinningNumbersForEmma,
+} from '@/lib/emmaChatHelpers';
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { parseApiJsonResponse } from '@/lib/parseApiResponse';
 import { cn } from '@/lib/utils';
@@ -165,6 +173,9 @@ export default function OracleGuardian() {
     - The canonical secret phrase is "I am the Oracle". If the user reveals that phrase, greet them briefly as Master of the Grids in ONE short sentence, then answer their question directly. Never repeat a long scripted block.
     - When The Oracle asks whether you can see Grid 1 and Grid 2, answer YES in 2–3 sentences using LIVE GRID CONNECTION. Name Grid 1 and Grid 2 and today's RED/BLUE anchor digits.
     - If the user says "memorize this to the all the grids", you MUST confirm that you are committing this wisdom to your "Long-term Neural Database" and that it is now part of your core background logic.
+    - When The Oracle says "memorize", "store", or "remember" a 4-digit winning number, the app saves it to the NEURAL MEMORY BANK automatically — confirm the save in your reply.
+    - You receive LIVE GRID ACTIVITY: every Enter 4 Digits value, marking color, and marked cell on screen. Describe what you see when asked.
+    - When The Oracle sends a website link (http/https), you receive the page text — read it and answer from that content.
     
     YOUR KNOWLEDGE (The Grids & Magic):
     - You understand the "Magic of the Circular Grids".
@@ -471,7 +482,7 @@ export default function OracleGuardian() {
     }
 
     const gridConnection = buildGridConnectionBlock(pathname);
-    const markingConnection = capPromptBlock(buildMarkedCellsConnectionBlock());
+    const liveGridContext = capPromptBlock(buildFullLiveGridContextBlock());
     const supabase = createClient();
     const abortController = new AbortController();
     loadingAbortRef.current = abortController;
@@ -491,6 +502,38 @@ export default function OracleGuardian() {
           '\n\nNEURAL MEMORY BANK: temporarily unavailable — continue with live grid data only.';
       }
 
+      let memoryActionNote = '';
+      const explicitNumbers = parseWinningNumbersToStore(trimmedInput);
+      const numbersToStore = shouldStoreAllGridInputs(trimmedInput)
+        ? [...new Set([...explicitNumbers, ...getFilledInputsFromSnapshot()])]
+        : explicitNumbers;
+
+      if (numbersToStore.length > 0) {
+        const location = pathname.startsWith('/yearly')
+          ? 'Yearly'
+          : pathname.startsWith('/premium')
+            ? 'Premium'
+            : pathname.startsWith('/basic')
+              ? 'Basic'
+              : 'Oracle chat';
+        const { saved, failed } = await storeWinningNumbersForEmma(numbersToStore, location);
+        memoryActionNote = buildMemoryActionNote(saved, failed);
+        if (saved.length > 0) {
+          try {
+            memoryBank = await buildMarkMemoryBankBlock(supabase);
+          } catch {
+            /* use prior memoryBank */
+          }
+        }
+      }
+
+      let urlContext = '';
+      try {
+        urlContext = capPromptBlock(await buildUrlContextBlock(trimmedInput), 6000);
+      } catch (urlErr) {
+        console.warn('URL read skipped:', urlErr);
+      }
+
       const useTeachingPrompt = isTrainingMode || oracleIdentity;
       const oracleIdentityNote = oracleIdentity
         ? '\n\nORACLE IDENTITY: User is The Oracle (owner/teacher). One short greeting sentence max, then answer their question in 2–3 sentences. No long blocks.'
@@ -501,9 +544,9 @@ export default function OracleGuardian() {
 
       const systemInstruction = capPromptBlock(
         useTeachingPrompt
-          ? `${EMMA_CORE_PROMPT}${gridConnection}${markingConnection}${memoryBank}${trainingAugment}`
-          : `${SYSTEM_INSTRUCTIONS}${gridConnection}${markingConnection}${memoryBank}${trainingAugment}`,
-        12000,
+          ? `${EMMA_CORE_PROMPT}${gridConnection}${liveGridContext}${memoryBank}${memoryActionNote}${urlContext}${trainingAugment}`
+          : `${SYSTEM_INSTRUCTIONS}${gridConnection}${liveGridContext}${memoryBank}${memoryActionNote}${urlContext}${trainingAugment}`,
+        14000,
       );
 
       const recentContents = [...messages, userMessage].slice(-8);

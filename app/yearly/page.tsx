@@ -165,6 +165,10 @@ export default function YearlyTwentyGridPage() {
     grid18: getGrid2Values(inputs[8]),
     grid19: getGrid1Values(inputs[9]),
     grid20: getGrid2Values(inputs[9]),
+  }, {
+    pageTier: 'yearly',
+    inputs,
+    selectedMarkColor,
   });
 
   usePersistGridMarks({

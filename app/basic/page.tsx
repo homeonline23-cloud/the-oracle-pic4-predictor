@@ -165,6 +165,11 @@ export default function BasicGridPage() {
           grid4: getGrid2Values(demoInputs[1]),
         }
       : { grid1: grid1Values, grid2: grid2Values },
+    {
+      pageTier: 'basic',
+      inputs: isTesterDemo ? demoInputs : [input],
+      selectedMarkColor,
+    },
   );
 
   usePersistGridMarks({

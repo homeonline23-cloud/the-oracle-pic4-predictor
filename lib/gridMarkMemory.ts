@@ -19,6 +19,13 @@ export type GridMarkMemoryRow = {
   created_at: string;
 };
 
+export type WinningNumberRow = {
+  id: string;
+  number: string;
+  location: string;
+  created_at: string;
+};
+
 /** Normalize JSON from Supabase (cell keys may be strings). */
 export function normalizeMarkedCells(raw: unknown): GridMarkedCells {
   if (!raw || typeof raw !== 'object') return {};
@@ -90,12 +97,55 @@ export async function fetchRecentMarkMemory(
   }
 }
 
+export async function fetchRecentWinningNumbers(
+  supabase: SupabaseClient,
+  limit = 30,
+): Promise<WinningNumberRow[]> {
+  try {
+    const { data, error } = await supabase
+      .from('winning_numbers')
+      .select('id, number, location, created_at')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('fetchRecentWinningNumbers:', error.message);
+      return [];
+    }
+
+    return (data ?? []) as WinningNumberRow[];
+  } catch (err) {
+    console.error('fetchRecentWinningNumbers:', err);
+    return [];
+  }
+}
+
+function formatWinningNumbersForAI(rows: WinningNumberRow[]): string {
+  if (rows.length === 0) {
+    return 'No winning numbers saved in the neural memory bank yet.';
+  }
+
+  return rows
+    .map((row) => {
+      const when = new Date(row.created_at).toISOString().slice(0, 10);
+      return `- ${row.number} (${row.location}, saved ${when})`;
+    })
+    .join('\n');
+}
+
 export async function buildMarkMemoryBankBlock(supabase: SupabaseClient): Promise<string> {
-  const rows = await fetchRecentMarkMemory(supabase);
+  const [markRows, winningRows] = await Promise.all([
+    fetchRecentMarkMemory(supabase),
+    fetchRecentWinningNumbers(supabase),
+  ]);
+
   return (
-    '\n\nNEURAL MEMORY BANK (saved color-mark patterns from members):\n' +
-    `${formatMarkMemoryRowsForAI(rows)}\n` +
-    'Use these as historical pattern notes for guess-work analysis only.'
+    '\n\nNEURAL MEMORY BANK:\n' +
+    'WINNING NUMBERS (4-digit draws saved by members):\n' +
+    `${formatWinningNumbersForAI(winningRows)}\n` +
+    'COLOR-MARK PATTERNS (cells marked yellow/turquoise/orange/purple):\n' +
+    `${formatMarkMemoryRowsForAI(markRows)}\n` +
+    'Use these as historical pattern notes for guess-work analysis only. When the Oracle asks you to memorize/store a number, confirm it was saved to this bank.'
   );
 }
 

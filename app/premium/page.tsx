@@ -153,6 +153,10 @@ export default function PremiumTenGridPage() {
     grid8: getGrid2Values(inputs[3]),
     grid9: getGrid1Values(inputs[4]),
     grid10: getGrid2Values(inputs[4]),
+  }, {
+    pageTier: 'premium',
+    inputs,
+    selectedMarkColor,
   });
 
   usePersistGridMarks({
