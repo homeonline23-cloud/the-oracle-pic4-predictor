@@ -49,6 +49,6 @@ export function getGrid2DemoUrl(origin?: string): string {
   const base =
     origin?.trim() ||
     process.env.NEXT_PUBLIC_APP_URL?.trim() ||
-    'https://theoraclepic4.com';
+    'https://www.theoraclepic4.com';
   return `${base.replace(/\/$/, '')}${GRID2_DEMO_PATH}`;
 }

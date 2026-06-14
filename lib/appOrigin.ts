@@ -26,7 +26,7 @@ export function getAppOrigin(runtimeOrigin?: string): string {
 
   const configured = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, '');
   if (configured) return configured;
-  return 'https://theoraclepic4.com';
+  return 'https://www.theoraclepic4.com';
 }
 
 export function authCallbackUrl(nextPath?: string | null): string {
