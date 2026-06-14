@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const rawNext = request.nextUrl.searchParams.get('next');
   const next =
     rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/';
-  const callbackUrl = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
+  const callbackUrl = `${origin}/api/auth/callback?next=${encodeURIComponent(next)}`;
 
   const cookieJar = NextResponse.redirect(`${origin}/login`);
   const supabase = createRouteHandlerClient(request, cookieJar);

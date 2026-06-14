@@ -21,8 +21,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Skip session refresh on auth callback and API routes
-  if (pathname.startsWith('/auth/callback') || pathname.startsWith('/api/')) {
+  // Skip session refresh on OAuth callback routes and API routes
+  if (
+    pathname.startsWith('/auth/callback') ||
+    pathname.startsWith('/api/auth/callback') ||
+    pathname.startsWith('/api/auth/exchange') ||
+    pathname.startsWith('/api/auth/google') ||
+    pathname.startsWith('/api/')
+  ) {
     return NextResponse.next();
   }
 
