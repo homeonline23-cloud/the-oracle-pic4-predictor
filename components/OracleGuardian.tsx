@@ -403,9 +403,22 @@ export default function OracleGuardian() {
     const gridConnection = buildGridConnectionBlock(pathname);
     const markingConnection = buildMarkedCellsConnectionBlock();
     const supabase = createClient();
-    const memoryBank = await buildMarkMemoryBankBlock(supabase);
 
     try {
+      let memoryBank = '';
+      try {
+        memoryBank = await Promise.race([
+          buildMarkMemoryBankBlock(supabase),
+          new Promise<string>((_, reject) => {
+            window.setTimeout(() => reject(new Error('Memory bank timed out')), 8000);
+          }),
+        ]);
+      } catch (memoryErr) {
+        console.warn('Oracle memory bank skipped:', memoryErr);
+        memoryBank =
+          '\n\nNEURAL MEMORY BANK: temporarily unavailable — continue with live grid data only.';
+      }
+
       const useTeachingPrompt = isTrainingMode || oracleIdentity;
       const oracleIdentityNote = oracleIdentity
         ? '\n\nORACLE IDENTITY: User is The Oracle (owner/teacher). One short greeting sentence max, then answer their question in 2–3 sentences. No long blocks.'
@@ -419,7 +432,7 @@ export default function OracleGuardian() {
       const response = await fetchWithTimeout('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        timeoutMs: 90000,
+        timeoutMs: 65000,
         body: JSON.stringify({
           contents: [...messages, userMessage],
           systemInstruction,
@@ -441,8 +454,10 @@ export default function OracleGuardian() {
       setMessages(prev => [...prev, { role: 'model', parts: [{ text: modelText }] }]);
     } catch (error) {
       console.error("Oracle Guardian Error:", error);
-      const fallback =
-        'Emma is busy for a moment — please try again in a few seconds.';
+      const errText = error instanceof Error ? error.message : String(error);
+      const fallback = /timed out|timeout|504|502/i.test(errText)
+        ? 'Emma took too long — try a shorter message, or wait a moment and ask again.'
+        : 'Emma is busy for a moment — please try again in a few seconds.';
       if (emmaVoiceEnabled) void speakModelReply(fallback);
       setMessages(prev => [...prev, { role: 'model', parts: [{ text: fallback }] }]);
     } finally {

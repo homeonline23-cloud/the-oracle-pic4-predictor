@@ -71,18 +71,23 @@ export async function fetchRecentMarkMemory(
   supabase: SupabaseClient,
   limit = 40,
 ): Promise<GridMarkMemoryRow[]> {
-  const { data, error } = await supabase
-    .from('grid_mark_memory')
-    .select('id, user_id, page_tier, grid_id, cell_index, color_name, digit, created_at')
-    .order('created_at', { ascending: false })
-    .limit(limit);
+  try {
+    const { data, error } = await supabase
+      .from('grid_mark_memory')
+      .select('id, user_id, page_tier, grid_id, cell_index, color_name, digit, created_at')
+      .order('created_at', { ascending: false })
+      .limit(limit);
 
-  if (error) {
-    console.error('fetchRecentMarkMemory:', error.message);
+    if (error) {
+      console.error('fetchRecentMarkMemory:', error.message);
+      return [];
+    }
+
+    return (data ?? []) as GridMarkMemoryRow[];
+  } catch (err) {
+    console.error('fetchRecentMarkMemory:', err);
     return [];
   }
-
-  return (data ?? []) as GridMarkMemoryRow[];
 }
 
 export async function buildMarkMemoryBankBlock(supabase: SupabaseClient): Promise<string> {
