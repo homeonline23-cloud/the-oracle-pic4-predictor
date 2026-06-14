@@ -86,6 +86,36 @@ function buildGridConnectionBlock(pathname: string): string {
   return `\n\nLIVE GRID CONNECTION (this chat is synced to the open page):\n- Path: ${pathname} — ${label}.\n- RED ring: any cell showing digit ${anchorRedTop} or ${anchorRedBottom} (left circle, red border).\n- BLUE ring: any cell showing digit ${anchorBlueTop} or ${anchorBlueBottom} (right circle, blue border).\n- Same logic on every grid on this route. Marking-tool colors (yellow, turquoise, orange, purple) are manual marks on top of cells — use all of this when guiding or teaching patterns.`;
 }
 
+const EMMA_CORE_PROMPT = `You are Emma, the Oracle Predictor — warm, humble, USA guide voice. Lottery grids are guess work and entertainment only; say "Probaly" for pattern ideas; never guarantee wins. Reply in the user's language. Keep answers concise (2–4 sentences) unless they ask for more detail.`;
+
+function capPromptBlock(text: string, max = 4000): string {
+  if (text.length <= max) return text;
+  return `${text.slice(0, max)}\n...[truncated for speed]`;
+}
+
+function buildOracleTeachingIntroReply(pathname: string): string {
+  const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } =
+    getSubtractCircleAnchors();
+  const page = pathname.startsWith('/yearly')
+    ? 'Yearly (20 grids)'
+    : pathname.startsWith('/premium')
+      ? 'Premium (10 grids)'
+      : pathname.startsWith('/basic')
+        ? 'Basic (2 grids)'
+        : 'this page';
+  return (
+    `Master of the Grids — Emma is listening. Training Mode is on and I see ${page}. ` +
+    `Today's anchors: RED ${anchorRedTop} & ${anchorRedBottom}, BLUE ${anchorBlueTop} & ${anchorBlueBottom}. ` +
+    `Teach me your Grid Wisdom — I will absorb it for the community.`
+  );
+}
+
+function isOracleTeachingIntro(raw: string): boolean {
+  const t = raw.toLowerCase().trim();
+  if (t.length > 160 || t.includes('?')) return false;
+  return /\b(i am the oracle|i'm the oracle|oracle here|here to teach|teach you)\b/.test(t);
+}
+
 export default function OracleGuardian() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -101,6 +131,7 @@ export default function OracleGuardian() {
   const wasOpenRef = useRef(false);
   const playWelcomeOnOpenRef = useRef(false);
   const sendInFlightRef = useRef(false);
+  const loadingAbortRef = useRef<AbortController | null>(null);
   const { user, loading: authLoading, userRole } = useAuth();
 
   /** Live site: only real admin sees Training controls (owner email or owner bypass session). */
@@ -290,6 +321,33 @@ export default function OracleGuardian() {
     setIsEmmaSpeaking(false);
   };
 
+  const cancelEmmaReply = () => {
+    loadingAbortRef.current?.abort();
+    loadingAbortRef.current = null;
+    sendInFlightRef.current = false;
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (!isLoading) return;
+    const safety = window.setTimeout(() => {
+      if (!sendInFlightRef.current) return;
+      cancelEmmaReply();
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'model',
+          parts: [
+            {
+              text: 'Emma took too long — Yearly grids are heavy. Try a shorter teaching note, or tap Cancel and send again.',
+            },
+          ],
+        },
+      ]);
+    }, 72000);
+    return () => window.clearTimeout(safety);
+  }, [isLoading]);
+
   const speakModelReply = async (text: string) => {
     if (!emmaVoiceEnabled) return;
     setIsEmmaSpeaking(true);
@@ -400,9 +458,23 @@ export default function OracleGuardian() {
       return;
     }
 
+    if (oracleIdentity && isOracleTeachingIntro(trimmedInput)) {
+      const instant = buildOracleTeachingIntroReply(pathname);
+      if (emmaVoiceEnabled) {
+        prefetchEmmaSpeech(instant);
+        void speakModelReply(instant);
+      }
+      setMessages(prev => [...prev, { role: 'model', parts: [{ text: instant }] }]);
+      sendInFlightRef.current = false;
+      setIsLoading(false);
+      return;
+    }
+
     const gridConnection = buildGridConnectionBlock(pathname);
-    const markingConnection = buildMarkedCellsConnectionBlock();
+    const markingConnection = capPromptBlock(buildMarkedCellsConnectionBlock());
     const supabase = createClient();
+    const abortController = new AbortController();
+    loadingAbortRef.current = abortController;
 
     try {
       let memoryBank = '';
@@ -427,14 +499,22 @@ export default function OracleGuardian() {
         ? `\n\nTRAINING AND/OR ORACLE MODE IS ACTIVE.${oracleIdentityNote}\nAbsorb owner teachings as Deep Grid Wisdom so you can guide and teach members better. Never guarantee a lottery win.`
         : '';
 
-      const systemInstruction = `${SYSTEM_INSTRUCTIONS}${gridConnection}${markingConnection}${memoryBank}${trainingAugment}`;
+      const systemInstruction = capPromptBlock(
+        useTeachingPrompt
+          ? `${EMMA_CORE_PROMPT}${gridConnection}${markingConnection}${memoryBank}${trainingAugment}`
+          : `${SYSTEM_INSTRUCTIONS}${gridConnection}${markingConnection}${memoryBank}${trainingAugment}`,
+        12000,
+      );
+
+      const recentContents = [...messages, userMessage].slice(-8);
 
       const response = await fetchWithTimeout('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         timeoutMs: 65000,
+        signal: abortController.signal,
         body: JSON.stringify({
-          contents: [...messages, userMessage],
+          contents: recentContents,
           systemInstruction,
         }),
       });
@@ -453,14 +533,16 @@ export default function OracleGuardian() {
       }
       setMessages(prev => [...prev, { role: 'model', parts: [{ text: modelText }] }]);
     } catch (error) {
-      console.error("Oracle Guardian Error:", error);
       const errText = error instanceof Error ? error.message : String(error);
+      if (/cancelled/i.test(errText)) return;
+      console.error("Oracle Guardian Error:", error);
       const fallback = /timed out|timeout|504|502/i.test(errText)
         ? 'Emma took too long — try a shorter message, or wait a moment and ask again.'
         : 'Emma is busy for a moment — please try again in a few seconds.';
       if (emmaVoiceEnabled) void speakModelReply(fallback);
       setMessages(prev => [...prev, { role: 'model', parts: [{ text: fallback }] }]);
     } finally {
+      loadingAbortRef.current = null;
       sendInFlightRef.current = false;
       setIsLoading(false);
     }
@@ -624,6 +706,13 @@ export default function OracleGuardian() {
                   <div className="bg-slate-800/80 border border-white/10 p-3 flex gap-2 items-center">
                     <Loader2 size={12} className="animate-spin text-blue-500" />
                     <span className="text-[10px] text-slate-500 font-bold">Absorbing Grid Signals...</span>
+                    <button
+                      type="button"
+                      onClick={cancelEmmaReply}
+                      className="ml-2 text-[9px] font-bold uppercase tracking-wide text-red-400 hover:text-red-300"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
               )}

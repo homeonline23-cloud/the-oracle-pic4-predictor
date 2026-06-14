@@ -46,5 +46,11 @@ export function formatMarkedCellsForAI(
     return 'No cells marked yet (Marking Tool: yellow, turquoise, orange, purple).';
   }
 
+  const maxLines = 48;
+  if (lines.length > maxLines) {
+    const extra = lines.length - maxLines;
+    return `${lines.slice(0, maxLines).join('\n')}\n- ... and ${extra} more marked cells (Yearly grid — use summary only).`;
+  }
+
   return lines.join('\n');
 }
