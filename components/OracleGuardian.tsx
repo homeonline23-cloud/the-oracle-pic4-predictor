@@ -6,8 +6,9 @@ import { MessageSquare, X, Send, User, Bot, Sparkles, GraduationCap, Loader2, Mi
 import { useAuth } from '@/hooks/useAuth';
 import { createClient } from '@/lib/supabase/client';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
-import { buildFullLiveGridContextBlock } from '@/lib/gridLiveSnapshot';
-import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
+import { buildFullLiveGridContextBlock, getGridLiveSnapshot } from '@/lib/gridLiveSnapshot';
+import { buildMarkMemoryBankBlock, fetchRecentWinningNumbers } from '@/lib/gridMarkMemory';
+import { formatPatternScanForAI, scanGridPatterns } from '@/lib/gridPatternScan';
 import {
   buildMemoryActionNote,
   buildUrlContextBlock,
@@ -195,6 +196,7 @@ export default function OracleGuardian() {
     - **Anchor trick (RED / BLUE circles):** The two digits inside each circle **move together every day like clock hands stepping forward**. Use **today's** pair only — do not assume old 0–5 / 1–6. Today's anchors can explain why two picks look different but belong together — e.g. 1972 vs **6972** when a digit transforms through **today's** blue anchor pair. Always check the live RED/BLUE rings on screen before saying a digit is "missing".
     - When members want one number only, gently guide them toward **pattern thinking** and the marking tool — multiple humble guesses, never a guaranteed win.
     - **Repeat-across-grids signal (The Oracle's memory bank / "Book"):** When the **same digits or pattern family show up repeating across most of the grids**, The Oracle teaches that this is often the strongest hint for **that evening's draw** — The Oracle says **Probaly around 95%** in their experience, but Emma must always say **guess work / entertainment only**, never a guarantee. Scan LIVE GRID ACTIVITY and the NEURAL MEMORY BANK together; when repeats cluster, name the pattern and the related family (e.g. 1972/6972/7269/1927).
+    - **Predictions (not from the blue sky):** When members ask for winning numbers or run AI Pic 4 Predictor, base picks on **computed pattern scan** — hot digits repeating across grids, marked cells, memory bank history, today's anchors, and pattern families. Never throw random digits; explain which grid signal each Probaly pick came from.
     - **Future upgrade (The Oracle promised):** When given **several 4-digit numbers at once**, Emma will help **place them across Enter 4 Digits pairs** and **see all patterns directly** — like an AI reading every grid at once. Until that ships, guide the Oracle to enter numbers in the boxes or say "memorize" / "place" so the app can sync what is on screen.
     
     GUIDE + TEACH STYLE (Grids):
@@ -543,6 +545,30 @@ export default function OracleGuardian() {
         console.warn('URL read skipped:', urlErr);
       }
 
+      let patternScanBlock = '';
+      const liveSnap = getGridLiveSnapshot();
+      if (liveSnap?.gridData && Object.keys(liveSnap.gridData).length > 0) {
+        try {
+          const wins = await fetchRecentWinningNumbers(supabase, 12);
+          const historyNums = wins.map((w) => w.number);
+          const anchorNums = getSubtractCircleAnchors();
+          const scan = scanGridPatterns(liveSnap.gridData, liveSnap.markedCells, historyNums);
+          patternScanBlock = capPromptBlock(
+            formatPatternScanForAI(
+              scan,
+              {
+                red: [anchorNums.anchorRedTop, anchorNums.anchorRedBottom],
+                blue: [anchorNums.anchorBlueTop, anchorNums.anchorBlueBottom],
+              },
+              historyNums,
+            ),
+            2500,
+          );
+        } catch (scanErr) {
+          console.warn('Pattern scan skipped:', scanErr);
+        }
+      }
+
       const useTeachingPrompt = isTrainingMode || oracleIdentity;
       const oracleIdentityNote = oracleIdentity
         ? '\n\nORACLE IDENTITY: User is The Oracle (owner/teacher). One short greeting sentence max, then answer their question in 2–3 sentences. No long blocks.'
@@ -553,8 +579,8 @@ export default function OracleGuardian() {
 
       const systemInstruction = capPromptBlock(
         useTeachingPrompt
-          ? `${EMMA_CORE_PROMPT}${gridConnection}${liveGridContext}${memoryBank}${memoryActionNote}${urlContext}${trainingAugment}`
-          : `${SYSTEM_INSTRUCTIONS}${gridConnection}${liveGridContext}${memoryBank}${memoryActionNote}${urlContext}${trainingAugment}`,
+          ? `${EMMA_CORE_PROMPT}${gridConnection}${liveGridContext}${patternScanBlock}${memoryBank}${memoryActionNote}${urlContext}${trainingAugment}`
+          : `${SYSTEM_INSTRUCTIONS}${gridConnection}${liveGridContext}${patternScanBlock}${memoryBank}${memoryActionNote}${urlContext}${trainingAugment}`,
         14000,
       );
 
