@@ -10,6 +10,7 @@ import { buildMarkMemoryBankBlock } from '@/lib/gridMarkMemory';
 import { buildPredictPrompt } from '@/lib/buildPredictPrompt';
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { parseApiJsonResponse } from '@/lib/parseApiResponse';
+import { validatePastWinningNumbersBeforePredict, getValidPastWinningInputs } from '@/lib/gridPredictionGate';
 import { recordWinningNumberClient } from '@/lib/recordWinningNumber';
 import { cn } from '@/lib/utils';
 
@@ -85,6 +86,15 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
     [watchInputs, currentInput],
   );
   const inputsWatchKey = inputsToWatch.map((v) => v?.trim() ?? '').join('|');
+
+  const filledPastWinners = useMemo(
+    () => getValidPastWinningInputs(inputsToWatch),
+    [inputsToWatch],
+  );
+  const canPredict = useMemo(() => {
+    const gate = validatePastWinningNumbersBeforePredict(inputsToWatch, maxPredictions);
+    return gate.ok;
+  }, [inputsToWatch, maxPredictions]);
 
   // Auto-save each 4-digit entry to the memory bank (silent — no error spam).
   useEffect(() => {
@@ -163,8 +173,14 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
       return;
     }
 
+    const gate = validatePastWinningNumbersBeforePredict(inputsToWatch, maxPredictions);
+    if (!gate.ok) {
+      setError(gate.message);
+      return;
+    }
+
     if (!gridData.grid1.some(v => v !== null)) {
-      setError("Please enter 4 digits first to populate the grids.");
+      setError("Grids are still loading — finish entering your past winning number(s) above.");
       return;
     }
 
@@ -315,6 +331,14 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
   return (
     <div className="w-full max-w-2xl mx-auto mt-2 md:mt-4 px-2 md:px-6">
       {/* Action Buttons Row */}
+      {/* Step 1 hint — past winners before predict */}
+      <p className="mb-2 text-center text-[9px] font-medium leading-relaxed text-slate-500">
+        Step 1: Enter past winning numbers (4 digits) in the boxes above the grids.
+        {filledPastWinners.length > 0
+          ? ` ${filledPastWinners.length} saved on screen — ${canPredict ? 'ready for AI.' : 'add one more past draw.'}`
+          : ' Then run AI Pic 4 Predictor.'}
+      </p>
+
       <div className="flex flex-col gap-2 mb-4">
         {/* Record Button */}
         <button
@@ -339,7 +363,8 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
         {/* Predict Button */}
         <button
           onClick={predictWinningNumbers}
-          disabled={loading}
+          disabled={loading || !canPredict}
+          title={canPredict ? undefined : 'Enter past winning numbers in Enter 4 Digits first'}
           className="w-full py-2 bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 hover:from-blue-500 hover:via-purple-500 hover:to-red-500 text-white rounded-none font-bold tracking-normal text-[11px] shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 group"
         >
           {loading ? (
@@ -359,6 +384,10 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
           )}
         </button>
       </div>
+
+      <p className="mb-4 text-center text-[9px] font-medium leading-relaxed text-slate-400">
+        Enter winning number — after 5 minutes you receive your prediction.
+      </p>
 
       <AnimatePresence>
         {error && (

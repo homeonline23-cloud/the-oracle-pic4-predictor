@@ -17,6 +17,11 @@ import {
   shouldStoreAllGridInputs,
   storeWinningNumbersForEmma,
 } from '@/lib/emmaChatHelpers';
+import {
+  emmaPastNumbersRequiredMessage,
+  isEmmaPredictionRequest,
+  minPastWinningInputsForPath,
+} from '@/lib/gridPredictionGate';
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { parseApiJsonResponse } from '@/lib/parseApiResponse';
 import { cn } from '@/lib/utils';
@@ -197,6 +202,7 @@ export default function OracleGuardian() {
     - When members want one number only, gently guide them toward **pattern thinking** and the marking tool — multiple humble guesses, never a guaranteed win.
     - **Repeat-across-grids signal (The Oracle's memory bank / "Book"):** When the **same digits or pattern family show up repeating across most of the grids**, The Oracle teaches that this is often the strongest hint for **that evening's draw** — The Oracle says **Probaly around 95%** in their experience, but Emma must always say **guess work / entertainment only**, never a guarantee. Scan LIVE GRID ACTIVITY and the NEURAL MEMORY BANK together; when repeats cluster, name the pattern and the related family (e.g. 1972/6972/7269/1927).
     - **Predictions (not from the blue sky):** When members ask for winning numbers or run AI Pic 4 Predictor, base picks on **computed pattern scan** — hot digits repeating across grids, marked cells, memory bank history, today's anchors, and pattern families. Never throw random digits; explain which grid signal each Probaly pick came from.
+    - **Past winners first (required):** Never give evening predictions until the member has entered **past winning numbers** (4 digits each) in Enter 4 Digits so grids populate. Basic: at least 1 past draw. Premium/Yearly: at least 2. Guide them to enter history first — this gives members a better chance because patterns become visible.
     - **Future upgrade (The Oracle promised):** When given **several 4-digit numbers at once**, Emma will help **place them across Enter 4 Digits pairs** and **see all patterns directly** — like an AI reading every grid at once. Until that ships, guide the Oracle to enter numbers in the boxes or say "memorize" / "place" so the app can sync what is on screen.
     
     GUIDE + TEACH STYLE (Grids):
@@ -490,6 +496,19 @@ export default function OracleGuardian() {
       sendInFlightRef.current = false;
       setIsLoading(false);
       return;
+    }
+
+    if (isEmmaPredictionRequest(trimmedInput)) {
+      const filled = getFilledInputsFromSnapshot();
+      const required = minPastWinningInputsForPath(pathname);
+      if (filled.length < required) {
+        const instant = emmaPastNumbersRequiredMessage(pathname);
+        if (emmaVoiceEnabled) void speakModelReply(instant);
+        setMessages(prev => [...prev, { role: 'model', parts: [{ text: instant }] }]);
+        sendInFlightRef.current = false;
+        setIsLoading(false);
+        return;
+      }
     }
 
     const gridConnection = buildGridConnectionBlock(pathname);
