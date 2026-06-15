@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { Clock, Calendar } from 'lucide-react';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { useAnchorClockTick, useSyncGridDateAtMidnight } from '@/hooks/useAnchorClockTick';
 import { useGridLiveSync } from '@/hooks/useGridLiveSync';
+import { useEmmaGridCommands } from '@/hooks/useEmmaGridCommands';
 import { usePersistGridMarks } from '@/hooks/usePersistGridMarks';
 
 export default function YearlyTwentyGridPage() {
@@ -169,6 +170,42 @@ export default function YearlyTwentyGridPage() {
     pageTier: 'yearly',
     inputs,
     selectedMarkColor,
+  });
+
+  const buildGridDataForEmma = useCallback(
+    (ins: string[]) => ({
+      grid1: getGrid1Values(ins[0] ?? ''),
+      grid2: getGrid2Values(ins[0] ?? ''),
+      grid3: getGrid1Values(ins[1] ?? ''),
+      grid4: getGrid2Values(ins[1] ?? ''),
+      grid5: getGrid1Values(ins[2] ?? ''),
+      grid6: getGrid2Values(ins[2] ?? ''),
+      grid7: getGrid1Values(ins[3] ?? ''),
+      grid8: getGrid2Values(ins[3] ?? ''),
+      grid9: getGrid1Values(ins[4] ?? ''),
+      grid10: getGrid2Values(ins[4] ?? ''),
+      grid11: getGrid1Values(ins[5] ?? ''),
+      grid12: getGrid2Values(ins[5] ?? ''),
+      grid13: getGrid1Values(ins[6] ?? ''),
+      grid14: getGrid2Values(ins[6] ?? ''),
+      grid15: getGrid1Values(ins[7] ?? ''),
+      grid16: getGrid2Values(ins[7] ?? ''),
+      grid17: getGrid1Values(ins[8] ?? ''),
+      grid18: getGrid2Values(ins[8] ?? ''),
+      grid19: getGrid1Values(ins[9] ?? ''),
+      grid20: getGrid2Values(ins[9] ?? ''),
+    }),
+    [],
+  );
+
+  useEmmaGridCommands({
+    maxPairs: 10,
+    inputs,
+    setInputs,
+    markedCells,
+    setMarkedCells,
+    buildGridData: buildGridDataForEmma,
+    setSelectedMarkColor,
   });
 
   usePersistGridMarks({

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Clock, Calendar } from 'lucide-react';
 import Grid from '@/components/Grid';
 import AnchorSubtractionCircles from '@/components/AnchorSubtractionCircles';
@@ -14,8 +14,10 @@ import { isGrid2DemoEmail } from '@/lib/demoAuth';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { useAnchorClockTick, useSyncGridDateAtMidnight } from '@/hooks/useAnchorClockTick';
 import { useGridLiveSync } from '@/hooks/useGridLiveSync';
+import { useEmmaGridCommands } from '@/hooks/useEmmaGridCommands';
 import { usePersistGridMarks } from '@/hooks/usePersistGridMarks';
 import { WINDOW_OUTER_SHELL_RESPONSIVE } from '@/lib/constants';
+import type { GridDataMap } from '@/lib/gridMarkColors';
 import { cn } from '@/lib/utils';
 
 export default function BasicGridPage() {
@@ -171,6 +173,38 @@ export default function BasicGridPage() {
       selectedMarkColor,
     },
   );
+
+  const buildGridDataForEmma = useCallback(
+    (ins: string[]): GridDataMap =>
+      isTesterDemo
+        ? {
+            grid1: getGrid1Values(ins[0] ?? ''),
+            grid2: getGrid2Values(ins[0] ?? ''),
+            grid3: getGrid1Values(ins[1] ?? ''),
+            grid4: getGrid2Values(ins[1] ?? ''),
+          }
+        : {
+            grid1: getGrid1Values(ins[0] ?? ''),
+            grid2: getGrid2Values(ins[0] ?? ''),
+          },
+    [isTesterDemo],
+  );
+
+  useEmmaGridCommands({
+    maxPairs: isTesterDemo ? 2 : 1,
+    inputs: isTesterDemo ? demoInputs : [input],
+    setInputs: (next) => {
+      if (isTesterDemo) {
+        setDemoInputs([next[0] ?? '', next[1] ?? '']);
+      } else {
+        setInput(next[0] ?? '');
+      }
+    },
+    markedCells,
+    setMarkedCells,
+    buildGridData: buildGridDataForEmma,
+    setSelectedMarkColor,
+  });
 
   usePersistGridMarks({
     pageTier: 'basic',

@@ -22,6 +22,18 @@ import {
   isEmmaPredictionRequest,
   minPastWinningInputsForPath,
 } from '@/lib/gridPredictionGate';
+import {
+  buildAutoMarkReply,
+  buildNotOnGridPageReply,
+  buildPlaceNumbersReply,
+  dispatchEmmaGridCommand,
+  hasEmmaGridCommandListener,
+  isPlaceNumbersRequest,
+  parseMarkColorFromText,
+  parseMarkOnlyRequest,
+  parseNumbersToPlace,
+  shouldAutoMarkFromPlace,
+} from '@/lib/emmaGridCommands';
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import { parseApiJsonResponse } from '@/lib/parseApiResponse';
 import { cn } from '@/lib/utils';
@@ -203,7 +215,7 @@ export default function OracleGuardian() {
     - **Repeat-across-grids signal (The Oracle's memory bank / "Book"):** When the **same digits or pattern family show up repeating across most of the grids**, The Oracle teaches that this is often the strongest hint for **that evening's draw** — The Oracle says **Probaly around 95%** in their experience, but Emma must always say **guess work / entertainment only**, never a guarantee. Scan LIVE GRID ACTIVITY and the NEURAL MEMORY BANK together; when repeats cluster, name the pattern and the related family (e.g. 1972/6972/7269/1927).
     - **Predictions (not from the blue sky):** When members ask for winning numbers or run AI Pic 4 Predictor, base picks on **computed pattern scan** — hot digits repeating across grids, marked cells, memory bank history, today's anchors, and pattern families. Never throw random digits; explain which grid signal each Probaly pick came from.
     - **Past winners first (required):** Never give evening predictions until the member has entered **past winning numbers** (4 digits each) in Enter 4 Digits so grids populate. Basic: at least 1 past draw. Premium/Yearly: at least 2. Guide them to enter history first — this gives members a better chance because patterns become visible.
-    - **Future upgrade (The Oracle promised):** When given **several 4-digit numbers at once**, Emma will help **place them across Enter 4 Digits pairs** and **see all patterns directly** — like an AI reading every grid at once. Until that ships, guide the Oracle to enter numbers in the boxes or say "memorize" / "place" so the app can sync what is on screen.
+    - **Auto-place + marking tool (live):** When given several 4-digit numbers, say **place** or **place and mark** — Emma fills Enter 4 Digits pairs on screen and can auto-mark hot/repeating digits (yellow, turquoise, orange, purple). Examples: "place 1234 6972 on my grids", "place and mark these winning numbers: 1234 5678". For marks only on filled grids: "mark hot digits" or "auto mark repeating patterns".
     
     GUIDE + TEACH STYLE (Grids):
     - New member: welcome them, guide them to Enter 4 Digits above Grid 1, then teach what RED/BLUE rings mean if they ask.
@@ -509,6 +521,89 @@ export default function OracleGuardian() {
         setIsLoading(false);
         return;
       }
+    }
+
+    const maxPairsForPath = pathname.startsWith('/yearly')
+      ? 10
+      : pathname.startsWith('/premium')
+        ? 5
+        : pathname.startsWith('/basic')
+          ? 2
+          : 0;
+
+    const markOnly = parseMarkOnlyRequest(trimmedInput);
+    if (markOnly) {
+      if (!hasEmmaGridCommandListener()) {
+        const instant = buildNotOnGridPageReply();
+        if (emmaVoiceEnabled) void speakModelReply(instant);
+        setMessages(prev => [...prev, { role: 'model', parts: [{ text: instant }] }]);
+        sendInFlightRef.current = false;
+        setIsLoading(false);
+        return;
+      }
+
+      dispatchEmmaGridCommand({ type: 'auto-mark', color: markOnly.color });
+      const liveSnap = getGridLiveSnapshot();
+      const scan = liveSnap?.gridData
+        ? scanGridPatterns(
+            liveSnap.gridData,
+            liveSnap.markedCells,
+            getFilledInputsFromSnapshot(),
+          )
+        : {
+            gridsWithData: 0,
+            digitGridCounts: {},
+            hotDigits: [],
+            markedDigits: [],
+            repeatSignalStrength: 'none' as const,
+            suggestedFamilies: [],
+          };
+      const instant = buildAutoMarkReply(scan, markOnly.color ?? 'yellow');
+      if (emmaVoiceEnabled) void speakModelReply(instant);
+      setMessages(prev => [...prev, { role: 'model', parts: [{ text: instant }] }]);
+      sendInFlightRef.current = false;
+      setIsLoading(false);
+      return;
+    }
+
+    if (isPlaceNumbersRequest(trimmedInput)) {
+      const numbers = parseNumbersToPlace(trimmedInput);
+      if (!hasEmmaGridCommandListener()) {
+        const instant = buildNotOnGridPageReply();
+        if (emmaVoiceEnabled) void speakModelReply(instant);
+        setMessages(prev => [...prev, { role: 'model', parts: [{ text: instant }] }]);
+        sendInFlightRef.current = false;
+        setIsLoading(false);
+        return;
+      }
+
+      const autoMark = shouldAutoMarkFromPlace(trimmedInput);
+      const color = parseMarkColorFromText(trimmedInput);
+      dispatchEmmaGridCommand(
+        autoMark
+          ? { type: 'place-and-mark', inputs: numbers, color: color ?? 'yellow' }
+          : { type: 'place-inputs', inputs: numbers },
+      );
+
+      const location = pathname.startsWith('/yearly')
+        ? 'Yearly'
+        : pathname.startsWith('/premium')
+          ? 'Premium'
+          : pathname.startsWith('/basic')
+            ? 'Basic'
+            : 'Oracle chat';
+      void storeWinningNumbersForEmma(numbers, location);
+
+      const instant = buildPlaceNumbersReply(
+        numbers,
+        maxPairsForPath || numbers.length,
+        autoMark,
+      );
+      if (emmaVoiceEnabled) void speakModelReply(instant);
+      setMessages(prev => [...prev, { role: 'model', parts: [{ text: instant }] }]);
+      sendInFlightRef.current = false;
+      setIsLoading(false);
+      return;
     }
 
     const gridConnection = buildGridConnectionBlock(pathname);
