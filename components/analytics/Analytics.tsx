@@ -1,8 +1,23 @@
 'use client';
 
+import { Suspense, useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
+import { GA_MEASUREMENT_ID, trackPageView } from '@/lib/analytics';
 
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
+function AnalyticsPageViews() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production' || !GA_MEASUREMENT_ID) return;
+    const query = searchParams?.toString();
+    const path = query ? `${pathname}?${query}` : pathname;
+    trackPageView(path);
+  }, [pathname, searchParams]);
+
+  return null;
+}
 
 export function Analytics() {
   if (process.env.NODE_ENV !== 'production' || !GA_MEASUREMENT_ID) return null;
@@ -19,7 +34,7 @@ export function Analytics() {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${GA_MEASUREMENT_ID}');
+          gtag('config', '${GA_MEASUREMENT_ID}', { send_page_view: true });
         `}
       </Script>
       {process.env.NEXT_PUBLIC_GTM_ID && (
@@ -37,6 +52,9 @@ export function Analytics() {
           }}
         />
       )}
+      <Suspense fallback={null}>
+        <AnalyticsPageViews />
+      </Suspense>
     </>
   );
 }

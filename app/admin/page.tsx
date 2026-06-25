@@ -166,7 +166,15 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 <div className="bg-white/5 border border-white/5 p-4 flex flex-col rounded-none">
                   <p className="text-slate-500 text-[9px] font-medium mb-1 lowercase tracking-tighter">website hits</p>
-                  <p className="text-xl font-bold text-white lowercase">{stats.totalHits.toLocaleString()}</p>
+                  <p className="text-xl font-bold text-white lowercase">GA4 live</p>
+                  <a
+                    href="https://analytics.google.com/analytics/web/#/p/realtime"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 text-[8px] text-blue-400 hover:text-blue-300 lowercase underline"
+                  >
+                    open google analytics realtime →
+                  </a>
                 </div>
                 <div className="bg-white/5 border border-white/5 p-4 flex flex-col rounded-none">
                   <p className="text-slate-500 text-[9px] font-medium mb-1 lowercase tracking-tighter">users</p>
