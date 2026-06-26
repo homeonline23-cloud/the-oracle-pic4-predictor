@@ -1,5 +1,4 @@
 import type {Metadata} from 'next';
-import { Inter, Outfit } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -7,16 +6,6 @@ import OracleGuardian from '@/components/OracleGuardian';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import { Analytics } from '@/components/analytics/Analytics';
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
-
-const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-outfit',
-});
 
 export const viewport = {
   width: 'device-width',
@@ -92,8 +81,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
-      <body className="min-h-screen w-full overflow-x-hidden overflow-y-auto font-sans text-slate-200 subpixel-antialiased">
+    <html lang="en">
+      <body className="min-h-screen w-full overflow-x-hidden overflow-y-auto font-sans text-slate-200">
         <Providers>
           <div className="relative min-h-screen w-full bg-transparent">
             {/* Dedicated Background Layer */}
@@ -104,8 +93,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
               }}
               aria-hidden
             />
-            {/* Background Texture Overlay */}
-            <div className="fixed inset-0 z-0 pointer-events-none opacity-10 bg-texture-carbon"></div>
+            {/* Background Texture Overlay — kept very light so text stays sharp */}
+            <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.04] bg-texture-carbon"></div>
             
             <Navbar />
             <div className="relative z-0 mt-[4.75rem] sm:mt-[5rem] md:mt-[5.25rem] shrink-0" aria-hidden="true" />

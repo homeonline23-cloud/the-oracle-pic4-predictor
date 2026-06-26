@@ -2,8 +2,7 @@
 @import "tw-animate-css";
 
 @theme {
-  --font-sans: var(--font-inter);
-  --font-outfit: var(--font-outfit);
+  --font-sans: Arial, Helvetica, 'Helvetica Neue', sans-serif;
 }
 
 :root {
@@ -26,9 +25,10 @@ body {
   color: var(--foreground);
   overflow-x: hidden;
   overflow-y: auto;
-  -webkit-font-smoothing: auto;
-  -moz-osx-font-smoothing: auto;
-  text-rendering: geometricPrecision;
+  font-family: Arial, Helvetica, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: auto;
 }
 
 /* Frosted-glass (backdrop-blur) on text panels makes every letter look fuzzy — disable sitewide */
