@@ -428,7 +428,7 @@ export default function AIPredictor({ gridData, markedCells, anchors, selectedLo
                   {/* Small Pill Clear Button */}
                   <button 
                     onClick={() => setPredictions([])}
-                    className="px-3 py-1 bg-white/5 hover:bg-red-500/20 text-white/40 hover:text-red-400 rounded-none transition-all text-[9px] font-bold tracking-normal border border-white/10 flex items-center gap-1.5 active:scale-95"
+                    className="px-3 py-1 bg-slate-900/95 hover:bg-red-500/20 text-white/40 hover:text-red-400 rounded-none transition-all text-[9px] font-bold tracking-normal border border-white/10 flex items-center gap-1.5 active:scale-95"
                   >
                     <Trash2 size={10} />
                     Clear

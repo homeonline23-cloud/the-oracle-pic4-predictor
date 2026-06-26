@@ -73,7 +73,7 @@ export default function RegisterYearlyPage() {
           {/* Outer frame */}
           <div className={cn('relative overflow-hidden rounded-none p-1.5', WINDOW_OUTER_SHELL)}>
             {/* Content */}
-            <div className="relative bg-slate-900/80 backdrop-blur-xl rounded-none p-10 text-center">
+            <div className="relative bg-slate-900/98 rounded-none p-10 text-center">
               <div className="w-20 h-20 bg-green-500/20 rounded-none flex items-center justify-center mx-auto mb-6">
                 <CheckCircle size={40} className="text-green-500" />
               </div>
@@ -104,7 +104,7 @@ export default function RegisterYearlyPage() {
         {/* Outer frame */}
         <div className={cn('relative overflow-hidden rounded-none p-1', WINDOW_OUTER_SHELL)}>
           {/* Content */}
-          <div className="relative bg-slate-900/80 backdrop-blur-xl rounded-none p-4 shadow-2xl text-center">
+          <div className="relative bg-slate-900/98 rounded-none p-4 shadow-2xl text-center">
           <div className="relative z-10 flex flex-col items-center mb-4">
             <h1 className="text-[8px] font-bold text-white tracking-normal italic">
               Claim Your <span className="text-amber-500">Yearly</span> Access

@@ -190,7 +190,7 @@ export default function EditableVideo({
 
       {!locked && (
         <>
-          <div className="absolute inset-0 z-10 flex items-center justify-center gap-4 bg-black/60 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
+          <div className="absolute inset-0 z-10 flex items-center justify-center gap-4 bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}

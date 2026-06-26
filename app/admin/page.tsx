@@ -145,11 +145,11 @@ export default function AdminDashboard() {
           <div className="absolute -inset-4 md:-inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[60px] md:blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
           <div
             className={cn(
-              'relative rounded-none bg-slate-900/20 p-1 backdrop-blur-sm md:p-2 min-h-0',
+              'relative rounded-none bg-slate-900/95 p-1 md:p-2 min-h-0',
               WINDOW_OUTER_SHELL
             )}
           >
-            <div className="relative bg-slate-950/40 backdrop-blur-xl rounded-none p-4 md:p-12 h-auto flex flex-col gap-8">
+            <div className="relative bg-slate-950/95 rounded-none p-4 md:p-12 h-auto flex flex-col gap-8">
               
               {/* system status banner */}
               <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
@@ -164,7 +164,7 @@ export default function AdminDashboard() {
 
               {/* kpi grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-                <div className="bg-white/5 border border-white/5 p-4 flex flex-col rounded-none">
+                <div className="bg-slate-900/95 border border-white/5 p-4 flex flex-col rounded-none">
                   <p className="text-slate-500 text-[9px] font-medium mb-1 lowercase tracking-tighter">website hits</p>
                   <p className="text-xl font-bold text-white lowercase">GA4 live</p>
                   <a
@@ -176,15 +176,15 @@ export default function AdminDashboard() {
                     open google analytics realtime →
                   </a>
                 </div>
-                <div className="bg-white/5 border border-white/5 p-4 flex flex-col rounded-none">
+                <div className="bg-slate-900/95 border border-white/5 p-4 flex flex-col rounded-none">
                   <p className="text-slate-500 text-[9px] font-medium mb-1 lowercase tracking-tighter">users</p>
                   <p className="text-xl font-bold text-white lowercase">{stats.totalUsers}</p>
                 </div>
-                <div className="bg-white/5 border border-white/5 p-4 flex flex-col rounded-none">
+                <div className="bg-slate-900/95 border border-white/5 p-4 flex flex-col rounded-none">
                   <p className="text-slate-500 text-[9px] font-medium mb-1 lowercase tracking-tighter">revenue</p>
                   <p className="text-xl font-bold text-green-400 text-shadow-sm lowercase">${stats.totalRevenue.toLocaleString()}</p>
                 </div>
-                <div className="bg-white/5 border border-white/5 p-4 flex flex-col rounded-none">
+                <div className="bg-slate-900/95 border border-white/5 p-4 flex flex-col rounded-none">
                   <p className="text-slate-500 text-[9px] font-medium mb-1 lowercase tracking-tighter">accuracy</p>
                   <p className="text-xl font-bold text-blue-400 lowercase">0%</p>
                 </div>
@@ -225,7 +225,7 @@ export default function AdminDashboard() {
                   <h2 className="text-[10px] font-bold text-white/80 border-l-2 border-blue-600 pl-2 lowercase tracking-widest">recent events</h2>
                   <div className="space-y-1.5">
                     {stats.recentPayments.length > 0 ? stats.recentPayments.map((payment) => (
-                      <div key={payment.id} className="flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/5 rounded-none">
+                      <div key={payment.id} className="flex items-center justify-between p-3 bg-slate-900/95 hover:bg-white/10 transition-all border border-transparent hover:border-white/5 rounded-none">
                         <div className="flex flex-col">
                           <span className="text-[10px] text-white/90 font-medium truncate max-w-[140px] lowercase">{payment.email}</span>
                           <span className="text-[8px] text-slate-500 font-mono italic lowercase">{payment.tier}</span>
@@ -240,7 +240,7 @@ export default function AdminDashboard() {
                   <h2 className="text-[10px] font-bold text-white/80 border-l-2 border-emerald-600 pl-2 lowercase tracking-widest mt-6">recent signups</h2>
                   <div className="space-y-1.5">
                     {stats.recentUsers.length > 0 ? stats.recentUsers.map((u) => (
-                      <div key={u.id} className="flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/5 rounded-none">
+                      <div key={u.id} className="flex items-center justify-between p-3 bg-slate-900/95 hover:bg-white/10 transition-all border border-transparent hover:border-white/5 rounded-none">
                         <div className="flex flex-col">
                           <span className="text-[10px] text-white/90 font-medium truncate max-w-[140px] lowercase">{u.full_name ?? 'unnamed'}</span>
                           <span className="text-[8px] text-slate-500 font-mono italic lowercase">{u.subscription_tier ?? 'free'}</span>

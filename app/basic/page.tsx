@@ -263,12 +263,12 @@ export default function BasicGridPage() {
           {/* Red Outer Border - Standard Size Window */}
           <div
             className={cn(
-              'relative rounded-none bg-slate-900/40 p-1 backdrop-blur-sm md:p-2',
+              'relative rounded-none bg-slate-900/95 p-1 md:p-2',
               WINDOW_OUTER_SHELL_RESPONSIVE
             )}
           >
             {/* Content without forced vertical scroll */}
-            <div className="relative p-3 md:p-8 rounded-none bg-slate-900/80 backdrop-blur-xl shadow-inner flex flex-col items-center space-y-4">
+            <div className="relative p-3 md:p-8 rounded-none bg-slate-900/98 shadow-inner flex flex-col items-center space-y-4">
               <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-white to-red-600 mb-4 rounded-none opacity-80"></div>
               
               {/* Date, Time, Year & Clock Row */}

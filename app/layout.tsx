@@ -93,7 +93,7 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
-      <body className="min-h-screen w-full overflow-x-hidden overflow-y-auto font-sans antialiased text-slate-200">
+      <body className="min-h-screen w-full overflow-x-hidden overflow-y-auto font-sans text-slate-200 subpixel-antialiased">
         <Providers>
           <div className="relative min-h-screen w-full bg-transparent">
             {/* Dedicated Background Layer */}

@@ -56,7 +56,7 @@ export default function SubscriptionGuard({
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-none p-8"
+          className="max-w-md w-full bg-slate-900/95 border border-white/10 rounded-none p-8"
         >
           <div className="w-20 h-20 bg-blue-500/20 rounded-none flex items-center justify-center mx-auto mb-6">
             <Lock className="w-10 h-10 text-blue-500" />
@@ -94,7 +94,7 @@ export default function SubscriptionGuard({
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-none p-8"
+          className="max-w-md w-full bg-slate-900/95 border border-white/10 rounded-none p-8"
         >
           <div className="w-20 h-20 bg-red-500/20 rounded-none flex items-center justify-center mx-auto mb-6">
             <Lock className="w-10 h-10 text-red-500" />

@@ -10,7 +10,7 @@ export const VIDEO_SHELL = 'w-full max-w-3xl mx-auto px-2 md:px-6';
 
 /**
  * Outer frame for primary “window” panels site-wide — medium blue border + soft blue outer glow
- * (replaces legacy red chrome). Pair with `bg-slate-900/20 backdrop-blur-sm` etc. on the same node.
+ * (replaces legacy red chrome). Pair with {@link WINDOW_PANEL_OUTER} / solid fills — not backdrop-blur.
  */
 export const WINDOW_OUTER_SHELL =
   'border-2 border-blue-600/[0.78] shadow-[0_0_0_1px_rgba(147,197,253,0.22),0_0_32px_rgba(37,99,235,0.42),0_0_52px_rgba(30,64,175,0.2),0_12px_40px_rgba(0,0,0,0.52)]';

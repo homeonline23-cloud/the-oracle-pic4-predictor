@@ -42,9 +42,8 @@ export default function HomePage() {
                     transition={{ delay: 0.2 }}
                     className="mb-6"
                   >
-                    <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight flex items-baseline justify-center">
-                      <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">Welcome</span>
-                      <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-300 text-3xl md:text-4xl animate-pulse drop-shadow-[0_0_15px_rgba(96,165,250,0.8)] ml-1 inline-block scale-y-125 origin-bottom">!</span>
+                    <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                      Welcome<span className="text-blue-400 ml-1">!</span>
                     </h2>
                     <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-white to-red-600 mx-auto mt-6 rounded-none opacity-80"></div>
                   </motion.div>

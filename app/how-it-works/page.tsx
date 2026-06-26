@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { BrainCircuit, LayoutGrid, History, Database, ShieldCheck, Target, AlertTriangle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
-import { PUBLIC_THE_ORACLE_2_IMAGE, WINDOW_OUTER_SHELL } from '@/lib/constants';
+import { PUBLIC_THE_ORACLE_2_IMAGE, WINDOW_OUTER_SHELL, PANEL_EDGE_GLOW, WINDOW_PANEL_OUTER, WINDOW_PANEL_INNER } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
@@ -59,18 +59,15 @@ export default function HowItWorksPage() {
       <div className="max-w-3xl mx-auto px-2 md:px-6 w-full">
         <div className="relative group">
           {/* Ambient Glows */}
-          <div className="absolute -inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
+          <div className={PANEL_EDGE_GLOW}></div>
           
-          {/* Red Outer Border - Standard Size Window */}
           <div
             className={cn(
-              'relative overflow-hidden rounded-none bg-slate-900/20 p-2 backdrop-blur-sm',
+              WINDOW_PANEL_OUTER,
               WINDOW_OUTER_SHELL
             )}
           >
-            
-            {/* Main Content Box — one gutter matches methodology panel below */}
-            <div className="relative rounded-none bg-slate-950/40 px-5 pb-5 pt-8 backdrop-blur-xl md:px-8 md:pb-6">
+            <div className={cn(WINDOW_PANEL_INNER, 'px-5 pb-5 pt-8 md:px-8 md:pb-6')}>
               <div className="mb-6 h-0.5 w-full rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80"></div>
               <div className="mb-8 text-center">
                 <h1 className="mb-3 text-2xl font-bold tracking-normal text-white md:text-3xl">
@@ -125,7 +122,7 @@ export default function HowItWorksPage() {
             </div>
 
             {/* Methodology — same horizontal padding + unified body scale */}
-            <div className="relative mb-4 overflow-hidden rounded-none border border-white/5 bg-slate-950/40 px-5 pb-2 pt-5 md:px-8 md:pb-3 md:pt-6">
+            <div className="relative mb-4 overflow-hidden rounded-none border border-white/5 bg-slate-950/95 px-5 pb-2 pt-5 md:px-8 md:pb-3 md:pt-6">
               <div className="pointer-events-none absolute top-0 right-0 h-96 w-96 rounded-none bg-blue-600/5 blur-[120px]"></div>
               <div className="relative z-10 flex flex-col">
                 {/* The Oracle-2 */}
@@ -173,7 +170,7 @@ export default function HowItWorksPage() {
 
                 <MethodologyStripe />
 
-                <div className="space-y-6 rounded-none border border-white/10 bg-slate-900/40 p-6 md:p-7">
+                <div className="space-y-6 rounded-none border border-white/10 bg-slate-900/95 p-6 md:p-7">
                   <h3 className="flex flex-col items-center gap-2 text-lg font-semibold tracking-normal text-white sm:flex-row sm:gap-4 md:text-xl md:justify-start">
                     <span className="shrink-0 font-bold text-blue-500 tabular-nums">03.</span>
                     Understanding the Grid Pattern Engine
@@ -184,7 +181,7 @@ export default function HowItWorksPage() {
                   </p>
 
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
-                    <div className="flex min-h-[11rem] flex-col gap-3 rounded-none border border-white/10 bg-slate-900/65 p-5 backdrop-blur-sm">
+                    <div className="flex min-h-[11rem] flex-col gap-3 rounded-none border border-white/10 bg-slate-950/95 p-5">
                       <div className="flex h-8 w-8 items-center justify-center rounded-none border border-red-500/30 bg-red-600/20">
                         <div className="h-2 w-2 animate-pulse rounded-none bg-red-500"></div>
                       </div>
@@ -193,7 +190,7 @@ export default function HowItWorksPage() {
                         Each day the anchor pairs move up one step like a clock — for example <span className="font-semibold text-red-500">Red: 0–5</span> with <span className="font-semibold text-blue-500">Blue: 1–6</span>, then the next day <span className="font-semibold text-red-500">Red: 1–6</span> and <span className="font-semibold text-blue-500">Blue: 2–7</span>.
                       </p>
                     </div>
-                    <div className="flex min-h-[11rem] flex-col gap-3 rounded-none border border-white/10 bg-slate-900/65 p-5 backdrop-blur-sm">
+                    <div className="flex min-h-[11rem] flex-col gap-3 rounded-none border border-white/10 bg-slate-950/95 p-5">
                       <div className="flex h-8 w-8 items-center justify-center rounded-none border border-amber-500/30 bg-amber-500/20">
                         <LayoutGrid size={14} className="text-amber-500" />
                       </div>
@@ -202,7 +199,7 @@ export default function HowItWorksPage() {
                         Numbers spread across <strong className="font-semibold text-white">32 grids</strong>, tied to dates and cycles so patterns recur in a calendar-like rhythm.
                       </p>
                     </div>
-                    <div className="flex min-h-[11rem] flex-col gap-3 rounded-none border border-white/10 bg-slate-900/65 p-5 backdrop-blur-sm">
+                    <div className="flex min-h-[11rem] flex-col gap-3 rounded-none border border-white/10 bg-slate-950/95 p-5">
                       <div className="flex h-8 w-8 items-center justify-center rounded-none border border-blue-500/30 bg-blue-600/20">
                         <Target size={14} className="text-blue-400" />
                       </div>

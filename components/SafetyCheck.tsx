@@ -47,7 +47,7 @@ export default function SafetyCheck() {
   const allClear = Object.values(checks).every(c => c.status === 'ready');
 
   return (
-    <div className="bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-none p-4 shadow-2xl relative overflow-hidden group">
+    <div className="bg-slate-900/95 border border-white/5 rounded-none p-4 shadow-2xl relative overflow-hidden group">
       {/* Background patterns */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-none -mr-16 -mt-16"></div>
       

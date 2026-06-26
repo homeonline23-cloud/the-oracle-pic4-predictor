@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function CheckEmailPage() {
   return (
     <div className="flex flex-col items-center justify-start px-6 py-10 relative overflow-hidden">
-      <div className="w-full max-w-md bg-slate-900/60 backdrop-blur-xl p-8 md:p-10 rounded-none border border-white/10 text-center shadow-2xl">
+      <div className="w-full max-w-md bg-slate-900/95 p-8 md:p-10 rounded-none border border-white/10 text-center shadow-2xl">
         <div className="w-20 h-20 bg-blue-600/20 rounded-none flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(37,99,235,0.2)]">
           <Mail className="w-10 h-10 text-blue-500 animate-bounce" />
         </div>

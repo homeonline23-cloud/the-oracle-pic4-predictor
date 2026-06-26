@@ -41,7 +41,7 @@ export default function PricingPage() {
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-1 bg-gradient-to-r from-red-600 via-white to-blue-600 bg-clip-text text-2xl font-bold leading-tight tracking-normal text-transparent md:text-3xl"
+            className="mb-1 text-2xl font-bold leading-tight tracking-normal text-white md:text-3xl"
           >
             Choose Your Advantage
           </motion.h1>
@@ -58,7 +58,7 @@ export default function PricingPage() {
         <div id="pricing-plans" className="w-full max-w-3xl px-2 md:px-6">
           <div
             className={cn(
-              'relative rounded-none bg-[#29465B] p-2 backdrop-blur-md md:p-4',
+              'relative rounded-none bg-[#29465B] p-2 md:p-4',
               WINDOW_OUTER_SHELL
             )}
           >
@@ -66,7 +66,7 @@ export default function PricingPage() {
               {/* Standard Plan */}
               <div className="relative group/plan">
                 <div className="absolute -inset-0.5 rounded-none bg-gradient-to-r from-blue-600 to-cyan-500 opacity-40 blur transition duration-1000 group-hover/plan:opacity-70"></div>
-                <div className="relative flex h-full flex-col space-y-2 rounded-none border border-white/20 bg-[#00004d]/40 p-4 pb-6 backdrop-blur-xl md:p-5 md:pb-7">
+                <div className="relative flex h-full flex-col space-y-2 rounded-none border border-white/20 bg-[#00004d]/93 p-4 pb-6 md:p-5 md:pb-7">
                   <div className="absolute -top-2 left-3 rounded-none bg-gradient-to-r from-blue-600 to-cyan-500 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white shadow-lg md:text-xs">
                     Standard
                   </div>
@@ -97,7 +97,7 @@ export default function PricingPage() {
               {/* Advanced Plan */}
               <div className="relative group/plan">
                 <div className="absolute -inset-0.5 rounded-none bg-gradient-to-r from-red-600 to-purple-600 opacity-40 blur transition duration-1000 group-hover/plan:opacity-70"></div>
-                <div className="relative flex h-full flex-col space-y-2 rounded-none border border-white/20 bg-[#00004d]/40 p-4 pb-6 backdrop-blur-xl md:p-5 md:pb-7">
+                <div className="relative flex h-full flex-col space-y-2 rounded-none border border-white/20 bg-[#00004d]/93 p-4 pb-6 md:p-5 md:pb-7">
                   <div className="absolute -top-2 left-3 rounded-none bg-gradient-to-r from-red-600 to-purple-600 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white shadow-lg md:text-xs">
                     Advanced
                   </div>
@@ -125,7 +125,7 @@ export default function PricingPage() {
               {/* Best Value Plan */}
               <div className="relative group/plan">
                 <div className="absolute -inset-0.5 rounded-none bg-gradient-to-r from-amber-500 to-yellow-600 opacity-40 blur transition duration-1000 group-hover/plan:opacity-70"></div>
-                <div className="relative flex h-full flex-col space-y-2 rounded-none border border-blue-500/50 bg-[#00004d]/40 p-4 pb-6 backdrop-blur-xl md:p-5 md:pb-7">
+                <div className="relative flex h-full flex-col space-y-2 rounded-none border border-blue-500/50 bg-[#00004d]/93 p-4 pb-6 md:p-5 md:pb-7">
                   <div className="absolute -top-2 left-3 rounded-none bg-gradient-to-r from-amber-500 to-yellow-600 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white shadow-lg md:text-xs">
                     Best Value
                   </div>
@@ -165,7 +165,7 @@ export default function PricingPage() {
             </div>
             <div
               className={cn(
-                'mt-2 rounded-none bg-[#29465B] p-4 backdrop-blur-md transition-all hover:scale-[1.02] md:p-5',
+                'mt-2 rounded-none bg-[#29465B] p-4 transition-all hover:scale-[1.02] md:p-5',
                 WINDOW_OUTER_SHELL
               )}
             >

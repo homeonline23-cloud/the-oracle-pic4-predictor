@@ -32,7 +32,7 @@ export default function Grid({ title, gridValues, redNums, blueNums, markedCells
               {(value !== null || markClass) && (
                 <div className={`
                   w-7 h-7 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all
-                  ${!markClass ? 'bg-white/50' : ''}
+                  ${!markClass ? 'bg-slate-900/950' : ''}
                   ${isRed ? 'border-[3px] sm:border-4 border-red-600 shadow-[0_0_15px_rgba(220,38,38,0.6)] scale-110 z-10' : ''}
                   ${isBlue ? 'border-[3px] sm:border-4 border-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.6)] scale-110 z-10' : ''}
                 `}>

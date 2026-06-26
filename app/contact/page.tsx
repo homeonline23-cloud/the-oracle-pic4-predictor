@@ -43,7 +43,7 @@ export default function ContactPage() {
           {/* Contact Form Window */}
           <div
             className={cn(
-              'rounded-none bg-[#29465B] p-6 backdrop-blur-md md:p-8',
+              'rounded-none bg-[#29465B] p-6 md:p-8',
               WINDOW_OUTER_SHELL
             )}
           >
@@ -75,7 +75,7 @@ export default function ContactPage() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full rounded-none border border-white/20 bg-slate-900/60 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded-none border border-white/20 bg-slate-900/95 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="Your name"
                   />
                 </div>
@@ -87,7 +87,7 @@ export default function ContactPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-none border border-white/20 bg-slate-900/60 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded-none border border-white/20 bg-slate-900/95 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -98,7 +98,7 @@ export default function ContactPage() {
                     type="text"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full rounded-none border border-white/20 bg-slate-900/60 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded-none border border-white/20 bg-slate-900/95 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="Subject (optional)"
                   />
                 </div>
@@ -110,7 +110,7 @@ export default function ContactPage() {
                     rows={5}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="w-full resize-none rounded-none border border-white/20 bg-slate-900/60 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full resize-none rounded-none border border-white/20 bg-slate-900/95 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="Write your message here..."
                   />
                 </div>

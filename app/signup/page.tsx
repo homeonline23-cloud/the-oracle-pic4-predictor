@@ -65,7 +65,7 @@ export default function SignupPage() {
       <motion.div 
         initial={{ opacity: 1, scale: 1 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md bg-slate-900/60 backdrop-blur-xl p-6 md:p-8 rounded-none border border-white/10 shadow-2xl"
+        className="w-full max-w-md bg-slate-900/95 p-6 md:p-8 rounded-none border border-white/10 shadow-2xl"
       >
         <div className="text-center mb-8">
           <h1 className="text-xl md:text-3xl font-bold text-white italic tracking-normal flex flex-col md:flex-row gap-2 justify-center items-center">

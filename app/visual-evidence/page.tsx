@@ -79,7 +79,7 @@ function EvidenceGridCard({
         )}
       </div>
       <div
-        className={`absolute top-3 left-3 px-2 py-0.5 bg-black/40 backdrop-blur-md border border-white/10 rounded-none text-[8px] font-bold text-slate-500 tracking-normal group-hover:${color.text} transition-colors flex items-center gap-1.5`}
+        className={`absolute top-3 left-3 px-2 py-0.5 bg-black/40 border border-white/10 rounded-none text-[8px] font-bold text-slate-500 tracking-normal group-hover:${color.text} transition-colors flex items-center gap-1.5`}
       >
         <span>{label}</span>
       </div>
@@ -118,13 +118,13 @@ export default function EvidencePage() {
           {/* Red Outer Border - Standard Size Window */}
           <div
             className={cn(
-              'relative min-h-0 rounded-none bg-slate-900/20 p-1 backdrop-blur-sm md:p-2',
+              'relative min-h-0 rounded-none bg-slate-900/95 p-1 md:p-2',
               WINDOW_OUTER_SHELL_RESPONSIVE
             )}
           >
             
             {/* Content Box with Scroll */}
-            <div className="relative min-h-0 overflow-y-auto rounded-none bg-slate-950/40 p-4 pb-6 backdrop-blur-xl custom-scrollbar md:p-8 md:pb-8">
+            <div className="relative min-h-0 overflow-y-auto rounded-none bg-slate-950/95 p-4 pb-6 custom-scrollbar md:p-8 md:pb-8">
 
               {/* Header — title + tagline above the blue-white-red stripe */}
               <div className="mb-10 flex flex-col items-center">
@@ -226,7 +226,7 @@ export default function EvidencePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl"
+            className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90"
             onClick={() => setSelectedImg(null)}
           >
             <motion.div 

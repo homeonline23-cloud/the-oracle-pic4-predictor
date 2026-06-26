@@ -180,7 +180,7 @@ export default function Navbar() {
           <>
             <button
               type="button"
-              className="fixed left-0 right-0 bottom-0 top-[4.75rem] z-[185] bg-slate-950/70 backdrop-blur-sm sm:top-[5rem] md:hidden"
+              className="fixed left-0 right-0 bottom-0 top-[4.75rem] z-[185] bg-slate-950/70 sm:top-[5rem] md:hidden"
               aria-label="Close menu"
               onClick={closeMobile}
             />
@@ -189,7 +189,7 @@ export default function Navbar() {
               role="dialog"
               aria-modal="true"
               aria-label="Mobile menu"
-              className="fixed left-0 right-0 bottom-0 z-[186] top-[4.75rem] sm:top-[5rem] md:hidden flex flex-col gap-1.5 overflow-y-auto border border-white/10 border-t-0 bg-slate-900/97 p-3 pb-8 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl"
+              className="fixed left-0 right-0 bottom-0 z-[186] top-[4.75rem] sm:top-[5rem] md:hidden flex flex-col gap-1.5 overflow-y-auto border border-white/10 border-t-0 bg-slate-900/97 p-3 pb-8 shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
             >
               {navLinks.map(({ href, label }) => (
                 <Link

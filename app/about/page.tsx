@@ -10,6 +10,9 @@ import {
   PUBLIC_THE_SYSTEM_ROBOT_IMAGE,
   PUBLIC_THE_ORACLE_1_IMAGE,
   WINDOW_OUTER_SHELL,
+  PANEL_EDGE_GLOW,
+  WINDOW_PANEL_OUTER,
+  WINDOW_PANEL_INNER,
 } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
@@ -61,22 +64,19 @@ export default function AboutPage() {
         <div className="relative">
           <div className="relative group">
             {/* Outer Glow / Blur */}
-            <div className="absolute -inset-10 bg-gradient-to-r from-blue-600/20 via-white/5 to-red-600/20 rounded-none blur-[100px] opacity-40 group-hover:opacity-80 transition duration-1000"></div>
+            <div className={PANEL_EDGE_GLOW}></div>
             
-            {/* Red Border Layer / Outer Window */}
             <div
               className={cn(
-                'relative overflow-hidden rounded-none bg-slate-900/20 p-2 backdrop-blur-sm',
+                WINDOW_PANEL_OUTER,
                 WINDOW_OUTER_SHELL
               )}
             >
-              
-              {/* Content Box — single symmetric gutter so every inner panel lines up */}
-              <div className="relative bg-slate-950/40 px-5 py-8 backdrop-blur-xl md:px-8 rounded-none">
+              <div className={cn(WINDOW_PANEL_INNER, 'px-5 py-8 md:px-8')}>
                 <div className="flex flex-col">
                   {/* System architecture heading — above robot image only */}
                   <div className="w-full text-center">
-                    <h3 className="mb-4 bg-gradient-to-r from-red-600 via-white to-blue-600 bg-clip-text text-base font-bold leading-relaxed tracking-normal text-transparent drop-shadow-sm md:text-xl">
+                    <h3 className="mb-4 text-base font-bold leading-relaxed tracking-normal text-white md:text-xl">
                       The System Architecture
                     </h3>
                     <div className="mb-4 h-0.5 w-full rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)] md:mb-5" />
@@ -96,7 +96,7 @@ export default function AboutPage() {
                   <SectionStripe />
 
                   {/* Core Analytics Engine — blue window (below robot image) */}
-                  <div className="relative overflow-hidden rounded-none border border-blue-500/20 bg-[#00004d]/50 p-6 backdrop-blur-sm md:p-8">
+                  <div className="relative overflow-hidden rounded-none border border-blue-500/20 bg-[#00004d]/93 p-6 md:p-8">
                     <div className="absolute top-0 right-0 h-64 w-64 rounded-none bg-blue-600/10 blur-[100px]"></div>
                     <div className="relative z-10 text-center">
                       <h3 className="mb-4 text-lg font-bold tracking-normal text-white">
@@ -136,7 +136,7 @@ export default function AboutPage() {
                       {featureCards.slice(0, 2).map((item) => (
                         <div
                           key={item.title}
-                          className="group/card flex h-full min-h-[9.5rem] flex-col rounded-none border border-blue-500/20 bg-[#00004d]/60 p-6 transition-all backdrop-blur-sm hover:border-blue-500/40 hover:bg-[#00004d]/80 md:p-7"
+                          className="group/card flex h-full min-h-[9.5rem] flex-col rounded-none border border-blue-500/20 bg-[#00004d]/93 p-6 transition-all hover:border-blue-500/40 hover:bg-[#00004d]/80 md:p-7"
                         >
                           <div className="mb-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-none border border-white/5 bg-slate-900 transition-all group-hover/card:scale-110 group-hover/card:border-white/10">
                             <div className="scale-75">{item.icon}</div>
@@ -153,7 +153,7 @@ export default function AboutPage() {
                       {featureCards.slice(2).map((item) => (
                         <div
                           key={item.title}
-                          className="group/card flex h-full min-h-[9.5rem] flex-col rounded-none border border-blue-500/20 bg-[#00004d]/60 p-6 transition-all backdrop-blur-sm hover:border-blue-500/40 hover:bg-[#00004d]/80 md:p-7"
+                          className="group/card flex h-full min-h-[9.5rem] flex-col rounded-none border border-blue-500/20 bg-[#00004d]/93 p-6 transition-all hover:border-blue-500/40 hover:bg-[#00004d]/80 md:p-7"
                         >
                           <div className="mb-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-none border border-white/5 bg-slate-900 transition-all group-hover/card:scale-110 group-hover/card:border-white/10">
                             <div className="scale-75">{item.icon}</div>
@@ -170,7 +170,7 @@ export default function AboutPage() {
                   <SectionStripe />
 
                   {/* How it Works — same 01 / 02 copy as Process page */}
-                  <div className="relative overflow-hidden rounded-none border border-blue-500/20 bg-[#00004d]/50 p-6 backdrop-blur-sm md:p-8">
+                  <div className="relative overflow-hidden rounded-none border border-blue-500/20 bg-[#00004d]/93 p-6 md:p-8">
                     <div className="absolute top-0 right-0 h-64 w-64 rounded-none bg-blue-600/10 blur-[100px]" />
                     <div className="relative z-10 mx-auto max-w-2xl space-y-8 text-center">
                       <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">How it Works</h2>
@@ -200,7 +200,7 @@ export default function AboutPage() {
                   <SectionStripe />
 
                   {/* Geo Definition — aligned padding/stripe family with Core Analytics */}
-                  <div className="relative overflow-hidden rounded-none border border-blue-500/20 bg-[#00004d]/50 p-6 backdrop-blur-sm md:p-8">
+                  <div className="relative overflow-hidden rounded-none border border-blue-500/20 bg-[#00004d]/93 p-6 md:p-8">
                     <div className="absolute inset-0 bg-blue-600/5"></div>
                     <div className="relative z-10 text-center">
                       <div className="mb-4 flex items-center justify-center gap-2">

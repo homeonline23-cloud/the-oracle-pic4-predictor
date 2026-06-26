@@ -25,23 +25,23 @@ export default function HeroVideoTitleOverlay() {
             priority
           />
           <h1 className="flex flex-wrap items-baseline justify-center gap-x-1.5 md:gap-x-2.5">
-            <span className="text-2xl font-black uppercase tracking-tight text-white antialiased drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] sm:text-3xl md:text-4xl lg:text-5xl">
+            <span className="text-2xl font-black uppercase tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl [text-shadow:0_1px_0_rgba(0,0,0,0.85)]">
               THE
             </span>
-            <span className="text-2xl font-black uppercase tracking-tight text-blue-500 antialiased drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] sm:text-3xl md:text-4xl lg:text-5xl">
+            <span className="text-2xl font-black uppercase tracking-tight text-blue-500 sm:text-3xl md:text-4xl lg:text-5xl [text-shadow:0_1px_0_rgba(0,0,0,0.85)]">
               ORACLE
             </span>
-            <span className="text-2xl font-black uppercase tracking-tight text-red-500 antialiased drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] sm:text-3xl md:text-4xl lg:text-5xl">
+            <span className="text-2xl font-black uppercase tracking-tight text-red-500 sm:text-3xl md:text-4xl lg:text-5xl [text-shadow:0_1px_0_rgba(0,0,0,0.85)]">
               PIC 4
             </span>
           </h1>
         </div>
 
-        <p className="text-base font-bold italic text-white antialiased drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] md:text-2xl lg:text-3xl">
+        <p className="text-base font-bold italic text-white md:text-2xl lg:text-3xl [text-shadow:0_1px_0_rgba(0,0,0,0.85)]">
           Predictor
         </p>
 
-        <p className="flex items-center justify-center gap-2 text-sm font-bold text-white antialiased drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] md:gap-2.5 md:text-xl lg:text-2xl">
+        <p className="flex items-center justify-center gap-2 text-sm font-bold text-white md:gap-2.5 md:text-xl lg:text-2xl [text-shadow:0_1px_0_rgba(0,0,0,0.85)]">
           <span>The World</span>
           <Image
             src={PUBLIC_WORLD_GLOBE_IMAGE}
@@ -54,7 +54,7 @@ export default function HeroVideoTitleOverlay() {
           <span>Globally</span>
         </p>
 
-        <blockquote className="mt-0.5 max-w-3xl space-y-0 px-1 text-[9px] font-medium leading-[1.25] text-white antialiased drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:mt-1 sm:space-y-0.5 sm:px-2 sm:text-[11px] sm:leading-snug md:mt-2 md:text-base md:leading-relaxed lg:text-lg">
+        <blockquote className="mt-0.5 max-w-3xl space-y-0 px-1 text-[9px] font-medium leading-[1.25] text-white sm:mt-1 sm:space-y-0.5 sm:px-2 sm:text-[11px] sm:leading-snug md:mt-2 md:text-base md:leading-relaxed lg:text-lg [text-shadow:0_1px_0_rgba(0,0,0,0.9)]">
           <p>
             &ldquo;Billions of dreams, millions of plays. One{' '}
             <span className="font-bold italic text-red-500">Pic 4</span>
