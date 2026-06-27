@@ -6,7 +6,7 @@ import OracleGuardian from '@/components/OracleGuardian';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import { Analytics } from '@/components/analytics/Analytics';
-import { AdSenseScript } from '@/components/ads/AdSenseScript';
+import { ADSENSE_CLIENT_ID } from '@/lib/adsense';
 
 export const viewport = {
   width: 'device-width',
@@ -84,7 +84,13 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en">
       <head>
-        <AdSenseScript />
+        {ADSENSE_CLIENT_ID ? (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+            crossOrigin="anonymous"
+          />
+        ) : null}
       </head>
       <body className="min-h-screen w-full overflow-x-hidden overflow-y-auto font-sans text-slate-200">
         <Providers>
