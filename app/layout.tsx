@@ -6,6 +6,7 @@ import OracleGuardian from '@/components/OracleGuardian';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import { Analytics } from '@/components/analytics/Analytics';
+import { AdSenseScript } from '@/components/ads/AdSenseScript';
 
 export const viewport = {
   width: 'device-width',
@@ -82,6 +83,9 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en">
+      <head>
+        <AdSenseScript />
+      </head>
       <body className="min-h-screen w-full overflow-x-hidden overflow-y-auto font-sans text-slate-200">
         <Providers>
           <div className="relative min-h-screen w-full bg-transparent">
