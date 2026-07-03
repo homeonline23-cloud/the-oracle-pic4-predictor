@@ -20,10 +20,7 @@ import { cn } from '@/lib/utils';
 
 export default function BasicGridPage() {
   const { user } = useAuth();
-  // Basic tier shows 4 grids (2 input pairs). "4 Grids Boxes".
-  const isFourGrid = true;
-  const [input, setInput] = useState('');
-  const [demoInputs, setDemoInputs] = useState(['', '']);
+  const [pairInputs, setPairInputs] = useState(['', '']);
   const [currentTime, setCurrentTime] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [mounted, setMounted] = useState(false);
@@ -83,26 +80,17 @@ export default function BasicGridPage() {
   // ==========================================
   const path = [0, 5, 10, 15, 11, 7, 3, 2, 1, 4, 8, 12, 13, 14, 6, 9];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
-    setInput(val);
-  };
-
-  const handleDemoInputChange = (index: number, val: string) => {
+  const handlePairInputChange = (index: number, val: string) => {
     const sanitized = val.replace(/[^0-9]/g, '').slice(0, 4);
-    const next = [...demoInputs];
+    const next = [...pairInputs];
     next[index] = sanitized;
-    setDemoInputs(next);
+    setPairInputs(next);
   };
 
-  const clearInput = () => {
-    setInput('');
-  };
-
-  const clearDemoInput = (index: number) => {
-    const next = [...demoInputs];
+  const clearPairInput = (index: number) => {
+    const next = [...pairInputs];
     next[index] = '';
-    setDemoInputs(next);
+    setPairInputs(next);
   };
 
   // LOCKED FORMULA FOR ODD GRIDS (1, 3, 5, 7, 9)
@@ -153,51 +141,31 @@ export default function BasicGridPage() {
   // END OF LOCKED FORMULAS
   // ==========================================
 
-  const grid1Values = getGrid1Values(input);
-  const grid2Values = getGrid2Values(input);
+  const buildFourGridData = (ins: string[]) => ({
+    grid1: getGrid1Values(ins[0] ?? ''),
+    grid2: getGrid2Values(ins[0] ?? ''),
+    grid3: getGrid1Values(ins[1] ?? ''),
+    grid4: getGrid2Values(ins[1] ?? ''),
+  });
 
-  useGridLiveSync(
-    markedCells,
-    isFourGrid
-      ? {
-          grid1: getGrid1Values(demoInputs[0]),
-          grid2: getGrid2Values(demoInputs[0]),
-          grid3: getGrid1Values(demoInputs[1]),
-          grid4: getGrid2Values(demoInputs[1]),
-        }
-      : { grid1: grid1Values, grid2: grid2Values },
-    {
-      pageTier: 'basic',
-      inputs: isFourGrid ? demoInputs : [input],
-      selectedMarkColor,
-    },
-  );
+  const fourGridData = buildFourGridData(pairInputs);
+
+  useGridLiveSync(markedCells, fourGridData, {
+    pageTier: 'basic',
+    inputs: pairInputs,
+    selectedMarkColor,
+  });
 
   const buildGridDataForEmma = useCallback(
-    (ins: string[]): GridDataMap =>
-      isFourGrid
-        ? {
-            grid1: getGrid1Values(ins[0] ?? ''),
-            grid2: getGrid2Values(ins[0] ?? ''),
-            grid3: getGrid1Values(ins[1] ?? ''),
-            grid4: getGrid2Values(ins[1] ?? ''),
-          }
-        : {
-            grid1: getGrid1Values(ins[0] ?? ''),
-            grid2: getGrid2Values(ins[0] ?? ''),
-          },
-    [isFourGrid],
+    (ins: string[]): GridDataMap => buildFourGridData(ins),
+    [],
   );
 
   useEmmaGridCommands({
-    maxPairs: isFourGrid ? 2 : 1,
-    inputs: isFourGrid ? demoInputs : [input],
+    maxPairs: 2,
+    inputs: pairInputs,
     setInputs: (next) => {
-      if (isFourGrid) {
-        setDemoInputs([next[0] ?? '', next[1] ?? '']);
-      } else {
-        setInput(next[0] ?? '');
-      }
+      setPairInputs([next[0] ?? '', next[1] ?? '']);
     },
     markedCells,
     setMarkedCells,
@@ -209,15 +177,8 @@ export default function BasicGridPage() {
     pageTier: 'basic',
     markedCells,
     setMarkedCells,
-    gridData: isFourGrid
-      ? {
-          grid1: getGrid1Values(demoInputs[0]),
-          grid2: getGrid2Values(demoInputs[0]),
-          grid3: getGrid1Values(demoInputs[1]),
-          grid4: getGrid2Values(demoInputs[1]),
-        }
-      : { grid1: grid1Values, grid2: grid2Values },
-    inputs: isFourGrid ? demoInputs : [input],
+    gridData: fourGridData,
+    inputs: pairInputs,
     userId: user?.id,
   });
 
@@ -246,7 +207,7 @@ export default function BasicGridPage() {
   const { anchorRedTop, anchorRedBottom, anchorBlueTop, anchorBlueBottom } = anchors;
 
   return (
-    <SubscriptionGuard requiredTier="standard" allowGuestView>
+    <SubscriptionGuard requiredTier="standard">
       <main className="relative flex min-h-screen min-w-0 flex-col items-center overflow-x-hidden p-0 font-sans">
         <PageHeader />
         <div className="mb-4 md:mb-8 w-full">
@@ -296,233 +257,126 @@ export default function BasicGridPage() {
             {/* AI Predictor Section */}
             <div className="w-full max-w-2xl lg:max-w-2xl py-4 mx-auto">
               <AIPredictor
-                gridData={
-                  isFourGrid
-                    ? {
-                        grid1: getGrid1Values(demoInputs[0]),
-                        grid2: getGrid2Values(demoInputs[0]),
-                        grid3: getGrid1Values(demoInputs[1]),
-                        grid4: getGrid2Values(demoInputs[1]),
-                      }
-                    : {
-                        grid1: grid1Values,
-                        grid2: grid2Values,
-                      }
-                }
+                gridData={fourGridData}
                 markedCells={markedCells}
                 anchors={{
                   red: [anchorRedTop, anchorRedBottom],
                   blue: [anchorBlueTop, anchorBlueBottom],
                 }}
                 selectedLocation=""
-                currentInput={isFourGrid ? demoInputs[0] : input}
-                watchInputs={isFourGrid ? demoInputs : undefined}
-                maxPredictions={isFourGrid ? 4 : 2}
+                currentInput={pairInputs[0]}
+                watchInputs={pairInputs}
+                maxPredictions={4}
               />
             </div>
 
-            {isFourGrid ? (
-              <div className="flex w-full flex-col space-y-2">
-                {[0, 1].map((pairIndex) => {
-                  const gridAIndex = pairIndex * 2 + 1;
-                  const gridBIndex = pairIndex * 2 + 2;
-                  const inputVal = demoInputs[pairIndex];
-                  const gridAValues = getGrid1Values(inputVal);
-                  const gridBValues = getGrid2Values(inputVal);
+            <div className="flex w-full flex-col space-y-2">
+              {[0, 1].map((pairIndex) => {
+                const gridAIndex = pairIndex * 2 + 1;
+                const gridBIndex = pairIndex * 2 + 2;
+                const inputVal = pairInputs[pairIndex];
+                const gridAValues = getGrid1Values(inputVal);
+                const gridBValues = getGrid2Values(inputVal);
 
-                  return (
-                    <div
-                      key={pairIndex}
-                      className="flex w-full flex-col items-center space-y-1.5 border-b border-slate-100/10 pb-2 last:border-0"
-                    >
-                      <AnchorSubtractionCircles anchors={anchors} mounted={mounted} className="mb-4" />
+                return (
+                  <div
+                    key={pairIndex}
+                    className="flex w-full flex-col items-center space-y-1.5 border-b border-slate-100/10 pb-2 last:border-0"
+                  >
+                    <AnchorSubtractionCircles anchors={anchors} mounted={mounted} className="mb-4" />
 
-                      <div className="flex w-full max-w-[230px] flex-col items-center space-y-2 rounded-none border border-[#94B6C7] bg-[#94B6C7] p-2.5 shadow-md sm:max-w-[300px] md:p-4">
-                        <div className="flex flex-col items-center">
-                          <p className="mb-1 text-center text-xs font-bold tracking-normal text-slate-800 shadow-sm md:text-[15px]">
-                            Enter 4 Digits (pair {pairIndex + 1})
-                          </p>
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              value={inputVal}
-                              onChange={(e) => handleDemoInputChange(pairIndex, e.target.value)}
-                              placeholder="----"
-                              className="w-[4.75rem] rounded-none border border-slate-700 bg-slate-900 py-1.5 text-center text-base font-bold tracking-normal text-white shadow-inner transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 sm:w-24 sm:py-1.5 sm:text-xl"
+                    <div className="flex w-full max-w-[230px] flex-col items-center space-y-2 rounded-none border border-[#94B6C7] bg-[#94B6C7] p-2.5 shadow-md sm:max-w-[300px] md:p-4">
+                      <div className="flex flex-col items-center">
+                        <p className="mb-1 text-center text-xs font-bold tracking-normal text-slate-800 shadow-sm md:text-[15px]">
+                          Enter 4 Digits (pair {pairIndex + 1})
+                        </p>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={inputVal}
+                            onChange={(e) => handlePairInputChange(pairIndex, e.target.value)}
+                            placeholder="----"
+                            className="w-[4.75rem] rounded-none border border-slate-700 bg-slate-900 py-1.5 text-center text-base font-bold tracking-normal text-white shadow-inner transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 sm:w-24 sm:py-1.5 sm:text-xl"
+                          />
+                          <button
+                            onClick={() => clearPairInput(pairIndex)}
+                            className="rounded-none border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-bold tracking-normal text-slate-300 shadow-sm transition-all hover:bg-slate-700 sm:px-3 sm:text-sm"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="my-1 h-px w-full bg-slate-400/50" />
+
+                      <div className="flex flex-col items-center space-y-1.5">
+                        <span className="text-[11px] font-bold uppercase tracking-wide text-slate-800 sm:text-xs">
+                          Marking Tool
+                        </span>
+                        <div className="flex items-center justify-center gap-1 sm:gap-2">
+                          {markColors.map((color) => (
+                            <button
+                              key={color.name}
+                              onClick={() =>
+                                setSelectedMarkColor(
+                                  selectedMarkColor === color.class ? null : color.class,
+                                )
+                              }
+                              className={`
+                                h-6 w-6 transform rounded-full border-2 transition-all hover:scale-110 sm:h-7 sm:w-7
+                                ${color.class}
+                                ${selectedMarkColor === color.class ? 'scale-110 border-white ring-2 ring-blue-400 ring-offset-1' : 'border-slate-400/30'}
+                              `}
+                              title={`Mark with ${color.name}`}
                             />
-                            <button
-                              onClick={() => clearDemoInput(pairIndex)}
-                              className="rounded-none border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-bold tracking-normal text-slate-300 shadow-sm transition-all hover:bg-slate-700 sm:px-3 sm:text-sm"
-                            >
-                              Clear
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="my-1 h-px w-full bg-slate-400/50" />
-
-                        <div className="flex flex-col items-center space-y-1.5">
-                          <span className="text-[11px] font-bold uppercase tracking-wide text-slate-800 sm:text-xs">
-                            Marking Tool
-                          </span>
-                          <div className="flex items-center justify-center gap-1 sm:gap-2">
-                            {markColors.map((color) => (
-                              <button
-                                key={color.name}
-                                onClick={() =>
-                                  setSelectedMarkColor(
-                                    selectedMarkColor === color.class ? null : color.class,
-                                  )
-                                }
-                                className={`
-                                  h-6 w-6 transform rounded-full border-2 transition-all hover:scale-110 sm:h-7 sm:w-7
-                                  ${color.class}
-                                  ${selectedMarkColor === color.class ? 'scale-110 border-white ring-2 ring-blue-400 ring-offset-1' : 'border-slate-400/30'}
-                                `}
-                                title={`Mark with ${color.name}`}
-                              />
-                            ))}
-                            <button
-                              onClick={() => {
-                                setSelectedMarkColor(null);
-                                setMarkedCells({
-                                  grid1: {},
-                                  grid2: {},
-                                  grid3: {},
-                                  grid4: {},
-                                });
-                              }}
-                              className="ml-1 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-1.5 text-xs font-bold text-slate-600 shadow-sm transition-all hover:bg-red-100 hover:text-red-600 active:scale-95 sm:px-3 sm:text-sm"
-                              title="Reset All Marks"
-                            >
-                              Clear
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="relative mx-auto flex w-full max-w-2xl flex-row items-start justify-center gap-2 px-1 py-4 md:px-4 sm:gap-6">
-                        <div className="absolute left-0 right-0 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
-                        <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
-                          <Grid
-                            title={`Grid ${gridAIndex}`}
-                            gridValues={gridAValues}
-                            redNums={[anchorRedTop, anchorRedBottom]}
-                            blueNums={[anchorBlueTop, anchorBlueBottom]}
-                            markedCells={markedCells[`grid${gridAIndex}`] || {}}
-                            onCellClick={(idx) => handleCellClick(`grid${gridAIndex}`, idx)}
-                          />
-                        </div>
-                        <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
-                          <Grid
-                            title={`Grid ${gridBIndex}`}
-                            gridValues={gridBValues}
-                            redNums={[anchorRedTop, anchorRedBottom]}
-                            blueNums={[anchorBlueTop, anchorBlueBottom]}
-                            markedCells={markedCells[`grid${gridBIndex}`] || {}}
-                            onCellClick={(idx) => handleCellClick(`grid${gridBIndex}`, idx)}
-                          />
+                          ))}
+                          <button
+                            onClick={() => {
+                              setSelectedMarkColor(null);
+                              setMarkedCells({
+                                grid1: {},
+                                grid2: {},
+                                grid3: {},
+                                grid4: {},
+                              });
+                            }}
+                            className="ml-1 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-1.5 text-xs font-bold text-slate-600 shadow-sm transition-all hover:bg-red-100 hover:text-red-600 active:scale-95 sm:px-3 sm:text-sm"
+                            title="Reset All Marks"
+                          >
+                            Clear
+                          </button>
                         </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <>
-                <AnchorSubtractionCircles
-                  anchors={anchors}
-                  mounted={mounted}
-                  showLegend
-                  className="mb-1"
-                />
 
-                <div className="flex w-full max-w-[230px] flex-col items-center space-y-2 rounded-none border border-[#94B6C7] bg-[#94B6C7] p-2.5 shadow-md sm:max-w-[300px] md:p-4">
-                  <div className="flex flex-col items-center">
-                    <p className="mb-1 text-center text-xs font-bold tracking-normal text-slate-800 shadow-sm md:text-[15px]">
-                      Enter 4 Digits
-                    </p>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={input}
-                        onChange={handleInputChange}
-                        placeholder="----"
-                        className="w-[4.75rem] rounded-none border border-slate-700 bg-slate-900 py-1.5 text-center text-base font-bold tracking-normal text-white shadow-inner transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 sm:w-24 sm:py-1.5 sm:text-xl"
-                      />
-                      <button
-                        onClick={clearInput}
-                        className="rounded-none border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-bold tracking-normal text-slate-300 shadow-sm transition-all hover:bg-slate-700 sm:px-3 sm:text-sm"
-                      >
-                        Clear
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="my-1 h-px w-full bg-slate-400/50" />
-
-                  <div className="flex flex-col items-center space-y-1.5">
-                    <span className="text-[11px] font-bold uppercase tracking-wide text-slate-800 sm:text-xs">
-                      Marking Tool
-                    </span>
-                    <div className="flex items-center justify-center gap-1 sm:gap-2">
-                      {markColors.map((color) => (
-                        <button
-                          key={color.name}
-                          onClick={() =>
-                            setSelectedMarkColor(
-                              selectedMarkColor === color.class ? null : color.class,
-                            )
-                          }
-                          className={`
-                            h-6 w-6 transform rounded-full border-2 transition-all hover:scale-110 sm:h-7 sm:w-7
-                            ${color.class}
-                            ${selectedMarkColor === color.class ? 'scale-110 border-white ring-2 ring-blue-400 ring-offset-1' : 'border-slate-400/30'}
-                          `}
-                          title={`Mark with ${color.name}`}
+                    <div className="relative mx-auto flex w-full max-w-2xl flex-row items-start justify-center gap-2 px-1 py-4 md:px-4 sm:gap-6">
+                      <div className="absolute left-0 right-0 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
+                      <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
+                        <Grid
+                          title={`Grid ${gridAIndex}`}
+                          gridValues={gridAValues}
+                          redNums={[anchorRedTop, anchorRedBottom]}
+                          blueNums={[anchorBlueTop, anchorBlueBottom]}
+                          markedCells={markedCells[`grid${gridAIndex}`] || {}}
+                          onCellClick={(idx) => handleCellClick(`grid${gridAIndex}`, idx)}
                         />
-                      ))}
-                      <button
-                        onClick={() => {
-                          setSelectedMarkColor(null);
-                          setMarkedCells({ grid1: {}, grid2: {}, grid3: {}, grid4: {} });
-                        }}
-                        className="ml-1 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-1.5 text-xs font-bold text-slate-600 shadow-sm transition-all hover:bg-red-100 hover:text-red-600 active:scale-95 sm:px-3 sm:text-sm"
-                        title="Reset Marks"
-                      >
-                        Clear
-                      </button>
+                      </div>
+                      <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
+                        <Grid
+                          title={`Grid ${gridBIndex}`}
+                          gridValues={gridBValues}
+                          redNums={[anchorRedTop, anchorRedBottom]}
+                          blueNums={[anchorBlueTop, anchorBlueBottom]}
+                          markedCells={markedCells[`grid${gridBIndex}`] || {}}
+                          onCellClick={(idx) => handleCellClick(`grid${gridBIndex}`, idx)}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="relative mx-auto flex min-h-[200px] w-full max-w-2xl flex-row items-start justify-center gap-2 px-1 py-4 md:px-4 sm:gap-6">
-                  <div className="absolute left-0 right-0 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-none bg-gradient-to-r from-blue-600 via-white to-red-600 opacity-80 shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
-                  <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
-                    <Grid
-                      title="Grid 1"
-                      gridValues={grid1Values}
-                      redNums={[anchorRedTop, anchorRedBottom]}
-                      blueNums={[anchorBlueTop, anchorBlueBottom]}
-                      markedCells={markedCells.grid1}
-                      onCellClick={(idx) => handleCellClick('grid1', idx)}
-                    />
-                  </div>
-                  <div className="relative z-10 max-w-[200px] flex-1 sm:max-w-[240px]">
-                    <Grid
-                      title="Grid 2"
-                      gridValues={grid2Values}
-                      redNums={[anchorRedTop, anchorRedBottom]}
-                      blueNums={[anchorBlueTop, anchorBlueBottom]}
-                      markedCells={markedCells.grid2}
-                      onCellClick={(idx) => handleCellClick('grid2', idx)}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
