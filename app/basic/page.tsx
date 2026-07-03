@@ -266,7 +266,7 @@ export default function BasicGridPage() {
                 selectedLocation=""
                 currentInput={pairInputs[0]}
                 watchInputs={pairInputs}
-                maxPredictions={4}
+                maxPredictions={2}
               />
             </div>
 

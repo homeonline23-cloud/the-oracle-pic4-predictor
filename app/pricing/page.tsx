@@ -81,7 +81,7 @@ export default function PricingPage() {
                   <ul className="mb-3 flex-grow space-y-1.5 text-[11px] leading-relaxed text-slate-200 md:text-xs">
                     <li className="flex items-start gap-2">
                       <span className="font-bold text-blue-400">*</span>
-                      4 AI Predictions
+                      2 AI Predictions
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="font-bold text-blue-400">*</span>
