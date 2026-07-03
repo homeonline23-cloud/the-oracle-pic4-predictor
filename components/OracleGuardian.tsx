@@ -108,7 +108,7 @@ function buildGridConnectionBlock(pathname: string): string {
   if (!onBasic && !onPremium && !onYearly) {
     return `\n\nPAGE / GRID CONTEXT: Current path is "${pathname}". User is not on Basic, Premium, or Yearly grid screens — explain Oracle Pic4 grids in general if asked. Universal anchors remain RED digits ${anchorRedTop}, ${anchorRedBottom} and BLUE digits ${anchorBlueTop}, ${anchorBlueBottom}.`;
   }
-  const label = onBasic ? 'Basic (2 grids)' : onPremium ? 'Premium (10 grids)' : 'Yearly (20 grids)';
+  const label = onBasic ? 'Basic (4 grids)' : onPremium ? 'Premium (10 grids)' : 'Yearly (20 grids)';
   return `\n\nLIVE GRID CONNECTION (this chat is synced to the open page):\n- Path: ${pathname} — ${label}.\n- RED ring: any cell showing digit ${anchorRedTop} or ${anchorRedBottom} (left circle, red border).\n- BLUE ring: any cell showing digit ${anchorBlueTop} or ${anchorBlueBottom} (right circle, blue border).\n- Same logic on every grid on this route. Marking-tool colors (yellow, turquoise, orange, purple) are manual marks on top of cells — use all of this when guiding or teaching patterns.`;
 }
 
@@ -127,7 +127,7 @@ function buildOracleTeachingIntroReply(pathname: string): string {
     : pathname.startsWith('/premium')
       ? 'Premium (10 grids)'
       : pathname.startsWith('/basic')
-        ? 'Basic (2 grids)'
+        ? 'Basic (4 grids)'
         : 'this page';
   return (
     `Master of the Grids — Emma is listening. Training Mode is on and I see ${page}. ` +

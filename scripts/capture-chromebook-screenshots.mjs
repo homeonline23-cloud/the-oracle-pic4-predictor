@@ -134,7 +134,7 @@ try {
   outputs.push(
     await capture(page, 'screen-shot-homepage-1920.png', `${siteBase}/`, {
       scrollY: 0,
-      waitForText: '2 Grids Boxes',
+      waitForText: '4 Grids Boxes',
       homepage: true,
     }),
   );

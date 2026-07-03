@@ -9,7 +9,6 @@ import SubscriptionGuard from '@/components/SubscriptionGuard';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
 import { useAuth } from '@/hooks/useAuth';
-import { isGrid2DemoEmail } from '@/lib/demoAuth';
 import { getSubtractCircleAnchors } from '@/lib/subtractCircles';
 import { useAnchorClockTick, useSyncGridDateAtMidnight } from '@/hooks/useAnchorClockTick';
 import { useGridLiveSync } from '@/hooks/useGridLiveSync';
@@ -21,7 +20,8 @@ import { cn } from '@/lib/utils';
 
 export default function BasicGridPage() {
   const { user } = useAuth();
-  const isTesterDemo = isGrid2DemoEmail(user?.email);
+  // Basic tier shows 4 grids (2 input pairs). "4 Grids Boxes".
+  const isFourGrid = true;
   const [input, setInput] = useState('');
   const [demoInputs, setDemoInputs] = useState(['', '']);
   const [currentTime, setCurrentTime] = useState(() => new Date());
@@ -158,7 +158,7 @@ export default function BasicGridPage() {
 
   useGridLiveSync(
     markedCells,
-    isTesterDemo
+    isFourGrid
       ? {
           grid1: getGrid1Values(demoInputs[0]),
           grid2: getGrid2Values(demoInputs[0]),
@@ -168,14 +168,14 @@ export default function BasicGridPage() {
       : { grid1: grid1Values, grid2: grid2Values },
     {
       pageTier: 'basic',
-      inputs: isTesterDemo ? demoInputs : [input],
+      inputs: isFourGrid ? demoInputs : [input],
       selectedMarkColor,
     },
   );
 
   const buildGridDataForEmma = useCallback(
     (ins: string[]): GridDataMap =>
-      isTesterDemo
+      isFourGrid
         ? {
             grid1: getGrid1Values(ins[0] ?? ''),
             grid2: getGrid2Values(ins[0] ?? ''),
@@ -186,14 +186,14 @@ export default function BasicGridPage() {
             grid1: getGrid1Values(ins[0] ?? ''),
             grid2: getGrid2Values(ins[0] ?? ''),
           },
-    [isTesterDemo],
+    [isFourGrid],
   );
 
   useEmmaGridCommands({
-    maxPairs: isTesterDemo ? 2 : 1,
-    inputs: isTesterDemo ? demoInputs : [input],
+    maxPairs: isFourGrid ? 2 : 1,
+    inputs: isFourGrid ? demoInputs : [input],
     setInputs: (next) => {
-      if (isTesterDemo) {
+      if (isFourGrid) {
         setDemoInputs([next[0] ?? '', next[1] ?? '']);
       } else {
         setInput(next[0] ?? '');
@@ -209,7 +209,7 @@ export default function BasicGridPage() {
     pageTier: 'basic',
     markedCells,
     setMarkedCells,
-    gridData: isTesterDemo
+    gridData: isFourGrid
       ? {
           grid1: getGrid1Values(demoInputs[0]),
           grid2: getGrid2Values(demoInputs[0]),
@@ -217,7 +217,7 @@ export default function BasicGridPage() {
           grid4: getGrid2Values(demoInputs[1]),
         }
       : { grid1: grid1Values, grid2: grid2Values },
-    inputs: isTesterDemo ? demoInputs : [input],
+    inputs: isFourGrid ? demoInputs : [input],
     userId: user?.id,
   });
 
@@ -297,7 +297,7 @@ export default function BasicGridPage() {
             <div className="w-full max-w-2xl lg:max-w-2xl py-4 mx-auto">
               <AIPredictor
                 gridData={
-                  isTesterDemo
+                  isFourGrid
                     ? {
                         grid1: getGrid1Values(demoInputs[0]),
                         grid2: getGrid2Values(demoInputs[0]),
@@ -315,13 +315,13 @@ export default function BasicGridPage() {
                   blue: [anchorBlueTop, anchorBlueBottom],
                 }}
                 selectedLocation=""
-                currentInput={isTesterDemo ? demoInputs[0] : input}
-                watchInputs={isTesterDemo ? demoInputs : undefined}
-                maxPredictions={isTesterDemo ? 4 : 2}
+                currentInput={isFourGrid ? demoInputs[0] : input}
+                watchInputs={isFourGrid ? demoInputs : undefined}
+                maxPredictions={isFourGrid ? 4 : 2}
               />
             </div>
 
-            {isTesterDemo ? (
+            {isFourGrid ? (
               <div className="flex w-full flex-col space-y-2">
                 {[0, 1].map((pairIndex) => {
                   const gridAIndex = pairIndex * 2 + 1;
