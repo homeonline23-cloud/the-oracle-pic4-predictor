@@ -8,7 +8,6 @@ import { motion } from 'motion/react';
 import { useAuth } from '@/hooks/useAuth';
 import PageHeader from '@/components/PageHeader';
 import GridButtons from '@/components/GridButtons';
-import { GRID2_DEMO_PATH } from '@/lib/demoAuth';
 import { redirectToWwwIfNeeded } from '@/lib/appOrigin';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -74,9 +73,7 @@ function LoginContent() {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Sign-in failed';
       if (/invalid login credentials/i.test(message)) {
-        setError(
-          'Wrong email or password. Testers: use the one-tap link at /demo/grid2 instead of typing here.',
-        );
+        setError('Wrong email or password. Please try again.');
       } else {
         setError(message);
       }
@@ -136,19 +133,6 @@ function LoginContent() {
             {success}
           </motion.div>
         )}
-
-        <div className="mb-6 rounded-none border border-emerald-500/30 bg-emerald-950/20 px-4 py-3 text-left">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-300">
-            Fiverr / tester access
-          </p>
-          <p className="mt-1 text-[11px] leading-relaxed text-emerald-100/90">
-            Do not create an account. Open{' '}
-            <Link href={GRID2_DEMO_PATH} className="font-bold text-emerald-300 underline">
-              the 4-grid demo page
-            </Link>{' '}
-            and tap <strong>Start 4-grid tester demo</strong> — one tap, no typing.
-          </p>
-        </div>
 
         <button
           type="button"
